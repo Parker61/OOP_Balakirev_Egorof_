@@ -1,6 +1,7 @@
 
 
-################################  1.3 Классы и объекты. Атрибуты классов и объектов // Egorof ///
+################################  1.3 Классы и объекты. Атрибуты классов и объектов / Egorof /
+
 
 class Goods: 
     title = "Мороженое"
@@ -199,6 +200,19 @@ tb2 = TravelBlog('Италия', 5)
 # color: 'blue'
 # Удалите из экземпляра класса свойство color и выведите на экран список всех локальных свойств (без значений) объекта
 # fig1 в одну строчку через пробел в порядке, указанном в задании.#
+class Figure:
+    type_fig = 'ellipse'
+    color = 'red'
+
+
+fig1 = Figure()
+fig1.start_pt = (10, 5)
+fig1.end_pt = (100, 20)
+fig1.color = 'blue'
+
+del fig1.color
+print(*fig1.__dict__)
+################################
 class Figure:
     type_fig = 'ellipse'
     color = 'red'
@@ -741,23 +755,207 @@ print(p1.is_adult())  # выводит "True"
 # то он по умолчанию принимает значение black.Создайте тысячу таких объектов с координатами (1, 1), (3, 3),
 # (5, 5), ... то есть, с увеличением на два для каждой новой точки. Каждый объект следует поместить в список
 # points (по порядку). Для второго объекта в списке points укажите
+# список points должен находится вне объявленного класса и должен содержать не значение переменных
+# [[1, 1, 'black], [3, 3, 'yellow'], [5, 5, 'black'], ............],а ссылку на создаваемый экземпляр
+# [<__main__.Point object at 0x7f4c8218ca60>, <__main__.Point object at 0x7f4c821c1ca0>,
+# Грубо говоря мы добавляем в список объявленный класс со значениями.!!!
+class Point:
 
+    def __init__(self, x, y, color='black'):
+        self.x = x
+        self.y = y
+        self.color = color
+
+
+points = [Point(i, i) for i in range(1, 2000, 2)]
+points[1].color = 'yellow'
+################################
+class Point:
+
+    def __init__(self, x, y, color='black'):
+        self.x = x
+        self.y = y
+        self.color = color
+
+points = []
+for i in range(1, 2000, 2):
+    if i >= 3:
+        points.append(Point(i, i, color='yellow'))
+    else:
+        points.append(Point(i, i))
+################################
+points = [Point(i, i) if i < 3 else Point(i, i, color='yellow') for i in range(1, 2000, 2)]
+################################################################ несовсем по заданию
+class Point:
+
+    def __init__(self, x, y, color='black'):
+        self.x = x
+        self.y = y
+        self.color = color
+        self.points = [(self.x, self.y, self.color)]
+
+    def set_points(self):
+        self.x += 2
+        self.y += 2
+        self.color = 'yellow'
+        self.points.append((self.x, self.y, self.color))
+
+pt = Point(1, 1)
+for i in range(999):
+    pt.set_points()
+print(pt.__dict__['points']) #[(1, 1, 'black'), (3, 3, 'yellow'), (5, 5, 'yellow'), (7, 7, 'yellow'),
 #######################################################################
+class Point:
+
+    def __init__(self, x, y, color='black'):
+        self.x = x
+        self.y = y
+        self.color = color
+points = []
+pt = Point(1, 1)
+points.append((pt.x, pt.y, pt.color))
+for i in range(2, 2000, 2):
+    points.append((pt.x + i, pt.y + i, 'yellow'))
+print(points[:10]) #[(1, 1, 'black'), (3, 3, 'yellow'), (5, 5, 'yellow')
+########################################################################
+class Point:
+    points = []
+
+    def __init__(self, x, y, color='black'):
+        self.x = x
+        self.y = y
+        self.color = color
+
+pt = Point(1, 1)
+
+Point.points.append((pt.x, pt.y, pt.color))
+
+for i in range(2, 2000, 2):
+    Point.points.append((pt.x + i, pt.y + i, 'yellow'))
+print(Point.points[:10])  # [(1, 1, 'black'), (3, 3, 'yellow'), (5, 5, 'yellow')
+########################################################################
+#Подвиг 4. Объявите три класса геометрических фигур: Line, Rect, Ellipse. Должна быть возможность создавать объекты
+# Здесь в качестве аргументов a, b, c, d передаются координаты верхнего правого и нижнего левого углов (произвольные
+# числа). В каждом объекте координаты должны сохраняться в локальных свойствах sp (верхний правый угол) и ep (нижний
+# левый) в виде кортежей (a, b) и (c, d) соответственно.Сформируйте 217 объектов этих классов: для каждого текущего
+# объекта класс выбирается случайно (или Line, или Rect, или Ellipse). Координаты также генерируются случайным
+# образом (числовые значения). Все объекты сохраните в списке elements.В списке elements обнулите координаты объектов
+# только для класса Line.
+
+from random import randint as r_int, choice as r_choice
+
+
+class Line:
+    def __init__(self, a, b, c, d):
+        self.sp = (a, b)
+        self.ep = (c, d)
+
+
+class Rect:
+    def __init__(self, a, b, c, d):
+        self.sp = (a, b)
+        self.ep = (c, d)
+
+
+class Ellipse:
+    def __init__(self, a, b, c, d):
+        self.sp = (a, b)
+        self.ep = (c, d)
+
+
+elements = []
+# elements.append(Line(0,0,0,0))
+for i in range(217):
+    a, b, c, d = r_int(1, 10), r_int(1, 10), r_int(1, 10), r_int(1, 10)
+    elements.append(r_choice([Line, Rect, Ellipse])(a, b, c, d))
+
+for i in elements:
+    if isinstance(i, Line):
+        # if type(i) == Line:
+        i.sp = i.ep = (0, 0)
+        # Line.sp = Line.ep = (0, 0) #так не работает
 
 ########################################################################
+#Подвиг 5. Объявите класс TriangleChecker, объекты которого можно было бы создавать командой:
+# tr = TriangleChecker(a, b, c)
+# Здесь a, b, c - длины сторон треугольника.# В классе TriangleChecker необходимо объявить метод is_triangle(),
+# который бы возвращал следующие коды:1 - если хотя бы одна сторона не число (не float или int) или хотя бы одно
+# число меньше или равно нулю;2 - указанные числа a, b, c не могут являться длинами сторон треугольника;3 - стороны
+# a, b, c образуют треугольник.Проверку параметров a, b, c проводить именно в таком порядке.Прочитайте из входного
+# потока строку, содержащую три числа, разделенных пробелами, командой:
+# a, b, c = map(int, input().split())Затем, создайте объект tr класса TriangleChecker и передайте ему прочитанные
+# значения a, b, c. Вызовите метод is_triangle() из объекта tr и выведите результат на экран (код, который она вернет).
+class TriangleChecker:
+    def __init__(self, a, b, c):
+        self.a = a
+        self.b = b
+        self.c = c
+
+    def is_triangle(self):
+        if type(self.a) not in (int, float) or type(self.b) not in (int, float) or type(self.c) not in (
+                int, float) or self.a <= 0 or self.b <= 0 or self.c <= 0:
+            return 1
+        elif self.a + self.b < self.c or self.b + self.c < self.a or self.a + self.c < self.b:
+            return 2
+        else:
+            return 3
+
+tr = TriangleChecker(3, 4, 5)
+print(tr.is_triangle())
 
 ########################################################################
-
+def is_triangle(self):
+    if not all(map(lambda x: type(x) in (int, float), [self.a, self.b, self.c])):
+        return 1
+    if not all(type(i) in (int, float) for i in [self.a, self.b, self.c]):
+    # if not all(map(lambda x: x > 0, [self.a, self.b, self.c])):
+    # if not all(type(i) in (int, float) and i > 0 for i in [self.a, self.b, self.c]):
+        return 1
+    lst = sorted([self.a, self.b, self.c])
+    if lst[0] + lst[1] < lst[2]:
+        return 2
+    return 3
 ########################################################################
+class TriangleChecker:
+    def __init__(self, a, b, c):
+        self.lst = [a, b, c]
 
+    def is_triangle(self):
+        for num in self.lst:
+            if not isinstance(num, int) or num <= 0:
+                return 1
+        if max(self.lst) >= sum(self.lst) - max(self.lst):
+            return 2
+        return 3
+
+
+a, b, c = map(int, input().split())
+tr = TriangleChecker(a, b, c)
+print(tr.is_triangle())
 ########################################################################
+class TriangleChecker:
+    def __init__(self, a, b, c):
+        self.s = [a, b, c]
 
+    def is_triangle(self):
+        if min(self.s) <= 0:
+            return 1
+        if max(self.s) * 2 >= sum(self.s):
+            return 2
+        return 3
 ########################################################################
+class TriangleChecker:
+    def __init__(self, *args):
+        self.args = args
 
-########################################################################
-
-########################################################################
-
+    def is_triangle(self):
+        if not all(type(i) in (int, float) and i > 0 for i in self.args):
+        # if any(type(i) in (int, float) and i <= 0 for i in self.args):
+            return 1
+        abc = sorted(self.args)
+        if sum(abc[:2]) <= abc[-1]:
+            return 2
+        return 3
 ########################################################################
 
 ########################################################################
