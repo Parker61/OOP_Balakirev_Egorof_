@@ -907,8 +907,8 @@ print(tr.is_triangle())
 def is_triangle(self):
     if not all(map(lambda x: type(x) in (int, float), [self.a, self.b, self.c])):
         return 1
-    if not all(type(i) in (int, float) for i in [self.a, self.b, self.c]):
-    # if not all(map(lambda x: x > 0, [self.a, self.b, self.c])):
+    # if not all(type(i) in (int, float) for i in [self.a, self.b, self.c]):
+    if not all(map(lambda x: x > 0, [self.a, self.b, self.c])):
     # if not all(type(i) in (int, float) and i > 0 for i in [self.a, self.b, self.c]):
         return 1
     lst = sorted([self.a, self.b, self.c])
@@ -918,7 +918,7 @@ def is_triangle(self):
 ########################################################################
 class TriangleChecker:
     def __init__(self, a, b, c):
-        self.lst = [a, b, c]
+        self.lst = [a, b, c] ## []
 
     def is_triangle(self):
         for num in self.lst:
@@ -952,17 +952,126 @@ class TriangleChecker:
         if not all(type(i) in (int, float) and i > 0 for i in self.args):
         # if any(type(i) in (int, float) and i <= 0 for i in self.args):
             return 1
-        abc = sorted(self.args)
-        if sum(abc[:2]) <= abc[-1]:
+        a = sorted(self.args)
+        if sum(a[:2]) <= a[-1]:
             return 2
         return 3
 ########################################################################
+    def is_triangle(self):
+        # print(self.__dict__.values())  # dict_values([3, 4, 5])
+        lst = self.__dict__.values()
+        for i in lst:
+            if not isinstance(i, (int, float)) or i <= 0:
+                return 1
 
+        a, b, c = sorted(lst)  # 3 4 5
+        if c >= a + b:
+            return 2
+        return 3
 ########################################################################
+#Подвиг 6. Объявите класс Graph, объекты которого можно было бы создавать с помощью команды:
+# data - ссылка на список из числовых данных (у каждого объекта должен быть свой список с данными, нужно создавать
+# копию переданного списка);
+# is_show - булево значение (True/False) для показа (True) и сокрытия (False) данных графика (по умолчанию True);
+# В этом классе объявите следующие методы:
+# set_data(self, data) - для передачи нового списка данных в текущий график;
+# show_table(self) - для отображения данных в виде строки из списка чисел (числа следуют через пробел);
+# show_graph(self) - для отображения данных в виде графика (метод выводит в консоль сообщение: "Графическое ...
+# show_bar(self) - для отображения данных в виде столбчатой диаграммы (метод выводит в консоль сообщение: "Столбчатая..
+# set_show(self, fl_show) - метод для изменения локального свойства is_show на переданное значение fl_show.
+# Если локальное свойство is_show равно False, то методы show_table(), show_graph() и show_bar() должны выводить
+# сообщение:"Отображение данных закрыто"Прочитайте из входного потока числовые данные с помощью команды:
+# Создайте объект gr класса Graph с набором прочитанных данных, вызовите метод show_bar(), затем метод set_show()
+# со значением fl_show = False и вызовите метод show_table(). На экране должны отобразиться две соответствующие строки.
+class Graph:
+    def __init__(self, data, is_show=True):
+        self.data = data[:]
+        # self.data = data.copy()
+        self.is_show = is_show
 
-########################################################################
+    def set_data(self, data):
+        self.data = data[:]
+        # self.data = data.copy()
 
+    def show_table(self):
+        if self.is_show == False:
+            self.closed_get()
+        else:
+            print(*self.data)
+
+    def closed_get(self):
+        print(f'Отображение данных закрыто')
+
+    def show_graph(self):
+        if self.is_show == False:
+            self.closed_get()
+        else:
+            print('Графическое отображение данных:', *self.data)
+
+    def show_bar(self):
+        if self.is_show == False:
+            self.closed_get()
+        else:
+            print('Столбчатая диаграмма:', *self.data)
+
+    def set_show(self, fl_show):
+        self.is_show = fl_show
+
+
+data_graph = list(map(int, input().split()))
+gr = Graph(data_graph)
+gr.show_bar()
+gr.set_show(fl_show=False)
+gr.show_table()
 ########################################################################
+class Graph:
+    def __init__(self, data):
+        self.data = data
+        self.is_show = True
+
+    def check_show(func):
+        def wrapper(self):
+            if self.is_show == False:
+                return print('Отображение данных закрыто')
+            else:
+                return func(self)
+
+        return wrapper
+
+    def set_data(self, data):
+        self.data = data
+
+    @check_show
+    def show_table(self):
+        return ' '.join(map(str, self.data))
+
+    @check_show
+    def show_graph(self):
+        print(f"Графическое отображение данных: {self.show_table()}")
+
+    @check_show
+    def show_bar(self):
+        print(f'Столбчатая диаграмма: {self.show_table()}')
+
+    def set_show(self, fl_show):
+        self.is_show = fl_show
+########################################################################
+#Подвиг 7. Объявите в программе следующие несколько классов:CPU - класс для описания процессоров;Memory - класс для
+# описания памяти;MotherBoard - класс для описания материнских плат.Обеспечить возможность создания объектов
+# каждого класса командами:cpu = CPU(наименование, тактовая частота)mem = Memory(наименование, размер памяти)
+# mb = MotherBoard(наименование, процессор, память1, память2, ..., памятьN)Обратите внимание при создании объекта
+# класса MotherBoard можно передавать несколько объектов класса Memory, максимум N - по числу слотов памяти на
+# материнской плате (N = 4).Объекты классов должны иметь следующие локальные свойства:для класса CPU: name -
+# наименование; fr - тактовая частота;для класса Memory: name - наименование; volume - объем памяти;
+# для класса MotherBoard: name - наименование; cpu - ссылка на объект класса CPU; total_mem_slots = 4 - общее число
+# лотов памяти (атрибут прописывается с этим значением и не меняется); mem_slots - список из объектов класса
+# Memory (максимум total_mem_slots = 4 штук по максимальному числу слотов памяти).Класс MotherBoard должен иметь
+# метод get_config(self) для возвращения текущей конфигурации компонентов на материнской плате в виде следующего
+# списка из четырех строк:['Материнская плата: <наименование>','Центральный процессор: <наименование>,
+# <тактовая частота>','Слотов памяти: <общее число слотов памяти>','Память: <наименование_1> - <объем_1>;
+# <наименование_2> - <объем_2>; ...; <наименование_N> - <объем_N>']Создайте объект mb класса MotherBoard с
+# одним CPU (объект класса CPU) и двумя слотами памяти (объекты класса Memory).
+
 
 ########################################################################
 
