@@ -1,9 +1,7 @@
-
-
 ################################  1.3 Классы и объекты. Атрибуты классов и объектов / Egorof /
 
 
-class Goods: 
+class Goods:
     title = "Мороженое"
     weight = 154
     tp = "Еда"
@@ -212,6 +210,8 @@ fig1.color = 'blue'
 
 del fig1.color
 print(*fig1.__dict__)
+
+
 ################################
 class Figure:
     type_fig = 'ellipse'
@@ -271,20 +271,22 @@ print('job' in p1.__dict__)
 # При этом, на экране должно отобразиться две строки (без кавычек):
 # "Воспроизведение filemedia1" "Воспроизведение filemedia2"
 class MediaPlayer:
-    def open(self,file):
-        self.filename=file
+    def open(self, file):
+        self.filename = file
 
     def play(self):
         print(f'Воспроизведение {self.filename}')
 
 
-media1=MediaPlayer()
-media2=MediaPlayer()
+media1 = MediaPlayer()
+media2 = MediaPlayer()
 media1.open('filemedia1')
 media2.open('filemedia2')
 
 media1.play()
 media2.play()
+
+
 ########################################################################  Egorof
 # В предыдущей задачи вы могли обратить внимание на то, что выводится всегда одно и тоже имя робота
 # в методе say_hello . Давайте это исправим при помощи атрибута экземпляра name . Для этого
@@ -314,9 +316,11 @@ c3po.set_name('R2D2')
 c3po.say_hello()  # печатает Hello, human! My name is R2D2
 c3po.say_bye()  # печатает See u later alligator
 
+
 ########################################################################
 class Robot:
     name = None
+
     def say_hello(self):
         if self.name:
             print(f'Hello, human! My name is {self.name}')
@@ -328,8 +332,10 @@ class Robot:
 
     def set_name(self, name):
         self.name = name
+
+
 ########################################################################
-#Создайте класс Counter, экземпляры которого будут подсчитывать внутри себя значения.В классе Counter нужно определить
+# Создайте класс Counter, экземпляры которого будут подсчитывать внутри себя значения.В классе Counter нужно определить
 # метод start_from, который принимает один необязательный аргумент - значение, с которого начинается подсчет, по
 # умолчанию равно 0Также нужно создать метод increment, который увеличивает счетчик на 1.Затем необходимо создать
 # метод display, который печатает фразу "Текущее значение счетчика = <value>" и метод reset,  который обнуляет
@@ -365,6 +371,8 @@ c2.start_from(3)
 c2.display()  # печатает "Текущее значение счетчика = 3"
 c2.increment()
 c2.display()  # печатает "Текущее значение счетчика = 4"
+
+
 ########################################################################
 # Создайте класс Constructor, в котором реализованы
 # метод add_atribute , принимающий на вход название атрибута в виде строки и его значение. При помощи
@@ -372,8 +380,9 @@ c2.display()  # печатает "Текущее значение счетчик
 # метод display ,  печатающий на экран словарь __dict__ у ЭК
 class Constructor:
     def add_attribute(self, attribute, value):
-        setattr(self, attribute, value) #Функция полезна в динамическом программировании, где имя атрибута не
+        setattr(self, attribute, value)  # Функция полезна в динамическом программировании, где имя атрибута не
         # статично. В этом случае мы не можем использовать оператор точки.
+
     # def add_attribute(self, *args):
     #     setattr(self, *args)
 
@@ -391,6 +400,8 @@ obj2 = Constructor()
 obj2.display()  # печатает {}
 obj2.add_attribute('height', 100)
 obj2.display()  # печатает {'height': 100}
+
+
 ########################################################################
 class Constructor:
     def add_atribute(self, name, value):
@@ -398,8 +409,10 @@ class Constructor:
 
     def display(self):
         print(self.__dict__)
+
+
 ########################################################################
-#Создайте класс Point. У этого класса должны быть
+# Создайте класс Point. У этого класса должны быть
 # метод set_coordinates, который принимает координаты по x и по y, и сохраняет их в экземпляр класса соответственн
 # о в атрибуты x и y метод get_distance, который обязательно принимает экземпляр класса Point и возвращает расстояние
 # между двумя точками по теореме Пифагора. В случае, если в данный метод передается не экземпляр класса Point
@@ -410,12 +423,13 @@ class Point:
         self.x = x
         self.y = y
 
-    def get_distance(self,object):
+    def get_distance(self, object):
         # if isinstance(self.x, Point) and isinstance(self.y, Point):
         if isinstance(object, Point):
-            return ((self.x - object.x)**2 + (self.y - object.y)**2)**0.5
+            return ((self.x - object.x) ** 2 + (self.y - object.y) ** 2) ** 0.5
         else:
             print(f'Передана не точка')
+
 
 p1 = Point()
 p2 = Point()
@@ -423,6 +437,8 @@ p1.set_coordinates(1, 2)
 p2.set_coordinates(4, 6)
 d = p1.get_distance(p2)  # вернёт 5.0
 p1.get_distance(10)  # Распечатает "Передана не точка"
+
+
 ########################################################################
 def get_distance(self, obj: 'Point'):
     """Метод принимает объект и возвращает расстояние между
@@ -431,15 +447,19 @@ def get_distance(self, obj: 'Point'):
         return ((self.x - obj.x) ** 2 + (self.y - obj.y) ** 2) ** 0.5
     except AttributeError:
         print('Передана не точка')
+    ########################################################################
+    # Функция hasattr() проверяет существование атрибута с именем name в объекте object.
+
+
+def get_distance(self, t):
+    if hasattr(t, 'x') and hasattr(t, 'y'):
+        return ((self.x - t.x) ** 2 + (self.y - t.y) ** 2) ** 0.5
+    else:
+        print('Передана не точка')
+
+
 ########################################################################
-#Функция hasattr() проверяет существование атрибута с именем name в объекте object.
-   def get_distance(self,t):
-        if hasattr(t,'x') and hasattr(t,'y'):
-            return ((self.x-t.x)**2+(self.y-t.y)**2)**0.5
-        else:
-            print('Передана не точка')
-########################################################################
-#Подвиг 5. Объявите класс с именем Graph и методами:
+# Подвиг 5. Объявите класс с именем Graph и методами:
 # set_data(data) - передача набора данных data для последующего отображения (data - список числовых данных);
 # draw() - отображение данных (в том же порядке, что и в списке data)и атрибутом:LIMIT_Y = [0, 10]
 # Метод set_data() должен формировать локальное свойство data объекта класса Graph. Атрибут data должен ссылаться на
@@ -450,6 +470,7 @@ def get_distance(self, obj: 'Point'):
 # чисел, записанных через пробел. Например (вывод без кавычек):"10 0 2 5 7"
 class Graph:
     LIMIT_Y = [0, 10]
+
     def set_data(self, data):
         self.data = data
 
@@ -462,17 +483,22 @@ class Graph:
 graph_1 = Graph()
 graph_1.set_data([10, -5, 100, 20, 0, 80, 45, 2, 5, 7])
 graph_1.draw()
+
+
 ########################################################################
 def draw(self):
     print(*(filter(lambda x: self.LIMIT_Y[0] <= x <= self.LIMIT_Y[-1], self.data)))
     print(' '.join(map(str, filter(lambda x: self.LIMIT_Y[0] <= x <= self.LIMIT_Y[-1], self.data))))
-########################################################################
+
+    ########################################################################
     def draw(self):
-        a,b=self.LIMIT_Y
+        a, b = self.LIMIT_Y
         print(*(filter(lambda x: a <= x <= b, self.data)))
+
+
 ########################################################################
-#Подвиг 7. Имеется следующий класс для считывания информации из входного потока:
-#Которым, затем, можно воспользоваться следующим образом:
+# Подвиг 7. Имеется следующий класс для считывания информации из входного потока:
+# Которым, затем, можно воспользоваться следующим образом:
 # sr = StreamReader()
 # data, result = sr.readlines()
 # Необходимо перед классом StreamReader объявить еще один класс StreamData с методом:
@@ -482,12 +508,12 @@ def draw(self):
 # именами полей из fields и соответствующими значениями из lst_values.Если создание локальных свойств проходит
 # успешно, то метод create() возвращает True, иначе - False. Если число полей и число строк не совпадает,
 # то метод create() возвращает False и локальные атрибуты создавать не нужно.
-#понимания учащимися разницы между локальными атрибутами и атрибутами классов
+# понимания учащимися разницы между локальными атрибутами и атрибутами классов
 class StreamData:
     def create(self, fields, lst_values):
         if len(fields) == len(lst_values):
             for key, value in zip(fields, lst_values):
-            # for key, value in dict(zip(fields, lst_values)).items():
+                # for key, value in dict(zip(fields, lst_values)).items():
                 if setattr(self, key, value):
                     continue
                 else:
@@ -513,6 +539,8 @@ data, result = sr.readlines()
 
 print(data, result)  # <__main__.StreamData object at 0x000002C5BE85F410> True
 print(data.__dict__)  # {'id': 10, 'title': 'Питон - основы мастерства', 'pages': 512}
+
+
 # вывод списка атрибутов объекта data
 # для этого и нужно делать проверку "print(data.__dict__)". Чтобы убедиться что в экземпляре класса появились все
 # атрибуты со значениями.(data.__dict__ --> не должен быть пустым, а содержать как написано в условии <<локальные
@@ -528,10 +556,13 @@ class StreamData:
         for i, k in enumerate(fields):
             setattr(self, k, lst_values[i])
         return True
-########################################################################
+
+    ########################################################################
     def create(self, fields, lst_values):
         self.__dict__ = dict(zip(fields, lst_values))
         return len(lst_values) == len(fields)
+
+
 ########################################################################
 class StreamData:
 
@@ -543,29 +574,35 @@ class StreamData:
                 # не дойдёт до последнего значения
             return True
         return False
+
+
 ########################################################################
 class StreamData:
     def create(self, fields, lst_values):
         if len(fields) == len(lst_values):
             self.__dict__.update(dict(zip(fields, lst_values)))
         return bool(self.__dict__)
+
+
 ########################################################################
-class StreamData:   # здесь объявляется класс StreamData
+class StreamData:  # здесь объявляется класс StreamData
     def create(self, fields, lst_values):
         if len(fields) != len(lst_values):  # Если кол-во элементов fields и lst_values не равны то return False и
-            return False                    # локальные свойства не создадутся
+            return False  # локальные свойства не создадутся
         else:
             self.__dict__ = dict(zip(fields, lst_values))  # локальные свойства экз-ра класса будут создоваться
-                                                           # из эл-тов fields и lst_values и устан. в  self.__dict__
+            # из эл-тов fields и lst_values и устан. в  self.__dict__
             return True  # возвращает True
+
+
 ########################################################################
-#Подвиг 9. Из входного потока читаются строки данных с помощью команды:
+# Подвиг 9. Из входного потока читаются строки данных с помощью команды:
 # lst_in = list(map(str.strip, sys.stdin.readlines()))  # считывание списка строк из входного потока
 # в формате: id, name, old, salary (записанные через пробел). Например:
 # 1 Сергей 35 1200002 Федор 23 120003 Иван 13 1200...То есть, каждая строка - это элемент списка lst_in.
 # Необходимо в класс DataBase:
-    # class DataBase:
-    # lst_data = []
+# class DataBase:
+# lst_data = []
 # FIELDS = ('id', 'name', 'old', 'salary')
 # добавить два метода:select(self, a, b) - возвращает список из элементов списка lst_data в диапазоне [a; b]
 # (включительно) по их индексам (не id, а индексам списка); также учесть, что граница b может превышать
@@ -573,6 +610,7 @@ class StreamData:   # здесь объявляется класс StreamData
 # строк data;
 # lst_in = list(map(str.strip, sys.stdin.readlines()))  # считывание списка строк из входного потока
 lst_in = ['1 Сергей 35 120000', '2 Федор 23 12000', '3 Иван 13 1200']
+
 
 class DataBase:
     lst_data = []
@@ -585,6 +623,7 @@ class DataBase:
         for i in data:
             self.lst_data.append(dict(zip(self.FIELDS, i.split())))
 
+
 db = DataBase()
 db.insert(lst_in)
 db.select(0, 50)
@@ -592,7 +631,7 @@ db.select(0, 50)
 print(DataBase.lst_data)
 print(DataBase.__dict__)
 ########################################################################
-#Подвиг 10. Объявите класс с именем Translator (для перевода с английского на русский) со следующими методами:
+# Подвиг 10. Объявите класс с именем Translator (для перевода с английского на русский) со следующими методами:
 # add(self, eng, rus) - для добавления новой связки английского и русского слова (если английское слово уже
 # существует, то новое русское слово добавляется как синоним для перевода, например, go - идти, ходить, ехать);
 # если связка eng-rus уже существует, то второй раз ее добавлять не нужно, например:  add('go', 'идти'),
@@ -609,6 +648,7 @@ print(DataBase.__dict__)
 # lst_in = list(map(str.strip, sys.stdin.readlines()))
 lst_in = ['tree - дерево', 'car - машина', 'car - автомобиль', 'leaf - лист', 'river - река', 'go - идти', 'go - ехать',
           'go - ходить', 'milk - молоко']
+
 
 class Translator:
 
@@ -641,23 +681,29 @@ tr.add("milk", "молоко")
 
 tr.remove('car')
 print(tr.translate('go'))
+
+
 ########################################################################
-########################################################################
-    def add(self, eng, rus):
-        if 'd' not in self.__dict__:
-            self.d = {}
-        if eng not in self.d:
-            self.d[eng] = [rus]
-        else:
-            self.d[eng].append(rus)
-            # self.d[eng] += [rus]
 ########################################################################
 def add(self, eng, rus):
     if 'd' not in self.__dict__:
         self.d = {}
-    self.d.setdefault(eng, []).append(rus) # но здесь перезапись кода
+    if eng not in self.d:
+        self.d[eng] = [rus]
+    else:
+        self.d[eng].append(rus)
+        # self.d[eng] += [rus]
+
+
 ########################################################################
-#2.2 Инициализация объекта. Метод init  Egorof
+def add(self, eng, rus):
+    if 'd' not in self.__dict__:
+        self.d = {}
+    self.d.setdefault(eng, []).append(rus)  # но здесь перезапись кода
+
+
+########################################################################
+# 2.2 Инициализация объекта. Метод init  Egorof
 ########################################################################
 class Laptop:
     def __init__(self, brand, model, price):
@@ -665,8 +711,9 @@ class Laptop:
         self.price = price
         self.model = model
         # self.laptop_name = brand + ' ' + model
-        self.laptop_name=self.brand+" "+self.model
-        #self.laptop_name = f'{brand} {model}'
+        self.laptop_name = self.brand + " " + self.model
+        # self.laptop_name = f'{brand} {model}'
+
 
 #
 # hp = Laptop('hp', '15-bw0xx', 57000)
@@ -674,6 +721,8 @@ class Laptop:
 # print(hp.laptop_name)  # выводит "hp 15-bw0xx"
 laptop1 = Laptop('lenovo', 'z-570-dx', 10)
 laptop2 = Laptop('lenovo', 'z-570-dx', 20)
+
+
 ########################################################################
 class SoccerPlayer:
     def __init__(self, name, surname):
@@ -683,13 +732,14 @@ class SoccerPlayer:
         self.assists = 0
 
     def score(self, count=1):
-        self.goals+=count
+        self.goals += count
 
     def make_assist(self, count=1):
         self.assists += count
 
     def statistics(self):
         print(f'{self.surname} {self.name} - голы: {self.goals}, передачи: {self.assists}')
+
 
 leo = SoccerPlayer('Leo', 'Messi')
 leo.score(700)
@@ -699,6 +749,8 @@ leo.statistics()  # выводит "Messi Leo - голы: 700, передачи:
 kokorin = SoccerPlayer('Alex', 'Kokorin')
 kokorin.score()
 kokorin.statistics()  # выводит "Kokorin Alex - голы: 1, передачи: 0"
+
+
 ########################################################################
 class Zebra:
     def __init__(self):
@@ -721,12 +773,18 @@ z1.which_stripe()  # печатает "Полоска белая"
 
 z2 = Zebra()
 z2.which_stripe()  # печатает "Полоска белая"
+
+
 ########################################################################
 def __init__(self):
     self.stripe = ["Полоска белая", "Полоска черная"]
+
+
 def which_stripe(self):
     print(self.pr[0])
     self.pr[0], self.pr[1] = self.pr[1], self.pr[0]
+
+
 ########################################################################
 class Person:
     def __init__(self, first_name, last_name, age):
@@ -740,15 +798,18 @@ class Person:
     def is_adult(self):
         return True if self.age >= 18 else False
 
+
 p1 = Person('Jimi', 'Hendrix', 55)
 print(p1.full_name())  # выводит "Hendrix Jimi"
 print(p1.is_adult())  # выводит "True"
+
+
 ########################################################################
 
 ########################################################################
 ##########      1.5 Инициализатор __init__ и финализатор __del__
 ########################################################################
-#Подвиг 3. Объявите класс Point так, чтобы объекты этого класса можно было создавать командами:
+# Подвиг 3. Объявите класс Point так, чтобы объекты этого класса можно было создавать командами:
 # p1 = Point(10, 20)
 # p2 = Point(12, 5, 'red')Здесь первые два значения - это координаты точки на плоскости (локальные свойства x,
 # y), а третий необязательный аргумент - цвет точки (локальное свойство color). Если цвет не указывается,
@@ -769,6 +830,8 @@ class Point:
 
 points = [Point(i, i) for i in range(1, 2000, 2)]
 points[1].color = 'yellow'
+
+
 ################################
 class Point:
 
@@ -776,6 +839,7 @@ class Point:
         self.x = x
         self.y = y
         self.color = color
+
 
 points = []
 for i in range(1, 2000, 2):
@@ -785,6 +849,8 @@ for i in range(1, 2000, 2):
         points.append(Point(i, i))
 ################################
 points = [Point(i, i) if i < 3 else Point(i, i, color='yellow') for i in range(1, 2000, 2)]
+
+
 ################################################################ несовсем по заданию
 class Point:
 
@@ -800,10 +866,13 @@ class Point:
         self.color = 'yellow'
         self.points.append((self.x, self.y, self.color))
 
+
 pt = Point(1, 1)
 for i in range(999):
     pt.set_points()
-print(pt.__dict__['points']) #[(1, 1, 'black'), (3, 3, 'yellow'), (5, 5, 'yellow'), (7, 7, 'yellow'),
+print(pt.__dict__['points'])  # [(1, 1, 'black'), (3, 3, 'yellow'), (5, 5, 'yellow'), (7, 7, 'yellow'),
+
+
 #######################################################################
 class Point:
 
@@ -811,12 +880,16 @@ class Point:
         self.x = x
         self.y = y
         self.color = color
+
+
 points = []
 pt = Point(1, 1)
 points.append((pt.x, pt.y, pt.color))
 for i in range(2, 2000, 2):
     points.append((pt.x + i, pt.y + i, 'yellow'))
-print(points[:10]) #[(1, 1, 'black'), (3, 3, 'yellow'), (5, 5, 'yellow')
+print(points[:10])  # [(1, 1, 'black'), (3, 3, 'yellow'), (5, 5, 'yellow')
+
+
 ########################################################################
 class Point:
     points = []
@@ -826,6 +899,7 @@ class Point:
         self.y = y
         self.color = color
 
+
 pt = Point(1, 1)
 
 Point.points.append((pt.x, pt.y, pt.color))
@@ -834,7 +908,7 @@ for i in range(2, 2000, 2):
     Point.points.append((pt.x + i, pt.y + i, 'yellow'))
 print(Point.points[:10])  # [(1, 1, 'black'), (3, 3, 'yellow'), (5, 5, 'yellow')
 ########################################################################
-#Подвиг 4. Объявите три класса геометрических фигур: Line, Rect, Ellipse. Должна быть возможность создавать объекты
+# Подвиг 4. Объявите три класса геометрических фигур: Line, Rect, Ellipse. Должна быть возможность создавать объекты
 # Здесь в качестве аргументов a, b, c, d передаются координаты верхнего правого и нижнего левого углов (произвольные
 # числа). В каждом объекте координаты должны сохраняться в локальных свойствах sp (верхний правый угол) и ep (нижний
 # левый) в виде кортежей (a, b) и (c, d) соответственно.Сформируйте 217 объектов этих классов: для каждого текущего
@@ -875,8 +949,9 @@ for i in elements:
         i.sp = i.ep = (0, 0)
         # Line.sp = Line.ep = (0, 0) #так не работает
 
+
 ########################################################################
-#Подвиг 5. Объявите класс TriangleChecker, объекты которого можно было бы создавать командой:
+# Подвиг 5. Объявите класс TriangleChecker, объекты которого можно было бы создавать командой:
 # tr = TriangleChecker(a, b, c)
 # Здесь a, b, c - длины сторон треугольника.# В классе TriangleChecker необходимо объявить метод is_triangle(),
 # который бы возвращал следующие коды:1 - если хотя бы одна сторона не число (не float или int) или хотя бы одно
@@ -900,8 +975,10 @@ class TriangleChecker:
         else:
             return 3
 
+
 tr = TriangleChecker(3, 4, 5)
 print(tr.is_triangle())
+
 
 ########################################################################
 def is_triangle(self):
@@ -909,16 +986,18 @@ def is_triangle(self):
         return 1
     # if not all(type(i) in (int, float) for i in [self.a, self.b, self.c]):
     if not all(map(lambda x: x > 0, [self.a, self.b, self.c])):
-    # if not all(type(i) in (int, float) and i > 0 for i in [self.a, self.b, self.c]):
+        # if not all(type(i) in (int, float) and i > 0 for i in [self.a, self.b, self.c]):
         return 1
     lst = sorted([self.a, self.b, self.c])
     if lst[0] + lst[1] < lst[2]:
         return 2
     return 3
+
+
 ########################################################################
 class TriangleChecker:
     def __init__(self, a, b, c):
-        self.lst = [a, b, c] ## []
+        self.lst = [a, b, c]  ## []
 
     def is_triangle(self):
         for num in self.lst:
@@ -932,6 +1011,8 @@ class TriangleChecker:
 a, b, c = map(int, input().split())
 tr = TriangleChecker(a, b, c)
 print(tr.is_triangle())
+
+
 ########################################################################
 class TriangleChecker:
     def __init__(self, a, b, c):
@@ -943,6 +1024,8 @@ class TriangleChecker:
         if max(self.s) * 2 >= sum(self.s):
             return 2
         return 3
+
+
 ########################################################################
 class TriangleChecker:
     def __init__(self, *args):
@@ -950,13 +1033,14 @@ class TriangleChecker:
 
     def is_triangle(self):
         if not all(type(i) in (int, float) and i > 0 for i in self.args):
-        # if any(type(i) in (int, float) and i <= 0 for i in self.args):
+            # if any(type(i) in (int, float) and i <= 0 for i in self.args):
             return 1
         a = sorted(self.args)
         if sum(a[:2]) <= a[-1]:
             return 2
         return 3
-########################################################################
+
+    ########################################################################
     def is_triangle(self):
         # print(self.__dict__.values())  # dict_values([3, 4, 5])
         lst = self.__dict__.values()
@@ -968,8 +1052,10 @@ class TriangleChecker:
         if c >= a + b:
             return 2
         return 3
+
+
 ########################################################################
-#Подвиг 6. Объявите класс Graph, объекты которого можно было бы создавать с помощью команды:
+# Подвиг 6. Объявите класс Graph, объекты которого можно было бы создавать с помощью команды:
 # data - ссылка на список из числовых данных (у каждого объекта должен быть свой список с данными, нужно создавать
 # копию переданного списка);
 # is_show - булево значение (True/False) для показа (True) и сокрытия (False) данных графика (по умолчанию True);
@@ -1023,6 +1109,8 @@ gr = Graph(data_graph)
 gr.show_bar()
 gr.set_show(fl_show=False)
 gr.show_table()
+
+
 ########################################################################
 class Graph:
     def __init__(self, data):
@@ -1055,8 +1143,10 @@ class Graph:
 
     def set_show(self, fl_show):
         self.is_show = fl_show
+
+
 ########################################################################
-#Подвиг 7. Объявите в программе следующие несколько классов:CPU - класс для описания процессоров;Memory - класс для
+# Подвиг 7. Объявите в программе следующие несколько классов:CPU - класс для описания процессоров;Memory - класс для
 # описания памяти;MotherBoard - класс для описания материнских плат.Обеспечить возможность создания объектов
 # каждого класса командами:cpu = CPU(наименование, тактовая частота)mem = Memory(наименование, размер памяти)
 # mb = MotherBoard(наименование, процессор, память1, память2, ..., памятьN)Обратите внимание при создании объекта
@@ -1071,32 +1161,413 @@ class Graph:
 # <тактовая частота>','Слотов памяти: <общее число слотов памяти>','Память: <наименование_1> - <объем_1>;
 # <наименование_2> - <объем_2>; ...; <наименование_N> - <объем_N>']Создайте объект mb класса MotherBoard с
 # одним CPU (объект класса CPU) и двумя слотами памяти (объекты класса Memory).
+class CPU:
+    def __init__(self, name: str, fr: int):
+        self.name = name  # наименование процессора
+        self.fr = fr  # тактовая частота
+
+
+class Memory:
+    def __init__(self, name: str, volume: int):
+        self.name = name  # наименование памяти
+        self.volume = volume  # объем памяти
+
+
+class MotherBoard:
+    def __init__(self, name, cpu, *mem_slots):
+        self.name = name
+        self.cpu = cpu
+        self.total_mem_slots = 4
+        self.mem_slots = mem_slots[:self.total_mem_slots]
+        # self.mem_slots = [mem for i, mem in enumerate(mem_slots) if i < self.total_mem_slots]
+
+    def get_config(self):
+        return [f'Материнская плата: {self.name}',
+                f'Центральный процессор: {self.name}, {self.CPU.fr}',
+                f'Слотов памяти: {self.total_mem_slots}',
+                'Память:' + '; '.join(map(lambda x: f'{self.Memory.name}-{self.volume}', self.mem_slots))]
+
+
+# вызов стороннего класса ч/з 2 варианта CPU {self.name}, {self.CPU.fr} и Memory {self.Memory.name}-{self.volume}
+
+mb = MotherBoard('Motherboard', CPU('intel', 1000), Memory('asrock', 1), Memory('asrock', 2))
 
 
 ########################################################################
+class MotherBoard:
+    def __init__(self, name: str, cpu_obj: CPU, mem_slots: list, total_mem_slots=4):
+        self.name = name  # наименование платы
+        self.cpu = cpu_obj  # ссылка на объект класса CPU, cpu_obj - объект класса CPU
+        self.mem_slots = mem_slots  # список из объектов класса Memory
+        self.total_mem_slots = total_mem_slots  # общее число слотов памяти
+
+        def get_config(self):
+            st_memory = []
+            for m in self.mem_slots:
+                st_memory.append(f"{m.name} - {m.volume}")
+
+            lst_config = [f"Материнская плата: {self.name}",
+                          f"Центральный процессор: {self.cpu.name}, {self.cpu.fr}",
+                          f"Слотов памяти: {self.total_mem_slots}",
+                          f"Память: {'; '.join(st_memory)}"
+                          ]
+            return lst_config
+
+    m1 = Memory("Kingstone_1", 1024)
+    m2 = Memory("Kingstone_2", 2048)
+    mb = MotherBoard(name="GIGABYTE", cpu=CPU("Pentium", 2600), mem_slots=[m1, m2])
+
 
 ########################################################################
+# Подвиг 8. Объявите в программе класс Cart (корзина), объекты которого создаются командой:cart = Cart()
+# Каждый объект класса Cart должен иметь локальное свойство goods - список объектов для покупки (объекты классов
+# Table, TV, Notebook и Cup). Изначально этот список должен быть пустым.В классе Cart объявить методы:add(self, gd)
+# - добавление в корзину товара, представленного объектом gd;remove(self, indx) - удаление из корзины товара по
+# индексу indx;get_list(self) - получение из корзины товаров в виде списка из строк:['<наименовние_1>: <цена_1>',
+# '<наименовние_2>: <цена_2>',..'<наименовние_N>: <цена_N>']Объявите в программе следующие классы для описания
+# товаров:Table - столы;TV - телевизоры;Notebook - ноутбуки;Cup - кружки.Объекты этих классов должны создаваться
+# командой:gd = ИмяКласса(name, price)Каждый объект классов товаров должен содержать локальные свойства:
+# name - наименование;price - цена.Создайте в программе объект cart класса Cart. Добавьте в него два телевизора (TV),
+# один стол (Table), два ноутбука (Notebook) и одну кружку (Cup). Названия и цены придумайте сами.
+class Cart:
+    def __init__(self):
+        self.goods = []
+
+    def add(self, gd):
+        self.goods.append(gd)
+
+    def remove(self, indx):
+        # del self.goods[indx]
+        # self.goods.remove(indx)
+        self.goods.pop(indx)
+
+    def get_list(self):
+        return [f"{obj.name}: {obj.price}" for obj in self.goods]  # ['sums: 11', 'LG: 34', 'ikea: 45'
+        # return list(map(lambda x: f'{x.name}: {x.price}', self.goods))   #['sums: 11', 'LG: 34', 'ikea: 45'
+
+
+class Table:
+    def __init__(self, name, price):
+        self.name = name
+        self.price = price
+
+
+class TV:
+    def __init__(self, name, price):
+        self.name = name
+        self.price = price
+
+
+class Notebook:
+    def __init__(self, name, price):
+        self.name = name
+        self.price = price
+
+
+class Cup:
+    def __init__(self, name, price):
+        self.name = name
+        self.price = price
+
+
+cart = Cart()
+lst = [TV("sums", 11), TV("LG", 34), Table("ikea", 45), Notebook("msi", 53), Notebook("apple", 52), Cup("keep", 43)]
+for i in lst:
+    cart.add(i)
+
+
+# tv1 = TV("samsung", 1111)
+# tv2 = TV("LG", 1234)
+# table = Table("ikea", 2345)
+# n1 = Notebook("msi", 5433)
+# n2 = Notebook("apple", 542)
+# c = Cup("keepcup", 43)
+# cart.add(tv1)
+# cart.add(tv2)
+# cart.add(table)
+# cart.add(n1)
+# cart.add(n2)
+# cart.add(c)
+
+# cart.add(TV('Samsung', 12990))
+# cart.add(TV('Sony', 39990))
+# cart.add(Table('Решка', 6350))
+# cart.add(Notebook('Acer', 35990))
+# cart.add(Notebook('Asus', 75990))
+# cart.add(Cup('Керамика', 350))
+########################################################################
+class Product:
+    def __init__(self, name, price):
+        self.name = name
+        self.price = price
+        # первый аргумент - имя класса
+        # второй - кортеж с классами, откуда наследоваться
+        # третий - словарь с атрибутами ключ-значение
+
+    def __str__(self):
+        return f'{self.name}: {self.price}'
+
+    @classmethod
+    def create(cls, product_name):
+        return type(product_name, (cls,), {})
+
+
+class Cart:
+    def __init__(self):
+        self.goods = []
+
+    def add(self, gd):
+        self.goods.append(gd)
+
+    def get_list(self):
+        return [str(gd) for gd in self.goods]
+
+    def remove(self, indx):
+        self.goods.pop(indx)
+
+
+TV = Product.create("TV")
+Table = Product.create("Table")
+Notebook = Product.create("Notebook")
+Cup = Product.create("Cup")
+
+cart = Cart()
+gd = TV("рубин", 500)
+cart.add(gd)
+gd = TV("стекло", 300)
+cart.add(gd)
+gd = Table("фанера", 1000)
+cart.add(gd)
+gd = Notebook("Эльбрус", 9000)
+cart.add(gd)
+gd = Notebook("Байкал", 8000)
+cart.add(gd)
+gd = Cup("дешёвая", 100)
+cart.add(gd)
 
 
 ########################################################################
+class Cart:
+    def __init__(self):
+        self.goods = []
 
-########################################################################
+    def add(self, gd):
+        self.goods.append(gd)
+
+    def remove(self, indx):
+        del self.goods[indx]
+
+    def get_list(self):
+        return [f"{good.name}: {good.price}" for good in self.goods]
+
+
+class Products:
+    def __init__(self, name, price):
+        self.name = name
+        self.price = price
+
+
+class Table(Products):
+    pass
+
+
+class TV(Products):
+    pass
+
+
+class Notebook(Products):
+    pass
+
+
+class Cup(Products):
+    pass
+
+
+cart = Cart()
+cart.add(TV('LG 32LP500B6LA', 750))
+cart.add(TV("Samsung UE50AU7570UXRU", 2000))
+cart.add(Table("ArtGlass", 160))
+cart.add(Notebook("ASUS TUF Gaming Dash F15 FX516PM-HN023", 6400))
+cart.add(Notebook("Lenovo Legion 5 15IMH6 (82NL0035RK)", 4000))
+cart.add(Cup("Beeztees Игрушка Рождественская кружка", 15))
+
 
 #######################################################################
+class Good:
+    def __init__(self, name, price):
+        self.name, self.price = name, price
+
+    def __str__(self):
+        return f'{self.name}: {self.price}'
+
+
+class Table(Good): pass
+
+
+class TV(Good): pass
+
+
+class Notebook(Good): pass
+
+
+class Cup(Good): pass
+
+
+class Cart:
+    goods = []
+
+    def add(self, gd):
+        self.goods.append(gd)
+
+    def remove(self, indx):
+        return self.goods.pop(indx)
+
+    def get_list(self):
+        return list(map(Good.__str__, self.goods))
+
+
+cart = Cart()
+cart.add(TV('LG', 50000))
+
 
 ########################################################################
+class Merchandise:
+    def __init__(self, name, price):
+        self.name, self.price = name, price
 
-########################################################################
+    def __str__(self):
+        return f'{self.name}: {self.price}'
 
-########################################################################
 
-########################################################################
+class Table(Merchandise): pass
 
-########################################################################
 
-########################################################################
+class TV(Merchandise): pass
 
+
+class Notebook(Merchandise): pass
+
+
+class Cup(Merchandise): pass
+
+
+class Cart:
+    def __init__(self, goods):
+        self.goods = goods
+
+    def add(self, gd):
+        self.goods.append(gd)
+
+    def remove(self, indx):
+        del self.goods[indx]
+
+    def get_list(self):
+        return list(map(str, self.goods))
+
+
+goods = [TV("samsung", 1111), TV("LG", 1234), Table("ikea", 2345),
+         Notebook("msi", 5433), Notebook("apple", 542), Cup("keepcup", 43)]
+cart = Cart(goods)
 ########################################################################
+# Подвиг 9. Вам необходимо реализовать односвязный список (не список языка Python, объекты в списке не хранить, а
+# формировать связанную структуру, показанную на рисунке) из объектов класса ListObject:Для этого объявите в программе
+# класс ListObject, объекты которого создаются командой:obj = ListObject(data) Каждый объект класса ListObject должен
+# содержать локальные свойства:next_obj - ссылка на следующий присоединенный объект (если следующего объекта нет,
+# то next_obj = None);data - данные объекта в виде строки.В самом классе ListObject должен быть объявлен метод:
+# link(self, obj) - для присоединения объекта obj такого же класса к текущему объекту self (то есть, атрибут next_obj
+# объекта self должен ссылаться на obj).Прочитайте список строк из входного потока командой:
+# lst_in = list(map(str.strip, sys.stdin.readlines()))Затем сформируйте односвязный список, в объектах которых
+# (в атрибуте data) хранятся строки из списка lst_in (первая строка в первом объекте, вторая - во втором и  т.д.).
+# На первый добавленный объект класса ListObject должна ссылаться переменная head_obj.
+# #Нужно создать экземпляры класса ListObject в количестве равном числу строк в переменной lst_in. Имя имеет только
+# первый экземпляр. Остальные существуют в виде ссылки, которая прописана в предыдущем экземпляре. Ну это если совсем
+# грубо. Получается такая конструкция, в которой к экземплярам (кроме первого) нельзя обратиться напрямую, а только
+# вызвав из предыдущего экземпляр
+
+# создать пустой список , потом циклом пройтись по lst_in и наполнить тот наш пустой список обьектами класса(то есть
+# нужно их тут создать). Далее другим циклом пройтись по этому нашему списку(в котором теперь у нас лежат наши обьекты)
+# , вызывая при этом метод link для каждого нашего обьекта( и передавая соответственно нужные ему аргументы), другими
+# словами наполняя ссылками сами обьекты: l[i].link(l[i+1]) , где l это как раз таки наш список с обьектами, но будьте
+# внимательными чтобы индекс не выходил за пределы списка, а так же, что нужно оставить последнему обьекту ссылку на
+# None(проще говоря делайте цикл на количество строк в этом списке и потом сделайте условие if i < len(l)-1: )
+import sys
+
+
+class ListObject:
+    def __init__(self, data: str):
+        self.data = data
+        self.next_obj = None
+
+    def link(self, obj):
+        self.next_obj = obj
+
+
+# lst_in = list(map(str.strip, sys.stdin.readlines()))
+
+lst_in = ['1. Первые шаги в ООП', '1.1 Как правильно проходить этот курс', '1.2 Концепция ООП простыми словами',
+          '1.3 Классы и объекты. Атрибуты классов и объектов', '1.4 Методы классов. Параметр self',
+          '1.5 Инициализатор init и финализатор del', '1.6 Магический метод new. Пример паттерна Singleton',
+          '1.7 Методы класса (classmethod) и статические методы (staticmethod)']
+lst = []
+for i in lst_in:
+    obj = ListObject(i)
+    lst.append(obj)
+
+for i in range(len(lst)):
+    if i < len(lst) - 1:
+        lst[i].link(lst[i + 1])
+
+head_obj = lst[0]
+########################################################################
+head_obj = ListObject(lst_in[0])
+obj = head_obj
+for i in range(1, len(lst_in)):  # если будет срез - то большие затраты памяти тк создаётся копия lst
+    obj_new = ListObject(lst_in[i])
+    obj.link(obj_new)  # obj_new добавляем в конец объекта obj
+    obj = obj_new
+########################################################################
+class ListObject:
+    def __init__(self, data: str):
+        self.data = data
+        self.next_obj = None
+
+    def link(self, obj):
+        self.next_obj = obj
+
+
+head_obj = ListObject(lst_in[0])
+obj = head_obj
+for i in range(1, len(lst_in)):
+    obj.link(ListObject(lst_in[i]))
+    obj = obj.next_obj
+########################################################################
+objects = [ListObject(x) for x in lst_in]
+for i in range(len(lst_in)-1):
+    objects[i].link(objects[i+1])
+
+head_obj = objects[0]
+########################################################################
+lst = [ListObject(i) for i in lst_in]
+for i in range(len(lst_in) - 1):
+    lst[i].link((lst[i + 1]))
+head_obj = lst[0]
+########################################################################
+#Большой подвиг 10. Объявите два класса:Cell - для представления клетки игрового поля;GamePole - для управления
+# игровым полем, размером N x N клеток.С помощью класса Cell предполагается создавать отдельные клетки командой:
+# c1 = Cell(around_mines, mine)Здесь around_mines - число мин вокруг данной клетки поля; mine - булева величина
+# (True/False), означающая наличие мины в текущей клетке. При этом, в каждом объекте класса Cell должны создаваться
+# локальные свойства:around_mines - число мин вокруг клетки (начальное значение 0);mine - наличие мины в текущей клетке
+# (True/False);fl_open - открыта/закрыта клетка - булево значение (True/False). Изначально все клетки закрыты (False).
+# С помощью класса GamePole должна быть возможность создавать квадратное игровое поле с числом клеток N x N:
+# pole_game = GamePole(N, M)Здесь N - размер поля; M - общее число мин на поле. При этом, каждая клетка представляется
+# объектом класса Cell и все объекты хранятся в двумерном списке N x N элементов - локальном свойстве pole объекта
+# класса GamePole.В классе GamePole должны быть также реализованы следующие методы:init() - инициализация поля с новой
+# расстановкой M мин (случайным образом по игровому полю, разумеется каждая мина должна находиться в отдельной клетке).
+# show() - отображение поля в консоли в виде таблицы чисел открытых клеток (если клетка не открыта, то отображается
+# символ #).При создании экземпляра класса GamePole в его инициализаторе следует вызывать метод init() для
+# первоначальной инициализации игрового поля.В классе GamePole могут быть и другие вспомогательные методы.Создайте
+# экземпляр pole_game класса GamePole с размером поля N = 10 и числом мин M = 12.
+
 
 ########################################################################
 
