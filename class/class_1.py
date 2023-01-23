@@ -583,7 +583,6 @@ class StreamData:
             self.__dict__.update(dict(zip(fields, lst_values)))
         return bool(self.__dict__)
 
-
 ########################################################################
 class StreamData:  # здесь объявляется класс StreamData
     def create(self, fields, lst_values):
@@ -1570,62 +1569,531 @@ head_obj = lst[0]
 
 
 ########################################################################
+#2.3 Практика "Создание класса и его методов" _____Egorof______
+class Stack:
+    def __init__(self):
+        self.values = []
 
-########################################################################
+    def push(self, item):
+        self.values.append(item) #добавляет новый элемент на вершину стека
 
-########################################################################
+    def pop(self):
+        if self.is_empty():
+            print('Empty Stack')
+        else:
+            return self.values.pop(-1) #даляет верхний элемент из стека
 
-########################################################################
+    def peek(self):
+        if self.is_empty():
+            print('Empty Stack')
+            return None
+        else:
+            return self.values[-1]
 
-########################################################################
+    def is_empty(self):
+        return not bool(self.size())
 
-########################################################################
+    def size(self):
+        return len(self.values)
 
+s = Stack()
+s.peek()  # распечатает 'Empty Stack'
+print(s.is_empty())  # распечатает True
+s.push('cat')  # кладем элемент 'cat' на вершину стека
+s.push('dog')  # кладем элемент 'dog' на вершину стека
+print(s.peek())  # распечатает 'dog'
+s.push(True)  # кладем элемент True на вершину стека
+print(s.size())  # распечатает 3
+print(s.is_empty())  # распечатает False
+s.push(777)  # кладем элемент 777 на вершину стека
+print(s.pop())  # удаляем элемент 777 с вершины стека и печатаем его
+print(s.pop())  # удаляем элемент True с вершины стека и печатаем его
+print(s.size())  # распечатает 2
 ########################################################################
+#Создайте класс Worker, у которого есть:метод __init__, принимающий 4 аргумента: имя, зарплата, пол и паспорт.
+# Необходимо сохранить их в следующих атрибутах: name, salary, gender и passport.
+# свойство get_info, которое распечатает информацию о сотруднике в следующем виде: «Worker {name}; passport-{passport}»
+# Ниже имеется список кортежей persons, содержащий информацию о десяти работниках. На основании этих данных необходимо
+# создать 10 экземпляров класса Worker и добавить их в список  worker_objects. Работников в списке следует
+# разместить в том же порядке, в каком они встречаются в списке persons.
+class Worker:
+    def __init__(self, name, salary, gender, passport):
+        self.name = name
+        self.salary = salary
+        self.gender = gender
+        self.passport = passport
 
-########################################################################
+    def get_info(self):
+        print(f'Worker {self.name}; passport-{self.passport}')
 
-########################################################################
 
+persons = [('Allison Hill', 334053, 'M', '1635644202'), ('Megan Mcclain', 191161, 'F', '2101101595'),
+           ('Brandon Hall', 731262, 'M', '6054749119'), ('Michelle Miles', 539898, 'M', '1355368461'),
+           ('Donald Booth', 895667, 'M', '7736670978'), ('Gina Moore', 900581, 'F', '7018476624'),
+           ('James Howard', 460663, 'F', '5461900982'), ('Monica Herrera', 496922, 'M', '2955495768'),
+           ('Sandra Montgomery', 479201, 'M', '5111859731'), ('Amber Perez', 403445, 'M', '0602870126')]
+worker_objects = []
+for i in range(10):
+    wk = Worker(*persons[i])
+    worker_objects.append(wk)
+    wk.get_info()
 ########################################################################
+worker_objects = []
+for i in range(10):
+    worker_objects.append(Worker(*persons[i]))
+    worker_objects[i].get_info()
+########################################################################
+class Worker:
+    def __init__(self, name, salary, gender, passport):
+        self.name = name
+        self.salary = salary
+        self.gender = gender
+        self.passport = passport
+        self.get_info() #использовать get_info при инициализации
 
-########################################################################
+    def get_info(self):
+        print(f'Worker {self.name}; passport-{self.passport}')
 
-########################################################################
 
+worker_objects = []
+[Worker(*i) for i in persons]
 ########################################################################
+#Ваша задача  создать класс CustomLabel, у которого есть:
+# метод __init__, принимающий один обязательный аргумент текст виджета, его необходимо сохранить в атрибут text.
+# И также в метод  может поступать произвольное количество именованных аргументов. Их необходимо сохранять в
+# атрибуты экземпляра под тем же названием метод config, который принимает произвольное количество именованных
+# атрибутов. Он должен создать атрибут с указанным именем или, если этот атрибут уже присутствовал в экземпляре,
+# изменить его на новое значение
+class CustomLabel:
+    def __init__(self, text, **kwargs):
+        self.text = text
+        self.config(**kwargs)
 
-########################################################################
+    def config(self, **kwargs):
+        for key in kwargs:
+            self.__dict__[key] = kwargs[key] #'bd': 100, 'bg': '#ffaaaa', 'color': 'red'
 
+label = CustomLabel(text="Hello", bd=20, bg='#ffaaaa')
+print(label.__dict__) # {'text': 'Hello', 'bd': 20, 'bg': '#ffaaaa'}
+label.config(color='red', bd=100)
+print(label.__dict__) # {'text': 'Hello', 'bd': 100, 'bg': '#ffaaaa', 'color': 'red'}
 ########################################################################
+# если значение нужно дозаписать к текущему ключу
+#ч/з добалегия в словарь списка
+class CustomLabel:
+    def __init__(self, text, **kwargs):
+        self.text = text
+        self.config(**kwargs)
+
+    def config(self, **kwargs):
+        for key in kwargs:
+            self.__dict__.setdefault(key, []).append(kwargs[key])
+########################################################################
+#ч/з добалегия в словарь множества
+class CustomLabel:
+    def __init__(self, text, **kwargs):
+        self.text = text
+        for key in kwargs:
+            self.__dict__[key] = {kwargs[key]}
+
+    def config(self, **kwargs):
+        for key in kwargs:
+            if key not in self.__dict__:
+                self.__dict__[key] = {kwargs[key]}
+            else:
+                self.__dict__[key].add(kwargs[key])
+########################################################################
+##ч/з добалегия в словарь множества
+class CustomLabel:
+    def __init__(self, text, **kwargs):
+        self.text = text
+        self.config(**kwargs)
+
+    def config(self, **kwargs):
+        for key in kwargs:
+            self.__dict__.setdefault(key, set()).add(kwargs[key])
+########################################################################
+#хороший вариант
+class CustomLabel:
+    def __init__(self, text, **kwargs):
+        self.text = text
+        self.config(**kwargs)
+
+    def config(self, **kwargs):
+        for k, v in kwargs.items():
+            setattr(self, k, v)
+########################################################################
+class CustomLabel:
+    def __init__(self, text, **kwargs):
+        self.text = text
+        self.config(**kwargs)
+
+    def config(self, **kwargs):
+        self.__dict__.update(kwargs)
+########################################################################
+#И в конце создайте класс Employee , который:имеет метод __init__, принимающий имя человека, его возраст, название
+# компании и город основания. Необходимо создать атрибут personal_data и сохранить в него экземпляр класса Person.
+# И также создать атрибут work  и сохранить в него экземпляр класса Company После этого через атрибуты personal_data
+# и work  вы можете обращаться к методам соответствующих классов Personи Company
+class Person:
+    def __init__(self, name, age):
+        self.name = name
+        self.age = age
+
+    def display_person_info(self):
+        print(f'Person: {self.name}, {self.age}')
+
+
+class Company:
+    def __init__(self, company_name, location):
+        self.company_name = company_name
+        self.location = location
+
+    def display_company_info(self):
+        print(f'Company: {self.company_name}, {self.location}')
+
+
+class Employee:
+    def __init__(self, name, age,company_name, location):
+        self.personal_data = Person(name, age)
+        self.work = Company(company_name, location)
+
+
+emp = Employee('Jessica', 28, 'Google', 'Atlanta')
+print(emp.personal_data.name)
+print(emp.personal_data.age)
+emp.personal_data.display_person_info()
+print(emp.work.company_name)
+print(emp.work.location)
+emp.work.display_company_info()
+########################################################################
+# ______________________1.6 Магический метод __new__. Пример паттерна Singleton________________________________
+#Подвиг 6. Объявите класс AbstractClass, объекты которого нельзя было бы создавать. При выполнении команды:
+# obj = AbstractClass()переменная obj должна ссылаться на строку с содержимым:
+# "Ошибка: нельзя создавать объекты абстрактного класса"
+class AbstractClass:
+    def __new__(cls, *args, **kwargs):
+        return 'Ошибка: нельзя создавать объекты абстрактного класса'
+
+obj = AbstractClass()
+print(obj)
+########################################################################
+#Подвиг 7. Объявите класс SingletonFive, с помощью которого можно было бы создавать объекты командой:
+# a = SingletonFive(<наименование>)Здесь <наименование> - это данные, которые сохраняются в локальном свойстве
+# name созданного объекта.Этот класс должен формировать только первые пять объектов. Остальные (шестой, седьмой и т.д.)
+# должны быть ссылкой на последний (пятый) созданный объект.Создайте первые десять объектов класса SingletonFive
+# с помощью следующего фрагмента программы:# objs = [SingletonFive(str(n)) for n in range(10)]
+class SingletonFive:
+    __instance = None #__ это делает метод/атрибут приватным. К приватным методам/атрибутам нельзя обращаться
+    # напрямую вне класса.
+    __total = 0
+
+    def __new__(cls, *args, **kwargs):
+        if cls.__total < 5:
+            cls.__instance = super().__new__(cls)
+            cls.__total += 1
+        return cls.__instance
+
+    def __init__(self, name):
+        self.name = name
+
+
+objs = [SingletonFive(str(n)) for n in range(10)]
+########################################################################
+class SingletonFive:
+    __instances = [] #__ это делает метод/атрибут приватным. К ним нельзя обращаться напрямую вне класса.
+
+    def __new__(cls, *args, **kwargs):
+        if len(cls.__instances) < 5:
+            cls.__instances.append(super().__new__(cls))
+        return cls.__instances[-1]
+
+    def __init__(self, name):
+        self.name = name
+
+    def __del__(self):#используя "del" ничего не удаляется, зато все инстансы будут удалены сразу по завершению
+     # программы. Я почитал побольше об этом, и не нашел явных и однозначных путей удалить инстанс класса.
+    #При использовании функции del удаляется ссылка на объект, но чтобы вызвался делитер, нужно явно удалить сам объект.
+        print(f"__instances с именем {self.name} удален")
+
+
+objs = [SingletonFive(str(n)) for n in range(10)]
+#элементы класса удаляются автоматически, если в программе не осталось ни одной ссылки на объект, а в скрытом
+# методе __instance это не получится сделать из вне
+########################################################################
+#Подвиг 8. В программе объявлена переменная TYPE_OS и два следующих класса:
+# TYPE_OS = 1 # 1 - Windows; 2 - Linux
+# Необходимо объявить третий класс с именем Dialog, который бы создавал объекты командой:dlg = Dialog(<название>)
+# Здесь <название> - это строка, которая сохраняется в локальном свойстве name объекта dlg.Класс Dialog должен
+# создавать объекты класса DialogWindows, если переменная TYPE_OS = 1 и объекты класса DialogLinux, если
+# переменная TYPE_OS не равна 1. При этом, переменная TYPE_OS может меняться в последующих строчках программы.
+# Имейте это в виду, при объявлении класса Dialog.
+TYPE_OS = 1  # 1 - Windows; 2 - Linux
+
+class DialogWindows:
+    name_class = "DialogWindows"
+
+class DialogLinux:
+    name_class = "DialogLinux"
+
+class Dialog:
+    def __new__(cls, *args, **kwargs):
+        if TYPE_OS == 1:
+            obj = super().__new__(DialogWindows)
+        else:
+            obj = super().__new__(DialogLinux)
+        obj.name = args[0]
+        return obj
+
+dlg = Dialog('Hello')
+print(dlg.__dict__['name'])  # 'Hello'
 #######################################################################
+class Dialog:
+    def __new__(cls, *args, **kwargs):
+        if TYPE_OS == 1:
+            obj = DialogWindows()
+        else:
+            obj = DialogLinux()
+        setattr(obj, 'name', args[0])
+        return obj
+########################################################################
+class Dialog:
+    __os = {1: DialogWindows, 2: DialogLinux}
+
+    def __new__(cls, *args, **kwargs):
+        obj = super().__new__(cls.__os[TYPE_OS])
+        obj.name = args[0]
+        return obj
+########################################################################
+class Dialog:
+    def __new__(cls, *args, **kwargs):
+        if TYPE_OS == 1:
+            obj = DialogWindows()
+            cls.__init__(obj, *args, *kwargs)
+
+            return obj
+        else:
+            obj = DialogLinux()
+            cls.__init__(obj, *args, *kwargs)
+            return obj
+
+    def __init__(self, n):
+        self.name = n
+########################################################################
+class Dialog(DialogWindows, DialogLinux):
+    def __new__(cls, *args, **kwargs):
+        if TYPE_OS == 1:
+            return super(DialogWindows, Dialog).__new__(Dialog)
+        else:
+            return super(DialogLinux, Dialog).__new__(Dialog)
+
+    def __init__(self, name):
+        self.name = name
+########################################################################
+#Подвиг 9 (на повторение материала). Объявите класс Point для представления точек на плоскости. Создавать объекты этого
+# класса предполагается командой:pt = Point(x, y)Здесь x, y - числовые координаты точки на плоскости (числа), то есть,
+# в каждом объекте этого класса создаются локальные свойства x, y, которые хранят конкретные координаты точки.
+# Необходимо в классе Point реализовать метод clone(self), который бы создавал новый объект класса Point как копию
+# текущего объекта с локальными атрибутами x, y и соответствующими значениями.Создайте в программе объект pt класса
+# Point и еще один объект pt_clone через вызов метода clone.
+
+class Point:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
+    def clone(self):
+        return Point(self.x, self.y)
+
+pt = Point(1, 2)
+pt_clone = pt.clone()
+########################################################################
+def clone(self):
+    new_obj = super().__new__(type(self))
+    new_obj.__dict__.update(self.__dict__)
+    return new_obj
+########################################################################
+    def clone(self):
+        return Point(**self.__dict__)
+########################################################################
+#Подвиг 10 (на повторение материала). В программе предполагается реализовать парсер (обработчик) строки (string) в
+# определенный выходной формат. Для этого объявлен следующий класс:
+    # class Loader:
+# И предполагается его использовать следующим образом:ld = Loader()res = ld.parse_format("4, 5, -6.5", Factory())
+# На выходе (в переменной res) ожидается получить список из набора вещественных чисел. Например, для заданной строки,
+# должно получиться:[4.0, 5.0, -6.5]Для реализации этой идеи необходимо вначале программы прописать класс Factory с
+# двумя методами:build_sequence(self) - для создания начального пустого списка (метод должен возвращать пустой список);
+# build_number(self, string) - для преобразования переданной в метод строки (string) в вещественное значение
+# (метод должен возвращать полученное вещественное число).
+class Factory:
+    def build_sequence(self):
+        return []
+
+    def build_number(self, string):
+        return float(string)
+        # return float(''.join(map(str, string)))
+
+class Loader:
+    def parse_format(self, string, factory):
+        seq = factory.build_sequence()
+        for sub in string.split(","):
+            item = factory.build_number(sub)
+            seq.append(item)
+        return seq
+
+
+ld = Loader()
+res = ld.parse_format("4, 5, -6.5", Factory()) #[4.0, 5.0, -6.5]
+########################################################################
+#__________1.7 Методы класса (classmethod) и статические методы (staticmethod)______
+class Test:
+    x = 1
+    y = 2
+    def __init__(self):
+        self.x = 3
+        self.y = 4
+
+    @staticmethod
+    def static_method(x, y):
+        a = x + y
+        b = self.x + self.y  # <-- ОШИБКА не понимает, что такое self
+        c = cls.x + cls.y  # <-- ОШИБКА не понимает, что такое cls
+        d = Test.x + Test.y
+        return a, b, c, d
+
+    @classmethod
+    def class_method(cls, x, y):
+        a = x + y
+        b = self.x + self.y  # <-- ОШИБКА не понимает, что такое self
+        c = cls.x + cls.y
+        d = Test.x + Test.y
+        return a, b, c, d
+
+    def self_method(self, x, y):
+        a = x + y
+        b = self.x + self.y
+        c = cls.x + cls.y  # <-- ОШИБКА не понимает, что такое cls
+        d = Test.x + Test.y
+        return a, b, c, d
+
+    def func_method(x, y):  # <-- ОШИБКА пихает в х ссылку на объект, ошибка при вызове
+        a = x + y  # <-- ОШИБКА ^
+        b = self.x + self.y  # <-- ОШИБКА ^
+        c = cls.x + cls.y  # <-- ОШИБКА ^
+        d = Test.x + Test.y
+        return a, b, c, d
+
+    def empty_method():  # <-- ОШИБКА не знает куда бы запихнуть ссылку на объект
+        return 123
+########################################################################
+#Подвиг 1. В программе объявлен следующий класс с одним методом:
+class Stepik:
+    def get_certificate(self):
+        return False
+# И создается объект этого класса:
+st = Stepik()
+# Выберите все верные варианты вызова метода get_certificate:
+
+Stepik.get_certificate(st)
+st.get_certificate()
+########################################################################
+#Подвиг 2. В программе объявлен следующий класс с одним методом:
+class Loader:
+    @classmethod
+    def json_parse(cls):
+        return ""
+# И создается объект этого класса:
+ld = Loader()
+# Выберите все верные варианты вызова метода json_parse:
+ld.json_parse()
+res = ld.json_parse()
+res = Loader.json_parse()
+Loader.json_parse()
+########################################################################
+# Подвиг 3. В программе объявлен следующий класс с одним методом:
+
+class Math:
+    @staticmethod
+    def sqrt(x):
+        return x ** 0.5
+# И создается объект этого класса:
+
+m = Math()
+# Выберите все верные варианты вызова метода sqrt:
+res = Math.sqrt(4)
+res = m.sqrt(2)
 
 ########################################################################
+# Подвиг 4. За что отвечает параметр cls в методах класса, объявленных следующим образом:
 
+class Loader:
+    @classmethod
+    def json_parse(cls): ...
+
+    # Ссылка    # на    # класс    # Loader
 ########################################################################
+#   Создайте класс Robot, у которого есть:атрибут класса population. В этом атрибуте будет хранится общее количество
+#   роботов, изначально принимает значение 0;конструктор __init__, принимающий 1 аргумент name. Данный метод
+#   должен сохранять атрибут name и печатать сообщение вида "Робот <name> был создан". Помимо инициализации
+#   робота данный метод должен увеличивать популяцию роботов на единицу;метод destroy, должен уменьшать популяцию
+#   роботов на единицу и печатать сообщение вида "Робот <name> был уничтожен"метод say_hello, которой печатает
+#   сообщение вида "Робот <name> приветствует тебя, особь человеческого рода"метод класса  how_many, который
+#   печатает сообщение вида "<population>, вот сколько нас еще осталось"
+class Robot:
+    population = 0
 
+    def __init__(self, name):
+        self.name = name
+        print(f'Робот {self.name} был создан')
+        Robot.population += 1
+
+    def destroy(self):
+        Robot.population -= 1
+        print(f'Робот {self.name} был уничтожен')
+        del self
+
+    def say_hello(self):
+        print(f'Робот {self.name} приветствует тебя, особь человеческого рода')
+
+    @classmethod
+    def how_many(cls):
+        print(f'{cls.population}, вот сколько нас еще осталось')
+
+r2 = Robot("R2-D2")  # печатает "Робот R2-D2 был создан"
+r2.say_hello()  # печатает "Робот R2-D2 приветствует тебя, особь человеческого рода"
+Robot.how_many()  # печатает "1, вот сколько нас еще осталось"
+r2.destroy()  # печатает "Робот R2-D2 был уничтожен"
+#######################################################################
+#Подвиг 5. В чем отличие между методами класса (объявленными через @classmethod) и статическими методами
+# (объявленными через @staticmethod)? # методы класса предназначены для работы с атрибутами класса и переданными
+# аргументами, а статические - только с переданными им аргументами
 ########################################################################
+#Подвиг 6. В программе предполагается реализовать парсер (обработчик) строки с данными string в определенный выходной
+# формат. Для этого объявлен следующий класс:class Loader:
+# res = Loader.parse_format("4, 5, -6", Factory)На выходе (в переменной res) ожидается получать список из набора целых
+# чисел. Например, для заданной строки, должно получиться:[4, 5, -6]Для реализации этой идеи необходимо вначале
+# программы прописать класс Factory с двумя статическими методами:build_sequence() - для создания пустого
+# списка (метод возвращает пустой список);build_number(string) - для преобразования строки (string) в целое число
+# (метод возвращает полученное целочисленное значение).Объявите класс с именем Factory
+class Factory:
+    def build_sequence():
+        return []
 
-########################################################################
+    def build_number(*args):
+        return int(*args)
 
-########################################################################
+class Loader:
+    @staticmethod
+    def parse_format(string, factory):
+        seq = factory.build_sequence()
+        for sub in string.split(","):
+            item = factory.build_number(sub)
+            seq.append(item)
 
-########################################################################
+        return seq
 
-########################################################################
-
-########################################################################
-
-########################################################################
-
-########################################################################
-
-########################################################################
-
-########################################################################
-
-########################################################################
-
+res = Loader.parse_format("4, 5, -6", Factory)
+print(res) #[4, 5, -6]
 ########################################################################
 
 ########################################################################
