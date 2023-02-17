@@ -2433,7 +2433,7 @@ class YouTube:
     def play(cls, video_indx):
         Video.play(cls.videos[video_indx])
         # cls.videos[video_indx].play()
-        #cls.videos[video_indx] - это обращение к экземпляру класса Video, данный экземпляр храниться в атрибуте
+        # cls.videos[video_indx] - это обращение к экземпляру класса Video, данный экземпляр храниться в атрибуте
         # класса (списке)YouTube. Строка cls.videos[video_indx].play() - это вызов метода play класса Video, у
         # экземпляра класса Video :). аналогично если бы был вызов v1.play()
 
@@ -2446,8 +2446,10 @@ YouTube.add_video(v1)
 YouTube.add_video(v2)
 YouTube.play(0)
 YouTube.play(1)
+
+
 ########################################################################
-#Подвиг 10 (на повторение). Объявите класс AppStore - интернет-магазин приложений для устройств под iOS. В этом классе
+# Подвиг 10 (на повторение). Объявите класс AppStore - интернет-магазин приложений для устройств под iOS. В этом классе
 # должны быть реализованы следующие методы:add_application(self, app) - добавление нового приложения app в магазин;
 # remove_application(self, app) - удаление приложения app из магазина;block_application(self, app) - блокировка
 # приложения app (устанавливает локальное свойство blocked объекта app в значение True);total_apps(self) - возвращает
@@ -2483,11 +2485,14 @@ class Application:
         self.name = name
         self.blocked = blocked
 
+
 store = AppStore()
 app_youtube = Application("Youtube")
 store.add_application(app_youtube)
 store.remove_application(app_youtube)
 print(store.total_apps())
+
+
 ########################################################################
 class AppStore:
     def __init__(self):
@@ -2514,8 +2519,10 @@ class Application:
     def __init__(self, name, blocked=False):
         self.name = name
         self.blocked = blocked
+
+
 ########################################################################
-#Подвиг 11 (на повторение). Объявите класс для мессенджера с именем Viber. В этом классе должны быть следующие методы:
+# Подвиг 11 (на повторение). Объявите класс для мессенджера с именем Viber. В этом классе должны быть следующие методы:
 # add_message(msg) - добавление нового сообщения в список сообщений;remove_message(msg) - удаление сообщения из списка;
 # set_like(msg) - поставить/убрать лайк для сообщения msg (т.е. изменить атрибут fl_like объекта msg: если лайка нет
 # то он ставится, если уже есть, то убирается);show_last_message(число) - отображение последних сообщений;
@@ -2546,20 +2553,24 @@ class Viber:
     def total_messages(cls):
         return len(cls.messages)
 
+
 class Message:
     def __init__(self, text):
         self.text = text
         self.fl_like = False
+
 
 msg = Message("Всем привет!")
 Viber.add_message(msg)
 Viber.add_message(Message("Это курс по Python ООП."))
 Viber.add_message(Message("Что вы о нем думаете?"))
 Viber.set_like(msg)
-print(msg.fl_like) #True
+print(msg.fl_like)  # True
 Viber.set_like(msg)
-print(msg.fl_like)#False
+print(msg.fl_like)  # False
 Viber.remove_message(msg)
+
+
 ########################################################################
 class Viber:
     messages = {}
@@ -2591,8 +2602,10 @@ class Message:
     def __init__(self, text):
         self.text = text
         self.fl_like = False
+
+
 ########################################################################
-#начнем с того, что по сути на одном устройстве должен быть только один клиент Viber, поэтому применен (в том виде,
+# начнем с того, что по сути на одном устройстве должен быть только один клиент Viber, поэтому применен (в том виде,
 # в котором мы его знаем) паттерн Singletone, поэтому можно хранить список сообщений как атрибут класса т.к. не
 # будет другого экземпляра, который сможет как-то критично поменять атрибут Message. декорирование методов - исходя
 # соображений семантики: в зависимости от того, использует ли метод атрибуты экземпляра и класса, или только атрибуты
@@ -2630,7 +2643,6 @@ class Viber:
     @classmethod
     def total_messages(cls):
         return len(cls.messages)
-
 
 
 class Message:
