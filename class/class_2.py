@@ -114,7 +114,202 @@ class Employee:
         return f'Name: {self.name}, Position: {self.get_position()}, Salary: {self.get_salary()}'
 
 
+################################################################
+class RobotVacuumCleaner:
+    name = 'Henry'
+    charge = 25
+
+    @classmethod
+    def update_charge(cls, new_value):
+        cls.charge = new_value
+
+    @staticmethod
+    def hello(name):
+        return f'Привет, {name}'
+
+    @property
+    def data(self):
+        return {'name': self.name, 'charge': self.charge}
+
+    @classmethod
+    def make_clean(self):
+        if self.charge < 30:
+            return 'Кожаный, заряди меня! Я слаб'
+        return 'Я вычищу твою берлогу!!!'
+
+
+print(RobotVacuumCleaner.hello('Господин'))
+RobotVacuumCleaner.update_charge(50)
+
+robot = RobotVacuumCleaner()
+print(robot.make_clean())
+print(robot.data)
+
+RobotVacuumCleaner.update_charge(False)
+print(robot.make_clean())
+
+
+# #Привет, Господин
+# Я вычищу твою берлогу!!!
+# {'name': 'Henry', 'charge': 50}
+# Кожаный, заряди меня! Я слаб
 ########################################################################
+# Метод @classmethod также можно использовать в качестве метода для создания нового экземпляра класса.
+# В нашем примере метод занимается только созданием новых объектов или порождением объектов, поэтому  его можно назвать
+# фабричным методом.Фабричный метод (Factory method) - пораждающий шаблон проектирования, определяющий общий
+# интерфейс создания объектов в родительском классе и позволяющий изменять создаваемые объекты в дочерних классах.
+class Car:
+
+    def __init__(self, model, color):
+        self.model = model
+        self.color = color
+
+    @classmethod
+    def get_red_car(cls, model):
+        return cls(model, 'red')
+
+
+car1 = Car.get_red_car('Audi')
+print(car1, car1.model, car1.color)
+
+car2 = Car.get_red_car('BMW')
+print(car2, car2.model, car2.color)
+
+
+########################################################################################################
+# Перед вами имеется реализация класса Circle. Ваша задача добавить в него следующее:класс-метод from_diameter,
+# принимающий диаметр круга. Метод from_diameter должен возвращать новый экземпляр класса Circle(учитывайте,
+# что экземпляры круга создаются по радиусу);статик-метод is_positive, принимающий одно число. Метод is_positive
+# должен возвращать ответ является ли переданное число положительным статик-метод area, который принимает радиус и
+# возвращает площадь круга. Для этого воспользуйтесь формулой
+class Circle:
+
+    def __init__(self, radius):
+        if not Circle.is_positive(radius):
+            raise ValueError("Радиус должен быть положительным")
+        self.radius = radius
+
+    @classmethod
+    def from_diameter(cls, diameter):
+        return cls(diameter / 2)
+
+    @staticmethod
+    def is_positive(value):
+        return True if value > 0 else False
+
+    @staticmethod
+    def area(radius):
+        return 2 * 3.14 * radius ** 2
+
+
+circle_1 = Circle.from_diameter(10)
+assert isinstance(circle_1, Circle)
+assert circle_1.radius == 5.0
+print(f"circle_1.radius={circle_1.radius}")
+assert Circle.is_positive(10)
+assert not Circle.is_positive(-5)
+assert Circle.area(1) == 6.28
+
+
+#########################################################################################
+# 2.10 Пространство имен класса________________________________
+
+# Создайте класс Robot, у которого есть:атрибут класса population. В этом атрибуте будет храниться общее
+# количество роботов, изначально принимает значение 0;конструктор __init__, принимающий 1 аргумент name.
+# Данный метод должен сохранять атрибут name и печатать сообщение вида "Робот <name> был создан".
+# Помимо инициализации робота данный метод должен увеличивать популяцию роботов на единицу;
+# метод destroy, должен уменьшать популяцию роботов на единицу и печатать сообщение вида "Робот <name> был уничтожен"
+# метод say_hello, которой печатает сообщение вида "Робот <name> приветствует тебя, особь человеческого рода"
+# метод класса  how_many, который печатает сообщение вида "<population>, вот сколько нас еще осталось"
+class Robot:
+    population = 0
+
+    def __init__(self, name):
+        self.name = name
+        print(f'Робот {self.name} был создан')
+        Robot.population += 1
+
+    def destroy(self):
+        print(f'Робот {self.name} был уничтожен')
+        Robot.population -= 1
+
+    def say_hello(self):
+        print(f'Робот {self.name} приветствует тебя, особь человеческого рода')
+
+    @classmethod
+    def how_many(cls):
+        print(f'{cls.population}, вот сколько нас еще осталось')
+
+
+r2 = Robot("R2-D2")  # печатает "Робот R2-D2 был создан"
+r2.say_hello()  # печатает "Робот R2-D2 приветствует тебя, особь человеческого рода"
+Robot.how_many()  # печатает "1, вот сколько нас еще осталось"
+r2.destroy()  # печатает "Робот R2-D2 был уничтожен"
+
+
+################################################################
+# 2.10 Пространство имен класса Создайте базовый класс User, у которого есть:метод __init__, принимающий имя
+# пользователя и его роль. Их необходимо сохранить в атрибуты экземпляра name и role соответственно
+# Затем создайте класс Access , у которого есть:приватный атрибут класса __access_list , в котором хранится
+# список ['admin', 'developer']приватный статик-метод __check_access , который принимает название роли и
+# возвращает True, если роль находится в списке __access_list , иначе - Falseпубличный статик-метод get_access ,
+# который должен принимать экземпляр класса User и проверять есть ли доступ у данного пользователя к ресурсу при
+# помощи метода __check_access  . Если у пользователя достаточно прав, выведите на экран сообщение«User <name>:
+# success», если прав недостаточно - «AccessDenied»Если передается тип данных, отличный от экземпляр класса User,
+# необходимо вывести сообщение:«AccessTypeError»
+
+class User:
+    def __init__(self, name, role):
+        self.name = name
+        self.role = role
+
+
+class Access:
+    __access_list = ['admin', 'developer']
+
+    @staticmethod
+    def __check_access(role):
+        return role in Access.__access_list
+
+    @staticmethod
+    def get_access(self_user):
+        if isinstance(self_user, User):
+            if Access.__check_access(self_user.role):
+                print(f'User {self_user.name}: success')
+            else:
+                print(f'AccessDenied')
+        else:
+            print(f'AccessTypeError')
+
+
+user1 = User('batya99', 'admin')
+Access.get_access(user1)  # печатает "User batya99: success"
+
+zaya = User('milaya_zaya999', 'user')
+Access.get_access(zaya)  # печатает AccessDenied
+
+Access.get_access(5)  # печатает AccessTypeError
+
+
+#####################################################################
+
+class BankAccount:
+    bank_name = "Tinkoff Bank"
+    address = 'Москва, ул. 2-я Хуторская, д. 38А'
+
+    def __init__(self, name, balance):
+        self.name = name
+        self.balance = balance
+
+    @classmethod
+    def create_account(cls, name, balance):
+        return cls(name, balance)
+
+    @classmethod
+    def bank_info(cls):
+        return f'{cls.bank_name} is located in {cls.address}'
+
+
 ################################################################################################
 # _________Balakirev________________________
 ################################################################
@@ -977,6 +1172,35 @@ k.email = 'prince@still.wait'
 print(k.email)  # prince@still.wait
 
 
+################################################################################################
+# Создайте класс Employee, который имеет следующие методы:метод __init__, который устанавливает значения приватных
+# атрибутов __name  и __salary: имя работника и его зарплату.приватный геттер метод для атрибута __name
+# приватный геттер метод для атрибута __salary приватный сеттер метод для атрибута __salary: он должен позволять
+# сохранять в атрибут __salary только положительные числа. В остальных случаях не сохраняем переданное значение в
+# сеттер и печатаем на экран сообщение "ErrorValue:<value>".свойство title, у которого есть только геттер
+# из пункта 2.свойство reward, у которого геттером будет метод из пункта 3, а сеттером — метод из пункта 4.
+
+class Employee:
+    def __init__(self, name, salary):
+        self.__name = name
+        self.__salary = salary
+
+    def __get_name(self):
+        return self.__name
+
+    def __get_salary(self):
+        return self.__salary
+
+    def __set_salary(self, value):
+        if isinstance(value, (int, float)) and value > 0:
+            self.__salary = value
+        else:
+            print(f'ErrorValue:{value}')
+
+    title = property(fget=__get_name)
+    reward = property(fget=__get_salary, fset=__set_salary)
+
+
 ################################################################
 # ___________Egorof ____________2.7 Декоратор Property________
 # Пожалуй самый элементарный вариант использования property — предоставить атрибуты только для чтения в ваших классах.
@@ -995,14 +1219,17 @@ class Person:
         return self._age
 
 
-# >>> person = Person('Jack', 33)
+# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+person = Person('Jack', 33)
 # >>> # Считываем значения
-# >>> person.name
+person.name
 # Jack
-# >>> person.age
+person.age
 # 33
 # >>> # Пытаемся записать новое значение
-# >>> person.age = 42
+person.age = 42
+
+
 # Traceback (most recent call last):
 #     ...
 # AttributeError: can't set attribute
@@ -1185,7 +1412,7 @@ print(Bill.total_cents)  # 66612
 # 2.8 Вычисляемые свойства
 class Square:
     def __init__(self, side):
-        self.side = side
+        self.side = side  # идет обращение к @side.setter а он устанавливает self.__area
 
     @property
     def side(self):
@@ -1206,6 +1433,59 @@ class Square:
     def area(self, value):
         self.side = value ** 0.5
         self.__area = value
+
+
+################################################################################################
+# Создайте класс Password, который имеет:метод __init__, который устанавливает значение атрибута password
+# вычисляемое свойство strength, которое определяет стойкость пароля. Если длина пароля меньше 8 символов, то такой
+# пароль считается слабым, свойство должно вернуть строку  "Weak". Сильным паролем считается тот, в котором длина
+# символов 12 и более, в таком случае свойство возвращает строку "Strong". Во всех остальных случаях необходимо
+# вернуть "Medium"
+class Password:
+    def __init__(self, password):
+        self.password = password
+
+    @property
+    def password(self):
+        return self.__password
+
+    @password.setter
+    def password(self, password):
+        self.__password = password
+
+    @property
+    def strength(self):
+        if len(self.password) < 8:
+            return 'Weak'
+        elif len(self.password) >= 12:
+            return 'Strong'
+        else:
+            return 'Medium'
+
+
+pass_1 = Password("Alligator34")
+assert pass_1.password == "Alligator34"
+assert pass_1.strength == "Medium"
+
+pass_2 = Password("Alligator345678")
+assert pass_2.password == "Alligator345678"
+assert pass_2.strength == "Strong"
+
+pass_3 = Password("345678")
+assert pass_3.strength == "Weak"
+print('Good')
+
+pass_1 = Password("Alligator34")
+assert pass_1.password == "Alligator34"
+assert pass_1.strength == "Medium"
+
+pass_2 = Password("Alligator345678")
+assert pass_2.password == "Alligator345678"
+assert pass_2.strength == "Strong"
+
+pass_3 = Password("345678")
+assert pass_3.strength == "Weak"
+print('Good')
 
 
 ###############################################################
@@ -1232,10 +1512,76 @@ print(d1.usa_date)  # 10-05-2001
 print(d2.date)  # 15/03/0999
 print(d2.usa_date)  # 03-15-0999
 
+# ###############################################################################################
+# 2.11 Практика по методам и свойствам (property)
+with open("pass.txt") as q:
+    q = q.read().strip().split()
 
-###############################################################################################
+
+class User:
+    def __init__(self, name, password):
+        self.name = name
+        self.password = password
+        self.__secret = "secret"
+
+    @property
+    def secret(self):
+        r = input("Ввудите ваш пароль: ")
+        if r == self.__password:
+            print(self.__secret)
+        else:
+            print("Пароль неверный")
+
+    @property
+    def password(self):
+        return self.__password
+
+    @staticmethod
+    def prov(passw):
+        return passw in q
+
+    @password.setter
+    def password(self, val):
+        if self.prov(val):
+            raise TypeError("такой есть уже")
+        else:
+            self.__password = val
+
+
+u = User('pad', 'ss')  # ss
+print(u.secret)  # secret
+
 
 ###############################################################
+# В классе Registration необходимо реализовать:метод __init__ принимающий один аргумент логин пользователя.
+# Метод __init__ должен сохранить переданный логин через сеттер (см пункт 3). То есть когда отработает данный код
+# def __init__(self, логин):   self.login = логин # передаем в сеттер login значение логин
+# должно сработать свойство сеттер login из пункта 3 для проверки валидности переданного значения
+# Cвойство геттер login, которое возвращает значение self.__login;Свойство сеттер login, принимает значение нового
+# логина. Новое значение мы должны проверить на следующее:логин, так как является почтой, должен содержать один символ
+# собаки «@». В случае, если в логине отсутствует символ «@», вызываем исключение при помощи строки raise ValueError
+# ("Логин должен содержать один символ '@'")логин должен содержать символ точки «.» после символа «@».В случае, если
+# после @ нету точки, вызываем исключение при помощи строки raise ValueError("Логин должен содержать символ '.'")
+
+class Registration:
+    def __init__(self, логин):
+        self.login = логин  # передаем в сеттер login значение логин
+
+    @property
+    def login(self):
+        return self.__login
+
+    @login.setter
+    def login(self, login):
+        if not login.count('@') == 1:
+            raise ValueError("Логин должен содержать один символ '@'")
+        if not '.' in login.split('@')[1]:
+            # if login.split('@')[1].count('.') == 1:
+            raise ValueError("Логин должен содержать символ '.'")
+        else:
+            self.__login = login
+
+
 ####################################################################################
 
 ###############################################################
@@ -1247,7 +1593,7 @@ print(d2.usa_date)  # 03-15-0999
 ###############################################################
 
 ###############################################################################################
-
+# ______________Balakiref________________________________
 ###############################################################
 # Подвиг 1. Пусть в программе объявлен следующий класс:
 
@@ -1329,6 +1675,7 @@ class WindowDlg:
     @staticmethod
     def check(value):
         return True if type(value) == int and value in range(0, 10001) else False
+
     # isinstance(num, int) при bool выдает True =)))) лучше type использовать
 
     @staticmethod
@@ -1345,19 +1692,553 @@ class WindowDlg:
             self.__height = height
             self.show()
 
+
 ###############################################################
+# Подвиг 6. Реализуйте односвязный список (не список Python, не использовать список Python для хранения объектов),
+# когда один объект ссылается на следующий и так по цепочке до последнего:Для этого объявите в программе два класса:
+# StackObj - для описания объектов односвязного списка;Stack - для управления односвязным списком.
+# Объекты класса StackObj предполагается создавать командой:obj = StackObj(данные)Здесь данные - это строка с
+# некоторым содержимым. Каждый объект класса StackObj должен иметь следующие локальные приватные атрибуты:
+# __data - ссылка на строку с данными, указанными при создании объекта;__next - ссылка на следующий объект класса
+# StackObj (при создании объекта принимает значение None).Также в классе StackObj должны быть объявлены
+# объекты-свойства:next - для записи и считывания информации из локального приватного свойства __next;
+# data - для записи и считывания информации из локального приватного свойства __data.При записи необходимо реализовать
+# проверку, что __next будет ссылаться на объект класса StackObj или значение None. Если проверка не проходит,
+# то __next остается без изменений.Класс Stack предполагается использовать следующим образом:
+# st = Stack() # создание объекта односвязного спискаВ объектах класса Stack должен быть локальный публичный атрибут:
+# top - ссылка на первый добавленный объект односвязного списка (если список пуст, то top = None).
+# А в самом классе Stack следующие методы:
+# push(self, obj) - добавление объекта класса StackObj в конец односвязного списка;
+# pop(self) - извлечение последнего объекта с его удалением из односвязного списка;
+# get_data(self) - получение списка из объектов односвязного списка (список из строк локального атрибута __data
+# каждого объекта в порядке их добавления, или пустой список, если объектов нет).
+
+class StackObj:
+    def __init__(self, data):
+        self.__data = data
+        self.__next = None
+
+    @property
+    def next(self):
+        return self.__next
+
+    @next.setter
+    def next(self, next):
+        if isinstance(next, StackObj) or next is None:
+            # if isinstance(next, (StackObj, type(None))):
+            self.__next = next
+
+    @property
+    def data(self):
+        return self.__data
+
+    @data.setter
+    def data(self, data):
+        self.__data = data
+
+
+class Stack:
+    def __init__(self):
+        self.top = None
+        self.tail = None
+
+    def push(self, obj):
+        if self.tail:
+            self.tail.next = obj
+        self.tail = obj
+        if not self.top:
+            self.top = obj
+
+    def pop(self):
+        data = self.top
+        if data is None:
+            return
+        while data and data.next != self.tail:
+            data = data.next
+        if data:
+            data.next = None
+        last = self.tail  # извлечение последнего объекта перед удалением
+        self.tail = data
+
+        if self.tail is None:
+            self.top = None
+        return last
+
+    def get_data(self):
+        lst = []
+        h = self.top
+        while h:
+            lst.append(h.data)
+            h = h.next
+        return lst
 
 
 ###############################################################
+class Stack:
+    def __init__(self):
+        self.top = None
+        self.tail = None
+
+    def push(self, obj):
+        if self.top == None:
+            self.top = obj
+            self.top.next = None
+        else:
+            self.tail.next = obj
+        self.tail = obj
+        self.tail.next = None
+
+    def pop(self):
+        d = self.tail
+        if self.top == self.tail:
+            self.top = None
+        else:
+            n = self.top
+            while n.next.next != None:
+                n = n.next
+            n.next = None
+            self.tail = n
+        return d
+
 
 ################################################################
+class StackObj:
+    def __init__(self, data):
+        self.__data = data
+        self.__next = None
+
+    @property
+    def next(self):
+        return self.__next
+
+    @next.setter
+    def next(self, obj):
+        if any((isinstance(obj, StackObj), obj is None)):
+            self.__next = obj
+
+    @property
+    def data(self):
+        return self.__data
+
+    @data.setter
+    def data(self, data):
+        self.__data = data
+
+
+class Stack:
+    def __init__(self):
+        self.top = None
+
+    def push(self, obj):  # при добавлении нового элемента
+        if not self.top:  # если отсутствует головной элемент
+            self.top = obj  # присваиваем объект в переменную головного элемента
+        else:  # иначе (если имеется головной элемент)
+            mark = self.top  # вспомогательной переменной присваиваем значение топ
+            while mark.next:  # пока у текущего значения вспомогательной переменной есть ссылка на след. элемент
+                mark = mark.next  # присваиваем вспомогательной переменной след. элемент (доходим до крайнего эл)
+            mark.next = obj  # если больше нет ссылок на следующий элемент, присваиваем этому атрибуту объект
+
+    def pop(self):  # при изъятии элемента
+        if not self.top:  # если отсутствует головной элемент (значит ни один элемент не был добавлен)
+            return  # выход из метода
+        if not self.top.next:  # если у головного элемента нет следующего(в списке только один элемент)
+            poper = self.top  # вспомогательной переменной присваиваем значение топ
+            self.top = None  # само значение топ меняем на None (удаляем из списка)
+            return poper  # возвращаем изъятое значение
+        else:  # иначе (если есть следующий элемент)
+            mark = self.top  # вспомогательной переменной присваиваем значение топ
+            while mark.next.next:  # пока у следующего значения есть следующее значение
+                mark = mark.next  # вспомогательная переменная становвится следующим значением (нашли предпоследний эл)
+            poper = mark.next  # определяем переменную для возврата последнего элемента
+            mark.next = None  # удаляем последний элемент
+            return poper  # возвращаем последний элемент
+
+    def get_data(self):
+        data = []  # заводим пустой список
+        mark = self.top  # отмечаем начало списка
+        while mark:  # пока существует текущий элемент
+            data.append(mark.data)  # добавляем его данные в список
+            mark = mark.next  # переходим к следующему элементу у текущего
+        return data  # как только текущий элемент == None - выход из цикла, возвращаем список данных
+
 
 ###############################################################
-###############################################################
+class StackObj:
+    """ для описания объектов стека """
 
-################################################################
+    def __init__(self, data: str):
+        self.__data = data
+        self.__next = None
+
+    @property
+    def next(self):
+        return self.__next
+
+    @next.setter
+    def next(self, next_):
+        if type(next_) is StackObj or not next_:
+            self.__next = next_
+
+    @property
+    def data(self):
+        return self.__data
+
+    @data.setter
+    def data(self, data):
+        self.__data = data
+
+    @classmethod
+    def check_data(cls, data):
+        pass
+
+
+class Stack:
+    """ для управления стек-подобной структурой """
+
+    def __init__(self):
+        self.top = None
+
+    def push(self, obj):
+        """ Если стэк пустой - просто добавляем элемент.
+        Если не пустой - проходимся по стэку, ищем последний элемент и вставляем после него новый"""
+        if not self.top:
+            self.top = obj
+            return
+        tmp = self.top
+        while tmp.next:
+            tmp = tmp.next
+        tmp.next = obj
+
+    def pop(self):
+        """ Если стэк пуст - ничего не делаем с ним
+         Если в стэке 1 элемент, удалвяем его
+         Если больше одного - ищем предпоследний и у него свойство __next устанавливаем в None"""
+        if not self.top:
+            return
+        if not self.top.next:
+            self.top = None
+            return
+        tmp1 = self.top
+        tmp2 = self.top.next
+        while tmp2.next:
+            tmp1, tmp2 = tmp2, tmp2.next
+        tmp1.next = None
+        return tmp2
+
+    def get_data(self):
+        """ проходим по всему стэку и добавляем в список res значение data каждого объекта стэка """
+        res = []
+        tmp = self.top
+        if self.top:
+            while tmp.next:
+                res.append(tmp.data)
+                tmp = tmp.next
+            else:
+                res.append(tmp.data)
+        return res
+
 
 ###############################################################
+# Подвиг 7. Объявите класс RadiusVector2D, объекты которого должны создаваться командами:
+# В каждом объекте класса RadiusVector2D должны формироваться локальные приватные атрибуты:
+# __x, __y - координаты конца вектора (изначально значения равны 0, если не передано какое-либо другое).
+# В классе RadiusVector2D необходимо объявить два объекта-свойства:
+# x - для изменения и считывания локального атрибута __x;y - для изменения и считывания локального атрибута __y.
+# При инициализации и изменении локальных атрибутов, необходимо проверять корректность передаваемых значений:
+# - значение должно быть числом (целым или вещественным) в диапазоне [MIN_COORD; MAX_COORD].
+# Если проверка не проходит, то координаты не меняются (напомню, что при инициализации они изначально равны 0).
+# Величины MIN_COORD = -100, MAX_COORD = 1024 задаются как публичные атрибуты класса RadiusVector2D.
+# Также в классе RadiusVector2D необходимо объявить статический метод:norm2(vector) -  для вычисления квадратической
+# нормы vector - переданного объекта класса RadiusVector2D (квадратическая норма вектора: x*x + y*y).
+
+class RadiusVector2D:
+    MIN_COORD = -100
+    MAX_COORD = 1024
+
+    def __init__(self, x=0, y=0):
+        self.__x = self.__y = 0
+        self.x = x
+        self.y = y
+
+    @classmethod
+    def __is_verify(cls, value):
+        return type(value) in (int, float) and cls.MIN_COORD <= value <= cls.MAX_COORD
+
+    # лучше вместо isinstance(x, (int, float)) проверять через type(x) in (int, float). Иначе у Вас пройдёт проверку
+    #  булевая переменная, т.к. её тип наследуется от int.
+
+    @property
+    def x(self):
+        return self.__x
+
+    @x.setter
+    def x(self, x):
+        if self.__is_verify(x):
+            self.__x = x
+
+    @property
+    def y(self):
+        return self.__y
+
+    @y.setter
+    def y(self, y):
+        if self.__is_verify(y):
+            self.__y = y
+
+    @staticmethod
+    def norm2(vector):
+        return (vector.x * vector.x) + (vector.y * vector.y)
+
+
+################################################################################################
+# Большой подвиг 8. Требуется реализовать программу по работе с решающими деревьями:Здесь в каждом узле дерева делается
+# проверка (задается вопрос). Если проверка проходит, то осуществляется переход к следующему объекту по левой стрелке
+# (с единицей), а иначе - по правой стрелке (с нулем). И так до тех пор, пока не дойдем до одного из листа дерева
+# (вершины без потомков).В качестве входных данных используется вектор (список) с бинарными значениями:
+# 1 - да, 0 - нет. Каждый элемент этого списка соответствует своему вопросу (своей вершине дерева), например:
+# Далее, этот вектор применяется к решающему дереву, следующим образом. Корневая вершина "Любит Python" с ней связан
+# первый элемент вектора x и содержит значение 1, следовательно, мы переходим по левой ветви. Попадаем в вершину
+# "Понимает ООП". С ней связан второй элемент вектора x со значением 0, следовательно, мы переходим по правой ветви и
+# попадаем в вершину "будет кодером". Так как эта вершина конечная (листовая), то получаем результат в виде строки
+# "будет кодером". По аналогии выполняется обработка вектора x с другими наборами значений 0 и 1.Для реализации
+# решающих деревьев в программе следует объявить два класса:
+# TreeObj - для описания вершин и листьев решающего дерева;
+# DecisionTree - для работы с решающим деревом в целом.В классе DecisionTree должны быть реализованы (по крайне мере)
+# два метода уровня класса (@classmethod):def predict(cls, root, x) - для построения прогноза
+# (прохода по решающему дереву) для вектора x из корневого узла дерева root.
+# def add_obj(cls, obj, node=None, left=True) - для добавления вершин в решающее дерево (метод должен возвращать
+# добавленную вершину - объект класса TreeObj);В методе add_obj параметры имеют, следующие значения:
+# obj - ссылка на новый (добавляемый) объект решающего дерева (объект класса TreeObj);
+# node - ссылка на объект дерева, к которому присоединяется вершина obj;left - флаг, определяющий ветвь дерева
+# (объекта node), к которой присоединяется объект obj (True - к левой ветви; False - к правой).В классе TreeObj
+# следует объявить инициализатор:def __init__(self, indx, value=None): ...где indx - проверяемый в вершине дерева
+# индекс вектора x; value - значение, хранящееся в вершине (принимает значение None для вершин, у которых есть потомки
+# - промежуточных вершин).При этом, в каждом создаваемом объекте класса TreeObj должны автоматически появляться
+# следующие локальные атрибуты:indx - проверяемый индекс (целое число);value - значение с данными (строка);
+# __left - ссылка на следующий объект дерева по левой ветви (изначально None);__right - ссылка на следующий объект
+# дерева по правой ветви (изначально None).Для работы с локальными приватными атрибутами __left и __right необходимо
+# объявить объекты-свойства с именами left и right.
+
+class TreeObj:
+    """для описания вершин и листьев решающего дерева;"""
+
+    def __init__(self, indx, value=None):
+        """ indx - проверяемый в вершине дерева индекс вектора x;
+        value - значение, хранящееся в вершине
+        (принимает значение None для вершин, у которых есть потомки - промежуточных вершин)."""
+        self.indx = indx
+        self.value = value
+        self.left = None
+        self.right = None
+
+    @property
+    def left(self):
+        """__left - ссылка на следующий объект дерева по левой ветви (изначально None);"""
+        return self.__left
+
+    @left.setter
+    def left(self, left):
+        self.__left = left
+
+    @property
+    def right(self):
+        return self.__right
+
+    @right.setter
+    def right(self, right):
+        self.__right = right
+
+
+class DecisionTree:
+    """для работы с решающим деревом в целом."""
+
+    @classmethod
+    def predict(cls, root, x):
+        """для построения прогноза (прохода по решающему дереву) для вектора x из корневого узла дерева root"""
+        # DecisionTree.predict(root, [1, 1, 0])
+        if x[0] == 1:
+            c = root.left
+            if x[1] == 1:
+                return c.left.value  # [1, 1, 0]) == 'программист', "неверный вывод решающего дерева"
+            else:
+                return c.right.value
+        else:
+            c = root.right
+            if x[2] == 1:
+                return c.left.value
+            else:
+                return c.right.value
+        # var_2
+        current = root
+        while current.value == None:
+            if x[current.indx]:
+                current = current.left
+            else:
+                current = current.right
+        return current.value
+
+        # var_3
+        current = root
+        while not current.value:
+            current = current.left if x[current.indx] == 1 else current.right
+        return current.value
+
+    @classmethod
+    def add_obj(cls, obj, node=None, left=True):
+        """для добавления вершин в решающее дерево (метод должен возвращать добавленную вершину - объект класса TreeObj)
+            obj - ссылка на новый (добавляемый) объект решающего дерева (объект класса TreeObj);
+            node - ссылка на объект дерева, к которому присоединяется вершина obj; предыдущий объект
+            left - флаг, определяющий ветвь дерева (объекта node), к которой присоединяется объект obj
+            (True - к левой ветви; False - к правой)."""
+
+        # DecisionTree.add_obj(TreeObj(-1, "будет кодером"), v_11, False)
+        if node:
+            if left:  # left=True
+                node.left = obj  # v_11         ###- value : "будет программистом" / "будет кодером"
+            else:
+                node.right = obj  # v_12        ###- value : "не все потеряно" / "безнадежен"
+        return obj
+
+
+root = DecisionTree.add_obj(TreeObj(0))  # root
+v_11 = DecisionTree.add_obj(TreeObj(1), root)  # v_11
+v_12 = DecisionTree.add_obj(TreeObj(2), root, False)  # v_12
+DecisionTree.add_obj(TreeObj(-1, "будет программистом"), v_11)
+DecisionTree.add_obj(TreeObj(-1, "будет кодером"), v_11, False)
+DecisionTree.add_obj(TreeObj(-1, "не все потеряно"), v_12)
+DecisionTree.add_obj(TreeObj(-1, "безнадежен"), v_12, False)
+
+x = [1, 1, 0]
+res = DecisionTree.predict(root, x)  # будет программистом
+print(res)
+
+assert hasattr(DecisionTree, 'add_obj') and hasattr(DecisionTree,
+                                                    'predict'), "в классе DecisionTree должны быть методы add_obj и predict"
+
+assert type(TreeObj.left) == property and type(
+    TreeObj.right) == property, "в классе TreeObj должны быть объекты-свойства left и right"
+
+root = DecisionTree.add_obj(TreeObj(0))
+v_11 = DecisionTree.add_obj(TreeObj(1), root)
+v_12 = DecisionTree.add_obj(TreeObj(2), root, False)
+DecisionTree.add_obj(TreeObj(-1, "программист"), v_11)
+DecisionTree.add_obj(TreeObj(-1, "кодер"), v_11, False)
+DecisionTree.add_obj(TreeObj(-1, "посмотрим"), v_12)
+DecisionTree.add_obj(TreeObj(-1, "нет"), v_12, False)
+
+assert DecisionTree.predict(root, [1, 1, 0]) == 'программист', "неверный вывод решающего дерева"
+assert DecisionTree.predict(root, [0, 1, 0]) == 'нет', "неверный вывод решающего дерева"
+assert DecisionTree.predict(root, [0, 1, 1]) == 'посмотрим', "неверный вывод решающего дерева"
+
+
+################################################################################################
+class DecisionTree:  # var_3
+
+    @classmethod
+    def predict(cls, root, x):
+        current = root
+        while not current.value:
+            current = cls.get_next(current, x)
+        return current.value
+
+    @classmethod
+    def get_next(cls, current, x):
+        if x[current.indx] == 1:
+            return current.left
+        return current.right
+
+    ################################################################################################
+    class DecisionTree:
+        @classmethod
+        def predict(cls, root, x):
+            current = root
+            while current is not None:
+                left, right = current.left, current.right
+
+                # if not (left and right):
+                if left is None or right is None:
+                    break
+                current = current.left if x[current.indx] else current.right
+            return current.value
+
+        @classmethod
+        def add_obj(cls, obj, node=None, left=True):
+            if node:
+                setattr(node, 'left' if left else 'right', obj)  # settatr(obj,name,value)
+            return obj
+
+
+################################################################################################
+class DecisionTree:
+    STEP = {1: 'left', 0: 'right'}
+
+    @classmethod
+    def predict(cls, root, x):
+        node = root
+        while node.indx != -1:
+            node = getattr(node, cls.STEP[x[node.indx]])
+        return node.value
+
+    @classmethod
+    def add_obj(cls, obj, node=None, left=True):
+        if node:
+            setattr(node, cls.STEP[left], obj)
+        return obj
+################################################################################################
+#Подвиг 9 (на закрепление). Вам требуется сформировать класс PathLines для описания маршрутов, состоящих из линейных
+# сегментов. При этом каждый линейный сегмент предполагается задавать отдельным классом LineTo. Объекты этого класса
+# будут формироваться командой:line = LineTo(x, y)где x, y - следующая координата линейного участка (начало маршрута
+# из точки 0, 0).В каждом объекте класса LineTo должны формироваться локальные атрибуты:
+# x, y - для хранения координат конца линии (начало определяется по координатам предыдущего объекта).
+# Объекты класса PathLines должны создаваться командами:p = PathLines()  начало маршрута из точки 0, 0
+# p = PathLines(line1, line2, ...)  # начало маршрута из точки 0, 0
+# где line1, line2, ... - объекты класса LineTo.Сам же класс PathLines должен иметь следующие методы:
+# get_path() - возвращает список из объектов класса LineTo (если объектов нет, то пустой список);
+# get_length() - возвращает суммарную длину пути (сумма длин всех линейных сегментов);
+# add_line(self, line) - добавление нового линейного сегмента (объекта класса LineTo) в конец маршрута.
+# Пояснение: суммарный маршрут - это сумма длин всех линейных сегментов, а длина каждого линейного сегмента
+# определяется как евклидовое расстояние по формуле:L = sqrt((x1-x0)^2 + (y1-y0)^2)где x0, y0 - предыдущая точка
+# маршрута; x1, y1 - текущая точка маршрута.
+
+import math
+
+
+class PathLines:
+    def __init__(self, *args):
+        self.lines = [LineTo(0, 0)] + [*args]
+
+    def get_path(self):
+        return self.lines
+
+    def get_length(self):
+        L = 0
+        for i in range(len(self.lines) - 1):
+            L += math.sqrt(
+                pow((self.lines[i + 1].x - self.lines[i].x), 2) + pow((self.lines[i + 1].y - self.lines[i].y), 2))
+        return L
+
+    def add_line(self, line):
+        self.lines.append(line)
+
+
+class LineTo:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+###############################################################
+class PathLines:
+    def __init__(self, *args):
+        self.lines = list((LineTo(0, 0),) + args)
+
+    def get_path(self):
+        return self.lines
+
+    def get_length(self):
+        gen_turple = ((self.lines[i], self.lines[i + 1]) for i in range(len(self.lines) - 1))
+        return sum(map(lambda g: ((g[1].x - g[0].x) ** 2 + (g[1].y - g[0].y) ** 2) ** 0.5, gen_turple))
+
+    def add_line(self, line):
+        self.lines.append(line)
 ###############################################################
 
 ################################################################
