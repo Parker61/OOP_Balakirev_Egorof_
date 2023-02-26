@@ -1554,7 +1554,6 @@ for i in range(len(lst_in) - 1):
     lst[i].link((lst[i + 1]))
 head_obj = lst[0]
 
-
 ########################################################################
 # Большой подвиг 10. Объявите два класса:Cell - для представления клетки игрового поля;GamePole - для управления
 # игровым полем, размером N x N клеток.С помощью класса Cell предполагается создавать отдельные клетки командой:
@@ -1571,7 +1570,203 @@ head_obj = lst[0]
 # символ #).При создании экземпляра класса GamePole в его инициализаторе следует вызывать метод init() для
 # первоначальной инициализации игрового поля.В классе GamePole могут быть и другие вспомогательные методы.Создайте
 # экземпляр pole_game класса GamePole с размером поля N = 10 и числом мин M = 12.
+from random import randint
 
+
+class Cell:  # С помощью класса Cell предполагается создавать отдельные клетки командой:
+    def __init__(self, around_mines=0, mine=False):
+        """around_mines - число мин вокруг данной клетки поля; mine - булева величина (True/False)"""
+        self.around_mines = around_mines
+        self.mine = mine
+        self.fl_open = True  # чтобы открыть все клетки перевести в True
+
+
+class GamePole:
+    def __init__(self, N, M):
+        """N - размер поля; M - общее число мин на поле. """
+        self.N = N
+        self.M = M
+        self.pole = [[Cell() for _ in range(self.N)] for _ in range(self.N)]
+        self.init()
+
+    def init(self):
+        m = 0
+        while m < self.M:
+            i = randint(0, self.N - 1)
+            j = randint(0, self.N - 1)
+            if not self.pole[i][j].mine:
+                self.pole[i][j].mine = True
+            m += 1
+
+        indx = (-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)
+        for x in range(self.N):
+            for y in range(self.N):
+                if not self.pole[x][y].mine:
+                    mines = sum(
+                        self.pole[x + i][y + j].mine for i, j in indx if 0 <= x + i < self.N and 0 <= y + j < self.N)
+                    self.pole[x][y].around_mines = mines
+
+    def show(self):
+        for row in self.pole:
+            print(*map(lambda x: '#' if not x.fl_open else x.around_mines if not x.mine else '*', row))
+
+
+pole_game = GamePole(10, 12)
+pole_game.show()
+################################################################################################
+import random as rnd
+import itertools
+
+class Cell:
+    def __init__(self, around_mines=0, mine=False):
+        self.around_mines = around_mines
+        self.mine = mine
+        self.fl_open = True
+
+class GamePole:
+    def __init__(self, N, M):
+        self.size = N
+        self.num_mines = M
+        self.pole = [[Cell() for _ in range(N)] for _ in range(N)]
+        self.init()
+
+    def init(self):
+        for idx in rnd.sample(range(self.size ** 2), self.num_mines):
+            i, j = divmod(idx, self.size)
+            self.pole[i][j].mine = True
+            for di, dj in itertools.product((-1, 0, 1), repeat=2):
+                if all(0 <= coord < self.size for coord in (i + di, j + dj)):
+                    self.pole[i + di][j + dj].around_mines += 1
+
+    def show(self):
+        for row in self.pole:
+            print(*('#' if not cell.fl_open else '*' if cell.mine else cell.around_mines for cell in row))
+
+pole_game = GamePole(10, 12)
+pole_game.show()
+################################################################
+# здесь пишется программа
+from random import randrange
+
+
+class Cell:
+    '''для представления клетки игрового поля'''
+
+    def __init__(self, around_mines: int = 0, mine: bool = False) -> None:
+        self.around_mines = around_mines
+        self.mine = mine
+        self.fl_open: bool = False
+
+
+class GamePole:
+    '''для управления игровым полем, размером N x N клеток'''
+
+    def __init__(self, N, M) -> None:
+        self.N = N
+        self.M = M
+        self.pole = []
+        self.init()
+
+    def init(self) -> None:
+        '''инициализация поля с новой расстановкой M мин'''
+        self.pole = [[Cell() for cells in range(self.N)] for cells in range(self.N)]
+
+        n = self.M
+        while n > 0:
+            i: int = randrange(self.N)
+            j: int = randrange(self.N)
+            if self.pole[i][j].mine: continue
+            self.pole[i][j].mine = True
+            n -= 1
+
+        for i in range(self.N):
+            for j in range(self.N):
+                if not self.pole[i][j].mine:
+                    self.pole[i][j].around_mines = self.getMinesCounter(i, j)
+
+    def getMinesCounter(self, i: int, j: int) -> int:
+        '''Подсчитывает мины вокруг клетки'''
+        n = 0
+        for i_offset in range(-1, 2):  # Пробегаем оффсет от -1 до +2 от текучего индекса по i
+            for j_offset in range(-1, 2):  # Пробегаем оффсет от -1 до +2 от текучего индекса по j
+                i_index: int = i + i_offset  # Получаем индекс проверяемой клетки по i
+                j_index: int = j + j_offset  # Получаем индекс проверяемой клетки по j
+                if any([i_index < 0, i_index >= self.N, j_index < 0, j_index >= self.N]): continue
+                if self.pole[i_index][j_index].mine:
+                    n += 1
+        return n
+
+    def show(self) -> None:
+        ''' отображение поля в консоли в виде таблицы чисел открытых клеток (если клетка не открыта, то отображается         символ #)'''
+        for i in range(self.N):
+            for j in range(self.N):
+                if not self.pole[i][j].fl_open:
+                    print("#", end=" ")
+                elif self.pole[i][j].mine:
+                    print("*", end=" ")
+                else:
+                    print(self.pole[i][j].around_mines, end=" ")
+            print()
+
+    def showAll(self) -> None:
+        '''Функция откроет все поле, т.е покажет все клетки, где есть мины и остальные тоже'''
+        for i in range(self.N):
+            for j in range(self.N):
+                self.pole[i][j].fl_open = True
+
+    def showAllZero(self) -> None:
+        '''Функция сделает все поля, где нет мин вокруг открытыми'''
+        for i in range(self.N):
+            for j in range(self.N):
+                if self.pole[i][j].around_mines == 0 and self.pole[i][
+                    j].mine == False:  # Если число мин в данная                         клетке не отличается от нуля и если это не мина...
+                    self.pole[i][j].fl_open = True  # То можно объявить клетку открытой
+                else:
+                    continue
+
+    def gameStatus(self, i: int, j: int) -> int:
+        '''Логический статус игры. Игра продолжается пока не открыты все клетки без мин или пока не наступили на мину
+        Игра продолжается (статус 0), Вы выиграли 1, Вы проиграли 0'''
+        if self.pole[i][j].mine:
+            return -1  # Вы проиграли, наступили на мину
+        open_cells_counter = 0
+        for i in range(self.N):
+            for j in range(self.N):
+                if self.pole[i][j].fl_open:
+                    open_cells_counter += 1
+        if open_cells_counter == (self.N * self.N) - self.M:
+            return 1  # Вы выиграли, открыли все клетки без мин
+        return 0  # Идет игра
+
+
+def getPlayerMove(pole_instance: GamePole) -> int:
+    '''Получаем от пользователя ход (координаты клетки, которую он хочет открыть) и возвращаем в программу'''
+    input_loop = True
+    while input_loop:
+        try:
+            x, y = input().split()
+
+        except ValueError:
+            print("Не могу понять, что вы ввели ¯\_(ツ)_/¯, Попробуйте еще разок")
+            continue
+
+        if not all((x.isdigit(), y.isdigit())):
+            print('Координаты должны быть целыми положительными числами, Попробуйте еще раз (ツ)')
+            continue
+
+        x = int(
+            x) - 1  # Конверсия координат пользователя - он не зает, что индексы элементов в списке начинаются с нуля
+        y = int(y) - 1
+
+        if any((x < 0, x >= pole_instance.N, y < 0, y >= pole_instance.N)):
+            print('Координаты за пределами поля ¯\_(ツ)_/¯, Попробуйте еще раз')
+            continue
+
+        input_loop = False
+        return (x, y)
+
+
+pole_game = GamePole(10, 12)
 
 ########################################################################
 # 2.3 Практика "Создание класса и его методов" _____Egorof______

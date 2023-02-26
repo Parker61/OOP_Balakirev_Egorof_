@@ -1328,6 +1328,7 @@ import os
 class User:
     def __init__(self, name, password):
         self.name = name
+        self.pas
         self.password = password
 
     @property
@@ -2184,8 +2185,10 @@ class DecisionTree:
         if node:
             setattr(node, cls.STEP[left], obj)
         return obj
+
+
 ################################################################################################
-#Подвиг 9 (на закрепление). Вам требуется сформировать класс PathLines для описания маршрутов, состоящих из линейных
+# Подвиг 9 (на закрепление). Вам требуется сформировать класс PathLines для описания маршрутов, состоящих из линейных
 # сегментов. При этом каждый линейный сегмент предполагается задавать отдельным классом LineTo. Объекты этого класса
 # будут формироваться командой:line = LineTo(x, y)где x, y - следующая координата линейного участка (начало маршрута
 # из точки 0, 0).В каждом объекте класса LineTo должны формироваться локальные атрибуты:
@@ -2225,10 +2228,13 @@ class LineTo:
     def __init__(self, x, y):
         self.x = x
         self.y = y
+
+
 ###############################################################
 class PathLines:
     def __init__(self, *args):
         self.lines = list((LineTo(0, 0),) + args)
+        # self.lines = [LineTo(0, 0), *args]
 
     def get_path(self):
         return self.lines
@@ -2242,15 +2248,167 @@ class PathLines:
 
 
 ###############################################################
+class LineTo:
+    def __init__(self, x=0, y=0):
+        self.x, self.y = x, y
+
+
+class PathLines:
+    def __init__(self, *tuple_):
+        self.list_ = [LineTo()] + list(tuple_)
+
+    def get_path(self):
+        return self.list_[1:]
+
+    def get_length(self):
+        return sum(((p1.x - p0.x) ** 2 + (p1.y - p0.y) ** 2) ** 0.5 for p0, p1 in zip(self.list_, self.list_[1:]))
+
+    def add_line(self, line):
+        self.list_.append(line)
+
 
 ################################################################
+class PathLines:
+    def __init__(self, *args):
+        self.lines = [*args]
+
+    def get_path(self):
+        return self.lines
+
+    def get_length(self):
+        x0 = y0 = length = 0
+        for line in self.lines:
+            length += (pow(line.x - x0, 2) + pow(line.y - y0, 2)) ** 0.5
+            x0, y0 = line.x, line.y
+        return length
+
+    def add_line(self, line):
+        self.lines.append(line)
+
 
 ###############################################################
+class LineTo:
+    def __init__(self, x=0, y=0):
+        self.x = x
+        self.y = y
+
+    def __str__(self):
+        """Строковое представление - для отладки"""
+        return f"{self.x}:{self.y}"
+
+
+# def __str__(self): """Строковое представление - для отладки""" для отладки используют __repr__ обычно.
+# __str__ для юзеров,с __repr__, согласен он здесь более удобен, например для вывода  содержимого списка объектов
+# достаточно написать# p = PathLines()# ...# print(p.get_path())
+# в случае с __str__ придется делать что-то вроде (и все равно вывод будет уродливый):
+# p = PathLines() # print(list(map(print, p.get_path())))
+
+class PathLines:
+    def __init__(self, *args):
+        # добавляем одну линию(точку) из начала координат
+        self.__lines = [LineTo()] + list(args)
+
+    @staticmethod
+    def distance(a: LineTo, b: LineTo):
+        """Возвращает расстрояние между двумя точками"""
+        return pow((b.x - a.x) ** 2 + (b.y - a.y) ** 2, 0.5)
+
+    def get_length(self):
+        return sum(map(self.distance, self.__lines[1:], self.__lines))
+
+    def get_path(self) -> list:
+        return self.__lines[1:]
+
+    def add_line(self, line):
+        self.__lines.append(line)
+
+
 ###############################################################
+class LineTo:
+    def __init__(self, x: int, y: int) -> None:
+        self.x = x
+        self.y = y
+
+
+class PathLines:
+
+    def __init__(self, *args) -> None:
+        self.ls: List[LineTo] = list(args)
+
+    def add_line(self, line: LineTo) -> None:
+        self.ls.append(line)
+
+    def get_path(self) -> List[LineTo]:
+        return self.ls
+
+    def get_length(self) -> float:
+        temp = LineTo(0, 0)
+        length = 0
+        for i in self.ls:
+            length += sqrt((i.x - temp.x) ** 2 + (i.y - temp.y) ** 2)
+            temp = i
+        return length
+
 
 ################################################################
+# Подвиг 10 (на закрепление). Вы создаете телефонную записную книжку. Она определяется классом PhoneBook. Объекты этого
+# класса создаются командой:p = PhoneBook()А сам класс должен иметь следующий набор методов:
+# add_phone(phone) - добавление нового номера телефона (в список);
+# remove_phone(indx) - удаление номера телефона по индексу списка;
+# get_phone_list() - получение списка из объектов всех телефонных номеров.Каждый номер телефона должен быть
+# представлен классом PhoneNumber. Объекты этого класса должны создаваться командой:
+# note = PhoneNumber(number, fio)где number - номер телефона (число) в формате XXXXXXXXXXX
+# (одиннадцати цифр, X - цифра); fio - Ф.И.О. владельца номера (строка).В каждом объекте класса PhoneNumber
+# должны формироваться локальные атрибуты:number - номер телефона (число);fio - ФИО владельца номера телефона.
 
+class PhoneBook:
+
+    def __init__(self):
+        self.lst = []
+
+    def add_phone(self, phone):
+        self.lst.append(phone)
+
+    def remove_phone(self, indx):
+        del self.lst[indx]
+
+    def get_phone_list(self):
+        return self.lst
+
+
+class PhoneNumber:
+    def __init__(self, number, fio):
+        self.number = number
+        self.fio = fio
+
+    @property
+    def number(self):
+        return self.__number
+
+    @number.setter
+    def number(self, number):
+        if len(str(number)) == 11:
+            self.__number = number
+        else:
+            self.__number = None
 ###############################################################
+class PhoneNumber:
+    def __new__(cls, *args, **kwargs):
+        number, fio = args
+        if cls.check_number(number) and cls.check_fio(fio):
+            return super().__new__(cls)
+
+    def __init__(self, number, fio):
+        self.number = number
+        self.fio = fio
+
+    @staticmethod
+    def check_number(number):
+        return re.match('\d{11}', str(number), re.ASCII)
+
+    @staticmethod
+    def check_fio(fio):
+        return True if type(fio) == str else False
 ###############################################################
 
 ################################################################
