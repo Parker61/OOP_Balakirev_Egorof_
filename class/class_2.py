@@ -2391,6 +2391,8 @@ class PhoneNumber:
             self.__number = number
         else:
             self.__number = None
+
+
 ###############################################################
 class PhoneNumber:
     def __new__(cls, *args, **kwargs):
@@ -2409,68 +2411,884 @@ class PhoneNumber:
     @staticmethod
     def check_fio(fio):
         return True if type(fio) == str else False
+
+
 ###############################################################
+# ______________________Egorof__________________________________________
+# Задача «Оформление заказа»Все вы думаю сталкивались с оформлением заказов в онлайн магазинах. Давайте и мы
+# воссоздадим этот процесс
+# Часть 1 Для этого нам понадобится реализовать несколько классов и связать их между собой. Первый класс, который
+# мы реализуем, будет Product. Это класс, описывающий товар. В нем должно быть реализовано:
+# метод __init__, принимающий на вход имя товара и его стоимость. Эти значения необходимо сохранить в атрибутах
+# name и price
+# Далее для оформления заказа нам нужен пользователь. Для этого создадим класс User, который содержит:
+# метод __init__, принимающий на вход логин пользователя и необязательный аргумент баланс его счета(по умолчанию 0).
+# Логин необходимо сохранить в атрибуте login , а баланс необходимо присвоить сеттеру   balance  (см. пункт 4)
+# метод __str__, возвращающий строку вида «Пользователь {login}, баланс - {balance}»
+# Cвойство геттер balance, которое возвращает значение self.__balance;
+# Свойство сеттер balance, принимает новое значение баланса и устанавливает его в атрибут self.__balance ;
+# метод deposit  принимает числовое значение и прибавляет его к атрибуту self.__balance ;
+# метод payment  принимает числовое значение, которое должно списаться с баланса пользователя. Если на счете у
+# пользователя не хватает средств, то необходимо вывести фразу  «Не хватает средств на балансе. Пополните счет» и
+# вернуть False. Если средств хватает, списываем с баланса у пользователя указанную сумму и возвращаем True
+# Последний штрих - создание класса корзины, куда наш пользователь будет складывать товары. Для этого нам понадобятся
+# ранее созданные классы User и ProductИ так, создаем класс Cart, который содержит:метод __init__, принимающий на вход
+# экземпляр класса User . Его необходимо сохранить в атрибуте user . Помимо этого метод  должен создать атрибут
+# goods - пустой словарь (лучше использовать defaultdict). Он нужен будет для хранения наших товаров и их количества
+# (ключ словаря - товар, значение - количество). И еще нам понадобится создать защищенный атрибут .__total со
+# значением 0. В нем будет хранится итоговая сумма заказаметод add принимает на вход экземпляр класса Product и
+# необязательный аргумент количество товаров (по умолчанию 1). Метод add  должен увеличить в корзине (атрибут goods)
+# количество указанного товара  на переданное значение количество и пересчитать атрибут self.__total
+# метод remove  принимает на вход экземпляр класса Product и необязательный аргумент количество товаров (по умолчанию 1)
+# .  Метод remove  должен уменьшить в корзине (атрибут goods) количество указанного товара  на переданное значение
+# количество и пересчитать атрибут self.__total. Обратите внимание на то, что количество товара в корзине не может
+# стать отрицательным как и итоговая суммаCвойство геттер total  , которое возвращает значение self.__total;
+# метод order  должен использовать метод payment  из класса User и передать в него итоговую сумму корзины.
+# В случае, если средств пользователю хватило, вывести сообщение «Заказ оплачен», в противном случае -
+# «Проблема с оплатой»;метод print_check  печатающий на экран чек. Он должен начинаться со строки---Your check---
+# Затем выводится состав корзины в алфавитном порядке по названию товара в виде
+# {Имя товара} {Цена товара} {Количество товара} {Сумма}И заканчивается чек строкой---Total: {self.total}---
+from collections import defaultdict
+
+
+class Product:
+    def __init__(self, name, price):
+        self.name = name
+        self.price = price
+
+
+class User:
+    def __init__(self, login, balance=0):
+        self.login = login
+        self.balance = balance
+
+    @property
+    def balance(self):
+        return self.__balance
+
+    @balance.setter
+    def balance(self, balance):
+        self.__balance = balance
+
+    def __str__(self):
+        return f'Пользователь {self.login}, баланс - {self.balance}'
+
+    def deposit(self, value):
+        self.__balance += value
+
+    def payment(self, payment):
+        if self.balance < payment:
+            print(f'Не хватает средств на балансе. Пополните счет')
+            return False
+        else:
+            self.__balance -= payment
+            return True
+
+
+class Cart:
+    def __init__(self, user):
+        self.user = user
+        self.goods = defaultdict(int)  # функции int() в качестве ф. default_factory, генерирующей значений по умолчанию
+        self.__total = 0
+
+    def add(self, product, value_goods=1):  # на вход экземпляр класса Product и  количество товаров (по умолчанию 1)
+        self.goods[product] += value_goods
+        self.__total += product.price * value_goods
+
+    def remove(self, product: Product, value_goods=1):
+        if self.goods[product] <= value_goods:
+            self.__total -= self.goods[product] * product.price
+            self.goods.pop(product)
+        else:
+            self.goods[product] -= value_goods
+            self.__total -= product.price * value_goods
+
+    @property
+    def total(self):
+        return self.__total
+
+    def order(self):
+        if self.user.payment(self.total):
+            print(f'Заказ оплачен»')
+        else:
+            print('Проблема с оплатой')
+
+    def print_check(self):
+        print(f'---Your check---')
+        # for k, v in sorted(self.goods.items(), key=lambda x: x[0].name):
+        #     # список кортежей (key, val) key стоит первым, то и ключ для сортировки укажем как lambda x: x[0],
+        #     # где x - это кортеж (key, val)
+        #     print(f"{k.name} {k.price} {v} {k.price * v}")
+        for product in sorted(self.goods.keys(), key=lambda x: x.name):
+            print(f"{product.name} {product.price} {self.goods[product]} {product.price * self.goods[product]}")
+        print(f'---Total: {self.total}---')
+
+billy = User('billy@rambler.ru')
+
+lemon = Product('lemon', 20)
+carrot = Product('carrot', 30)
+
+cart_billy = Cart(billy)
+print(cart_billy.user)  # Пользователь billy@rambler.ru, баланс - 0
+cart_billy.add(lemon, 2)
+cart_billy.add(carrot)
+cart_billy.print_check()
+''' Печатает текст ниже
+---Your check---
+carrot 30 1 30
+lemon 20 2 40
+---Total: 70---'''
+cart_billy.add(lemon, 3)
+cart_billy.print_check()
+''' Печатает текст ниже
+---Your check---
+carrot 30 1 30
+lemon 20 5 100
+---Total: 130---'''
+cart_billy.remove(lemon, 6)
+cart_billy.print_check()
+''' Печатает текст ниже
+---Your check---
+carrot 30 1 30
+---Total: 30---'''
+print(cart_billy.total)  # 30
+cart_billy.add(lemon, 5)
+cart_billy.print_check()
+''' Печатает текст ниже
+---Your check---
+carrot 30 1 30
+lemon 20 5 100
+---Total: 130---'''
+cart_billy.order()
+''' Печатает текст ниже
+Не хватает средств на балансе. Пополните счет
+Проблема с оплатой'''
+cart_billy.user.deposit(150)
+cart_billy.order()  # Заказ оплачен
+# ################################################################
+
+###############################################################
+###############################################################
+# ___________Дескрипторы ________________________________________________________________
+'''Общая схема работы дескриптора для класса Point3D'''
+
+
+class Integer:  # Дескриптор
+    def __set_name__(self, owner, name):
+        # Метод автоматически вызывается когда создается экземпляр класса
+        # self - ссылка на экземпляр класса, owner - ссылка на класс Point3D'''
+        self.name = '_' + name
+
+    def __get__(self, instance, owner):
+        # self - ссылка на экземпляр класса
+        # instance - ссылка на экзампляр класса из которого был вызван
+        # owner - ссылка на класс Point3D
+        return instance.__dict__[self.name]
+
+    def __set__(self, instance, value):
+        # Срабатывает в момент присваивания из инициализатора
+        # self - ссылка на экземпляр класса
+        # instance - ссылка на экзампляр класса из которого был вызван
+        # Value - значение которое будет присвоено
+        print(f"__set__:{self.name} = {value}")
+        instance.__dict__[self.name] = value
+
+
+class Point3D:
+    x = Integer()
+    y = Integer()
+    z = Integer()
+
+    def __init__(self, x, y, z):
+        # В инициализаторе идет обращение к дескрипторам x, y, z
+        self.x = x
+        self.y = y
+        self.z = z
+
+
+pt = Point3D(1, 2, 3)
+
+
+############################################################
+class Integer:
+    def __set_name__(self, owner, name):
+        print(f'__set_name__\nself = {self}\nowner = {owner}\nname = {name}\n')
+        self.name = f'__{name}'
+
+    def __get__(self, instance, owner):
+        print(f'__get__\nself = {self}\ninstance = {instance}\nowner = {owner}\n')
+        return getattr(instance, self.name)
+
+    def __set__(self, instance, value):
+        print(f'__set__\nself = {self}\ninstance = {instance}\nvalue = {value}\n')
+        setattr(instance, self.name, value)
+
+
+# __set_name__
+# self = <__main__.Integer object at 0x000001CC9579E950> // Ссылка на экземпляр класса Integer
+# owner = <class '__main__.Point3D'>  // Ссылка на класс Point3D (не экземпляр а основной)
+# name = x
+
+# __set_name__
+# self = <__main__.Integer object at 0x000001CC9579F8B0>
+# owner = <class '__main__.Point3D'>
+# name = y
+
+# __set_name__
+# self = <__main__.Integer object at 0x000001CC9579F730>
+# owner = <class '__main__.Point3D'>
+# name = z
+
+# __set__
+# self = <__main__.Integer object at 0x000001CC9579E950> // Ссылка на экземпляр класса Integer
+# instance = <__main__.Point3D object at 0x000001CC9579C1C0> // Ссылка на экземпляр класса Point3D
+# value = 1
+
+# __set__
+# self = <__main__.Integer object at 0x000001CC9579F8B0>
+# instance = <__main__.Point3D object at 0x000001CC9579C1C0>
+# value = 2
+
+# __set__
+# self = <__main__.Integer object at 0x000001CC9579F730>
+# instance = <__main__.Point3D object at 0x000001CC9579C1C0>
+# value = 3
+
+# __get__
+# self = <__main__.Integer object at 0x000001CC9579E950> // Ссылка на экземпляр класса Integer
+# instance = <__main__.Point3D object at 0x000001CC9579C1C0> // Ссылка на экземпляр класса Point3D
+# owner = <class '__main__.Point3D'>
+
+# __get__
+# self = <__main__.Integer object at 0x000001CC9579F8B0>
+# instance = <__main__.Point3D object at 0x000001CC9579C1C0>
+# owner = <class '__main__.Point3D'>
+
+# __get__
+# self = <__main__.Integer object at 0x000001CC9579F730>
+# instance = <__main__.Point3D object at 0x000001CC9579C1C0>
+# owner = <class '__main__.Point3D'>
+
+
+class Point3D:
+    x = Integer()
+    y = Integer()
+    z = Integer()
+
+    def __init__(self, x, y, z):
+        self.x = x
+        self.y = y
+        self.z = z
+
+
+p = Point3D(1, 2, 3)
+px = p.x
+py = p.y
+pz = p.z
+
+
+###############################################################
+# Подвиг 6. Объявите дескриптор данных FloatValue, который бы устанавливал и возвращал вещественные значения. При записи
+# вещественного числа должна выполняться проверка на вещественный тип данных. Если проверка не проходит, то генерировать
+# исключение командой:raise TypeError("Присваивать можно только вещественный тип данных.")
+# Объявите класс Cell, в котором создается объект value дескриптора FloatValue. А объекты класса Cell должны
+# создаваться командой:cell = Cell(начальное значение ячейки)Объявите класс TableSheet, с помощью которого создается
+# таблица из N строк и M столбцов следующим образом:table = TableSheet(N, M)Каждая ячейка этой таблицы должна быть
+# представлена объектом класса Cell, работать с вещественными числами через объект value (начальное значение должно
+# быть 0.0).В каждом объекте класса TableSheet должен формироваться локальный атрибут:
+# cells - список (вложенный) размером N x M, содержащий ячейки таблицы (объекты класса Cell).
+# Создайте объект table класса TableSheet с размером таблицы N = 5, M = 3.
+# Запишите в эту таблицу числа от 1.0 до 15.0 (по порядку).
+
+class FloatValue:
+    @classmethod
+    def verify(cls, value):
+        if type(value) != float:
+            raise TypeError("Присваивать можно только вещественный тип данных.")
+
+    def __set_name__(self, owner, name):
+        self.name = '_' + name
+
+    def __get__(self, instance, owner):
+        return getattr(instance, self.name)
+        # return instance.__dict__[self.name]
+
+    def __set__(self, instance, value):
+        self.verify(value)
+        setattr(instance, self.name, value)
+        # instance.__dict__[self.name] = value
+
+
+class Cell:
+    value = FloatValue()
+
+    def __init__(self, value=0.0):
+        self.value = value
+
+
+class TableSheet:
+    def __init__(self, N, M):
+        self.cells = [[Cell() for _ in range(M)] for _ in range(N)]  # объекты класса Cell).
+
+
+table = TableSheet(5, 3)
+N = 5
+M = 3
+n = 1.0
+for i in range(N):
+    for j in range(M):
+        table.cells[i][j].value = float(n)
+        n += 1
+
+
+###############################################################
+class TableSheet:
+    def __init__(self, n, m):
+        self.N = n
+        self.M = m
+        self.value = iter([float(i) for i in range(1, (n * m + 1))])
+        self.cells = [[Cell(next(self.value)) for i in range(m)] for j in range(n)]
+
 
 ################################################################
+# Подвиг 7. Объявите класс ValidateString для проверки корректности переданной строки. Объекты этого класса создаются
+# командой:validate = ValidateString(min_length=3, max_length=100)где min_length - минимальное число символов в строке;
+# max_length - максимальное число символов в строке.В классе ValidateString должен быть реализован метод:
+# validate(self, string) - возвращает True, если string является строкой (тип str) и длина строки в пределах
+# [min_length; max_length]. Иначе возвращается False.Объявите дескриптор данных StringValue для работы со строками,
+# объекты которого создаются командой:st = StringValue(validator=ValidateString(min_length, max_length))
+# При каждом присвоении значения объекту st должен вызываться валидатор (объект класса ValidateString) и с помощью
+# метода validate() проверяться корректность присваиваемых данных. Если данные некорректны, то присвоение не выполняется
+# (игнорируется).Объявите класс RegisterForm с тремя объектами дескриптора StringValue:
+# login = StringValue(...) - для ввода логина;password = StringValue(...)  - для ввода пароля;
+# email = StringValue(...)  - для ввода Email.Объекты класса RegisterForm создаются командой:
+# form = RegisterForm(логин, пароль, email)где логин, пароль, email - начальные значения логина, пароля и Email.
+# В классе RegisterForm также должны быть объявлены методы:get_fields() - возвращает список из значений полей в
+# порядке [login, password, email];show() - выводит в консоль многострочную строку в формате:
+# <form># Логин: <login># Пароль: <password># Email: <email># </form>
+
+class StringValue:
+
+    def __init__(self, validator):
+        self.validator = validator
+
+    def __set_name__(self, owner, name):
+        self.name = '-' + name
+
+    def __get__(self, instance, owner):
+        return getattr(instance, self.name)
+
+    def __set__(self, instance, value):
+        if self.validator.validate(value):
+            setattr(instance, self.name, value)
+
+
+class ValidateString:
+
+    def __init__(self, min_length=3, max_length=100):
+        self.min_length = min_length
+        self.max_length = max_length
+
+    def validate(self, string):
+        return type(string) == str and self.max_length >= len(string) >= self.min_length
+
+
+class RegisterForm:
+    login = StringValue(validator=ValidateString())
+    password = StringValue(validator=ValidateString())
+    email = StringValue(validator=ValidateString())
+
+    def __init__(self, login, password, email):
+        self.login = login
+        self.password = password
+        self.email = email
+
+    def get_fields(self):
+        return [self.login, self.password, self.email]
+
+    def show(self):
+        print(f'<form>\nЛогин: {self.login}\nПароль: {self.password}\nEmail: {self.email}\n</form>')
+
 
 ###############################################################
+# Подвиг 8. Вы начинаете создавать интернет-магазин. Для этого в программе объявляется класс SuperShop, объекты которого
+# создаются командой:myshop = SuperShop(название магазина)В каждом объекте класса SuperShop должны формироваться
+# следующие локальные атрибуты:name - название магазина (строка);goods - список из товаров.
+# Также в классе SuperShop должны быть методы:add_product(product) - добавление товара в магазин
+# (в конец списка goods);remove_product(product) - удаление товара из магазина (из списка goods).
+# Здесь product - это объект класса Product, описывающий конкретный товар. В этом классе следует объявить
+# следующие дескрипторы:name = StringValue(min_length, max_length)    # min_length - минимально допустимая длина
+# строки; max_length - максимально допустимая длина строки price = PriceValue(max_value)
+# max_value - максимально допустимое значениеОбъекты класса Product будут создаваться командой:
+# pr = Product(наименование, цена) Классы StringValue и PriceValue - это дескрипторы данных.
+# Класс StringValue должен проверять, что присваивается строковый тип с длиной строки в диапазоне [2; 50],
+# т.е. min_length = 2, max_length = 50. Класс PriceValue должен проверять, что присваивается вещественное или
+# целочисленное значение в диапазоне [0; 10000], т.е. max_value = 10000. Если проверки не проходят, то соответствующие
+# (прежние) значения меняться не должны.
+class StringValue:
+    def __init__(self, min_length, max_length):
+        self.min_length = min_length
+        self.max_length = max_length
+
+    def __set_name__(self, owner, name):
+        self.name = '_' + name
+
+    def __get__(self, instance, owner):
+        return getattr(instance, self.name)
+
+    def __set__(self, instance, value):
+        # if type(value) == str and len(value) <= len(range(self.min_length, self.max_length)):
+        if type(value) == str and self.min_length <= len(value) <= self.max_length:
+            setattr(instance, self.name, value)
+
+
+class PriceValue:
+    def __init__(self, max_value):
+        self.max_value = max_value
+
+    def __set_name__(self, owner, name):
+        self.name = '_' + name
+
+    def __get__(self, instance, owner):
+        return getattr(instance, self.name)
+
+    def __set__(self, instance, value):
+        # if type(value) in (int, float) and value in range(self.max_value):
+        if type(value) in (int, float) and 0 <= value <= self.max_value:
+            setattr(instance, self.name, value)
+
+
+class Product:
+    name = StringValue(2, 50)
+    price = PriceValue(10000)
+
+    def __init__(self, name, price):
+        self.name = name
+        self.price = price
+
+
+class SuperShop:
+    def __init__(self, name):
+        self.name = name
+        self.goods = []
+
+    def add_product(self, product):
+        self.goods.append(product)
+
+    def remove_product(self, product):
+        if product in self.goods:
+            self.goods.remove(product)
+            # self.goods.pop(product)
+
+
+shop = SuperShop("У Балакирева")
+print(shop.name)
+shop.add_product(Product("Курс по Python", 0))
+shop.add_product(Product("Курс по Python ООП", 2000))
+for p in shop.goods:
+    print(f"{p.name}: {p.price}")
+
+
 ###############################################################
+class Descriptor:  # указание родительского класса от которого происходит наследование.
+    def __set_name__(self, owner, name):
+        self.name = "__" + name
+
+    def __get__(self, instance, owner):
+        return getattr(instance, self.name)
+
+    def __set__(self, instance, value):
+        if self.is_valid(value):
+            setattr(instance, self.name, value)
+
+
+class StringValue(Descriptor):
+    def __init__(self, minl=0, maxl=50):
+        self.minl = minl
+        self.maxl = maxl
+
+    def is_valid(self, value):
+        return isinstance(value, str) and self.minl <= len(value) <= self.maxl
+
+
+class PriceValue(Descriptor):
+    def __init__(self, maxl=10000):
+        self.maxl = maxl
+
+    def is_valid(self, value):
+        return isinstance(value, (int, float)) and value <= self.maxl
+
+
+class Product:
+    name = StringValue()
+    price = PriceValue()
+
+    def __init__(self, name, price):
+        self.name = name
+        self.price = price
+
+
+class SuperShop:
+    def __init__(self, name):
+        self.name = name
+        self.goods = []
+
+    def add_product(self, product):
+        if isinstance(product, Product):
+            self.goods.append(product)
+
+    def remove_product(self, product):
+        self.goods.pop(self.goods.index(product))
+
 
 ################################################################
+class StringValue:
+    def __init__(self, min_length: int = 3, max_length: int = 100) -> None:
+        self.min_length = min_length
+        self.max_length = max_length
+
+    def __check_value(self, value: str) -> bool:
+        return isinstance(value, str) and self.min_length <= len(value) <= self.max_length
+
+    def __set_name__(self, owner, name) -> None:
+        self.name = f'_{name}'
+
+    def __get__(self, instance, owner):
+        return getattr(instance, self.name)
+
+    def __set__(self, instance, value) -> None:
+        if self.__check_value(value=value):
+            setattr(instance, self.name, value)
+
+
+class PriceValue:
+    _MIN_VALUE = 0
+
+    def __init__(self, max_value: int = 10_000) -> None:
+        self.max_value = max_value
+
+    def __check_value(self, value: int) -> bool:
+        return isinstance(value, (int, float)) and self._MIN_VALUE <= value <= self.max_value
+
+    def __set_name__(self, owner, name) -> None:
+        self.name = f'_{name}'
+
+    def __get__(self, instance, owner):
+        return getattr(instance, self.name)
+
+    def __set__(self, instance, value) -> None:
+        if self.__check_value(value=value):
+            setattr(instance, self.name, value)
+
+
+class Product:
+    name = StringValue()
+    price = PriceValue()
+
+    def __init__(self, name: str, price: int) -> None:
+        self.name = name
+        self.price = price
+
+
+class SuperShop:
+    def __init__(self, name: str) -> None:
+        self.name = name
+        self.goods = list()
+
+    @staticmethod
+    def __check_product(product) -> bool:
+        '''Проверка валидности product.'''
+        return isinstance(product, Product)
+
+    def add_product(self, product: Product) -> None:
+        '''добавление товара в магазин.'''
+        if self.__check_product(product=product):
+            self.goods.append(product)
+
+    def remove_product(self, product: Product) -> None:
+        '''удаление товара из магазина.'''
+        if product in self.goods:
+            self.goods.remove(product)
+
 
 ###############################################################
+class Descriptor:
+    def __set_name__(self, owner, name):
+        self.name = '_' + name
+
+    def __get__(self, instance, owner):
+        return getattr(instance, self.name)
+
+    def __set__(self, instance, val):
+        raise NotImplementerError('Setter is not defined in the derived class')
+    # NotImplementedError будет срабатывать, если не переопределить данный метод в дочернем классе. Можно и с pass
+    # решение сделать, но тогда это не имеет смысла: эти строчки просто не будут выполняться, не зависимо  от того,
+    # переопределён метод в дочернем классе или нет. А вот с исключением код сработает, если метод не переопределить,
+    # и даст нам знать, что метод мы не прописали (а, согласно логике) - обязаны были это сделать
+
+
+class StringValue(Descriptor):
+    def __set__(self, instance, val):
+        if isinstance(val, str) and len(val) > 1 and len(val) < 51:
+            setattr(instance, self.name, val)
+
+
+class PriceValue(Descriptor):
+    def __set__(self, instance, val):
+        if isinstance(val, (int, float)) and val >= 0 and val < 10001:
+            setattr(instance, self.name, val)
+
+
+class SuperShop:
+    name = StringValue()
+
+    def __init__(self, name):
+        self.name = name
+        self.goods = []
+
+    def add_product(self, product):
+        if isinstance(product, Product):
+            self.goods.append(product)
+
+    def remove_product(self, product):
+        if product in self.goods:
+            self.goods.remove(product)
+
+
+class Product:
+    name = StringValue()
+    price = PriceValue()
+
+    def __init__(self, n, p):
+        self.name = n
+        self.price = p
+
+
 ###############################################################
+class AbstractValue:
+    def __set_name__(self, owner, name):
+        self.name = '__' + name
+
+    def __set__(self, instance, value):
+        if self.verify(value):
+            setattr(instance, self.name, value)
+
+    def __get__(self, instance, owner):
+        return getattr(instance, self.name)
+
+
+class StringValue(AbstractValue):
+    min_length = 2
+    max_length = 50
+
+    @classmethod
+    def verify(cls, string):
+        return isinstance(string, str) and cls.min_length <= len(string) <= cls.max_length
+
+
+class PriceValue(AbstractValue):
+    max_value = 10_000
+
+    @classmethod
+    def verify(cls, value):
+        return isinstance(value, (int, float)) and 0 <= value <= cls.max_value
+
+
+class Product:
+    name = StringValue()
+    price = PriceValue()
+
+    def __init__(self, name, price):
+        self.name = name
+        self.price = price
+
 
 ################################################################
+# Подвиг 9 (на повторение). Необходимо объявить класс Bag (рюкзак), объекты которого будут создаваться командой:
+# bag = Bag(max_weight)где max_weight - максимальный суммарный вес вещей, который выдерживает рюкзак (целое число).
+# В каждом объекте этого класса должен создаваться локальный приватный атрибут:
+# __things - список вещей в рюкзаке (изначально список пуст).Сам же класс Bag должен иметь объект-свойство:
+# things - для доступа к локальному приватному атрибуту __things (только для считывания, не записи).
+# Также в классе Bag должны быть реализованы следующие методы:add_thing(self, thing) - добавление нового предмета в
+# рюкзак (добавление возможно, если суммарный вес (max_weight) не будет превышен, иначе добавление не происходит);
+# remove_thing(self, indx) - удаление предмета по индексу списка __things;get_total_weight(self) - возвращает
+# суммарный вес предметов в рюкзаке.Каждая вещь описывается как объект класса Thing и создается командой:
+# t = Thing(название, вес)где название - наименование предмета (строка); вес - вес предмета (целое или вещественное
+# число).В каждом объекте класса Thing должны формироваться локальные атрибуты:name - наименование предмета;
+# weight - вес предмета.
+class Bag:
+    def __init__(self, max_weight):
+        self.max_weight = max_weight
+        self.__things = []
+
+    @property
+    def things(self):
+        return self.__things
+
+    def add_thing(self, thing):
+        if self.get_total_weight() + thing.weight <= self.max_weight:
+            self.things.append(thing)
+
+    def remove_thing(self, indx):
+        self.things.pop(indx)
+
+    def get_total_weight(self):
+        return sum(i.weight for i in self.things)
+
+
+class Thing:
+    def __init__(self, name, weight):
+        self.name = name
+        self.weight = weight
+
+
+bag = Bag(1000)
+bag.add_thing(Thing("Книга по Python", 100))
+bag.add_thing(Thing("Котелок", 500))
+bag.add_thing(Thing("Спички", 20))
+bag.add_thing(Thing("Бумага", 100))
+w = bag.get_total_weight()
+for t in bag.things:
+    print(f"{t.name}: {t.weight}")
+
 
 ###############################################################
+class Bag:
+    def __init__(self, max_weight):
+        self.max_weight = max_weight
+        self.__current_weight = 0  # дешевле, чем при запросе к весу высчитывать сумму весов всех предметов каждый раз
+        self.__things = list()
+
+    @property
+    def things(self):
+        return self.__things
+
+    def add_thing(self, thing):
+        if self.max_weight - self.__current_weight - thing.weight >= 0:
+            self.__things.append(thing)
+            self.__current_weight += thing.weight
+
+    def remove_thing(self, indx):
+        thing = self.__things.pop(indx)
+        self.__current_weight -= thing.weight
+
+    def get_total_weight(self):
+        return self.__current_weight
+
+
+class Thing:
+    def __init__(self, name, weight):
+        self.name = name
+        self.weight = weight
+
+
 ###############################################################
+# Подвиг 10 (на повторение). Необходимо написать программу для представления и управления расписанием телевизионного
+# вещания. Для этого нужно объявить класс TVProgram, объекты которого создаются командой:
+# pr = TVProgram(название канала)где название канала - это строка с названием телеканала.В каждом объекте класса
+# TVProgram должен формироваться локальный атрибут:items - список из телепередач (изначально список пуст).
+# В самом классе TVProgram должны быть реализованы следующие методы:add_telecast(self, tl) - добавление новой
+# телепередачи в список items;remove_telecast(self, indx) - удаление телепередачи по ее порядковому номеру
+# (атрибуту __id, см. далее).Каждая телепередача должна описываться классом Telecast, объекты которого создаются
+# командой:tl = Telecast(порядковый номер, название, длительность)где порядковый номер - номер телепередачи в сетке
+# вещания (от 1 и далее); название - наименование телепередачи; длительность - время телепередачи
+# (в секундах - целое число).Соответственно, в каждом объекте класса Telecast должны формироваться локальные
+# приватные атрибуты:__id - порядковый номер (целое число);__name - наименование телепередачи (строка);
+# __duration - длительность телепередачи в секундах (целое число).Для работы с этими приватными атрибутами в
+# классе Telecast должны быть объявлены соответствующие объекты-свойства (property):uid - для записи и считывания из
+# локального атрибута __id;name - для записи и считывания из локального атрибута __name;duration - для записи и
+# считывания из локального атрибута __duration.
+class TVProgram:
+    def __init__(self, name):
+        self.name = name
+        self.items = []
+
+    def add_telecast(self, tl):
+        self.items.append(tl)
+
+    def remove_telecast(self, indx):
+        for tv in self.items:
+            if tv.uid == indx:
+                self.items.remove(tv)
+        # for tv in filter(lambda x: x.uid == indx, self.items):
+        #     self.items.remove(tv)
+
+
+class Telecast:
+    def __init__(self, uid, __name, __duration):
+        self.__id = uid
+        self.__name = __name
+        self.__duration = __duration
+
+    @property
+    def uid(self):
+        return self.__id
+
+    @uid.setter
+    def uid(self, value):
+        self.__id = value
+
+    @property
+    def name(self):
+        return self.__name
+
+    @name.setter
+    def name(self, name):
+        self.__name = name
+
+    @property
+    def duration(self):
+        return self.__duration
+
+    @duration.setter
+    def duration(self, duration):
+        self.__duration = duration
+
+
+pr = TVProgram("Первый канал")
+pr.add_telecast(Telecast(1, "Доброе утро", 10000))
+pr.add_telecast(Telecast(2, "Новости", 2000))
+pr.add_telecast(Telecast(3, "Интервью с Балакиревым", 20))
+for t in pr.items:
+    print(f"{t.name}: {t.duration}")
+
 
 ################################################################
+class Value:
+    def __set_name__(self, owner, name):
+        self.name = f'__{name}'
 
-###############################################################
-###############################################################
+    def __get__(self, instance, owner):
+        return property() if instance is None else getattr(instance, self.name)
 
-################################################################
+    def __set__(self, instance, value):
+        setattr(instance, self.name, value)
 
-###############################################################
-###############################################################
 
-################################################################
+class Telecast:
+    uid = Value()
+    name = Value()
+    duration = Value()
 
-###############################################################
-###############################################################
+    def __init__(self, uid: int, name: str, duration: int):
+        self.uid, self.name, self.duration = uid, name, duration
 
-################################################################
 
-###############################################################
-###############################################################
+class TVProgram:
+    def __init__(self, name):
+        self.name = name
+        self.__items = {}
 
-################################################################
+    @property
+    def items(self):
+        return [val for _, val in sorted(self.__items.items())]
 
-###############################################################
-###############################################################
+    def add_telecast(self, tl: Telecast):
+        self.__items[tl.uid] = tl
 
-################################################################
-
-###############################################################
-###############################################################
-
-################################################################
-
-###############################################################
-###############################################################
-
-################################################################
-
-###############################################################
+    def remove_telecast(self, ind):
+        del self.__items[ind]
 ###############################################################
 
-################################################################
-
-###############################################################
 ###############################################################
 
-################################################################
-
-###############################################################
