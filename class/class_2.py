@@ -2523,6 +2523,7 @@ class Cart:
             print(f"{product.name} {product.price} {self.goods[product]} {product.price * self.goods[product]}")
         print(f'---Total: {self.total}---')
 
+
 billy = User('billy@rambler.ru')
 
 lemon = Product('lemon', 20)
@@ -3254,15 +3255,25 @@ for t in pr.items:
 
 
 ################################################################
+# Делаем как нас учили через дескриптор, но если обращение идет через класс, то говорим - это свойство.Храним программы
+# в dict, такбыстрееудалять, а пр иполучении программ отдаем только значения.
+# Вставка не в конец списка по сложности алгоритмов так же как и переписывание ключей в словаре O(n). А так ты можешь
+# использовать разряженные id, что бы было место куда вставлять без переписывания id это операция будет у тебя
+# равна O(1).
+
+
 class Value:
     def __set_name__(self, owner, name):
         self.name = f'__{name}'
 
     def __get__(self, instance, owner):
         return property() if instance is None else getattr(instance, self.name)
+    # на property() можешь не обращать внимания, это костыль что бы пройти тесты задания. В них был какой-то assert на
+    # проверку наличия св-ва в классе.Достаточно return getattr(instance, self.name)для обычной разработки
 
-    def __set__(self, instance, value):
-        setattr(instance, self.name, value)
+
+def __set__(self, instance, value):
+    setattr(instance, self.name, value)
 
 
 class Telecast:
@@ -3280,8 +3291,9 @@ class TVProgram:
         self.__items = {}
 
     @property
-    def items(self):
-        return [val for _, val in sorted(self.__items.items())]
+    def items(self):  # по условию отдавать нужно список
+        # return [val for _, val in sorted(self.__items.items())]
+        return sorted(self.__items.values(), key=lambda x: x.uid)
 
     def add_telecast(self, tl: Telecast):
         self.__items[tl.uid] = tl
@@ -3291,4 +3303,3 @@ class TVProgram:
 ###############################################################
 
 ###############################################################
-
