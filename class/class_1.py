@@ -1989,6 +1989,19 @@ emp.work.display_company_info()
 
 
 ########################################################################
+# __________Singleton pattern________________
+class Singleton:
+    instance = None
+
+    def __new__(cls, *args, **kwargs):
+        if cls.instance is None:
+            cls.instance = super().__new__(cls, *args, **kwargs)
+        return cls.instance
+
+
+first = Singleton()
+second = Singleton()
+print(first is second)
 # ______________________1.6 Магический метод __new__. Пример паттерна Singleton________________________________
 # Подвиг 6. Объявите класс AbstractClass, объекты которого нельзя было бы создавать. При выполнении команды:
 # obj = AbstractClass()переменная obj должна ссылаться на строку с содержимым:
