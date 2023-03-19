@@ -28,8 +28,8 @@ class Book:
         return object.__getattribute__(self, item)
 
 
-
 book = Book('Python ООП', 'Сергей Балакирев', 123, 2022)
+
 
 ########################################################################
 class Book:
@@ -43,7 +43,7 @@ class Book:
 
     def __setattr__(self, key, value):
         if key in self.dict_title[type(value)]:
-        # if key in self.dict_title.get(type(value), []):
+            # if key in self.dict_title.get(type(value), []):
             object.__setattr__(self, key, value)
         else:
             raise TypeError("Неверный тип присваиваемых данных.")
@@ -51,8 +51,9 @@ class Book:
     def __getattribute__(self, item):
         return object.__getattribute__(self, item)
 
+
 ########################################################################
-#Подвиг 4. Вы создаете интернет-магазин. Для этого нужно объявить два класса:Shop - класс для управления магазином в
+# Подвиг 4. Вы создаете интернет-магазин. Для этого нужно объявить два класса:Shop - класс для управления магазином в
 # целом;Product - класс для представления отдельного товара.Объекты класса Shop следует создавать командой:
 # shop = Shop(название магазина)В каждом объекте класса Shop должно создаваться локальное свойство:
 # goods - список товаров (изначально список пустой).А также в классе объявить методы:add_product(self, product)
@@ -83,7 +84,6 @@ class Shop:
 
 
 class Product:
-
     uid = 1
 
     def __init__(self, name, weight, price):
@@ -113,6 +113,8 @@ shop.add_product(book)
 shop.add_product(Product("Python", 150, 512))
 for p in shop.goods:
     print(f"{p.name}, {p.weight}, {p.price},{p.id}")
+
+
 ########################################################################
 class Product:
     next_id = 1
@@ -130,7 +132,8 @@ class Product:
 
     def __setattr__(self, key, value):
         d = {'id': int, 'name': str, 'weight': (int, float), 'price': (int, float)}
-        if not isinstance(value, d.get(key)) or ((key in ('weight', 'price')) and (value < 0)) or ((key == 'id' and value < 1)):
+        if not isinstance(value, d.get(key)) or ((key in ('weight', 'price')) and (value < 0)) or (
+                (key == 'id' and value < 1)):
             raise TypeError("Неверный тип присваиваемых данных.")
         object.__setattr__(self, key, value)
 
@@ -138,30 +141,458 @@ class Product:
         if key == 'id':
             raise AttributeError("Атрибут id удалять запрещено.")
         object.__delattr__(self, key)
+
+
 ########################################################################
+# Подвиг 5. Необходимо создать программу для обучающего курса. Для этого объявляются три класса:
+# Course - класс, отвечающий за управление курсом в целом;Module - класс, описывающий один модуль (раздел) курса;
+# LessonItem - класс одного занятия (урока).Структура курса на уровне этих классов, приведена на рисунке ниже:
+# Объекты класса LessonItem должны создаваться командой:lesson = LessonItem(название урока, число практических
+# занятий, общая длительность урока)Соответственно, в каждом объекте класса LessonItem должны создаваться
+# локальные атрибуты:title - название урока (строка);practices - число практических занятий (целое положительное число);
+# duration - общая длительность урока (целое положительное число).Необходимо с помощью магических методов реализовать
+# следующую логику взаимодействия с объектами класса LessonItem:1. Проверять тип присваиваемых данных локальным
+# атрибутам. Если типы не соответствуют требованиям, то генерировать исключение командой:raise TypeError("Неверный
+# тип присваиваемых данных.")2. При обращении к несуществующим атрибутам объектов класса LessonItem возвращать
+# значение False.3. Запретить удаление атрибутов title, practices и duration в объектах класса LessonItem.
+# Объекты класса Module должны создаваться командой:module = Module(название модуля)Каждый объект класса Module должен
+# содержать локальные атрибуты:name - название модуля;lessons - список из уроков (объектов класса LessonItem),
+# входящих в модуль (изначально список пуст).Также в классе Module должны быть реализованы методы:
+# add_lesson(self, lesson) - добавление в модуль (в конец списка lessons) нового урока (объекта класса LessonItem);
+# remove_lesson(self, indx) - удаление урока по индексу в списке lessons.Наконец, объекты класса Course создаются
+# командой:course = Course(название курса)И содержат следующие локальные атрибуты:name - название курса (строка);
+# modules - список модулей в курсе (изначально список пуст).Также в классе Course должны присутствовать следующие
+# методы:add_module(self, module) - добавление нового модуля в конце списка modules;remove_module(self, indx)
+# - удаление модуля из списка modules по индексу в этом списке.
+
+class LessonItem:  # класс одного занятия (урока)
+    def __init__(self, title: str, practices: int, duration: int):
+        self.title = title
+        self.practices = practices
+        self.duration = duration
+
+    def __setattr__(self, key, value):
+        if (key == 'practices' or key == 'duration') and type(value) == int:
+            object.__setattr__(self, key, value)
+        elif key == 'title' and type(value) == str:
+            object.__setattr__(self, key, value)
+        else:
+            raise TypeError("Неверный тип присваиваемых данных.")
+
+    def __getattr__(self, item):
+        return False
+
+    def __delattr__(self, item):
+        if item in ['title', 'practices', 'duration']:
+            raise AttributeError("Атрибут id удалять запрещено.")
+        object.__delattr__(self, item)
+
+
+# ***magic!***
+
+class Module:  # класс, описывающий один модуль (раздел) курса
+    def __init__(self, name):
+        self.name = name
+        self.lessons = []
+
+    def add_lesson(self, lesson):  # добавление в модуль (в конец списка lessons) нового урока (объекта кл LessonItem);
+        self.lessons.append(lesson)
+
+    def remove_lesson(self, indx):  # удаление урока по индексу в списке lessons.
+        self.lessons.pop(indx)
+        # del self.lessons[indx]
+
+
+class Course:  # класс, отвечающий за управление курсом в целом:
+    def __init__(self, name):
+        self.name = name
+        self.modules = []
+
+    def add_module(self, module):  # добавление нового модуля в конце списка modules;
+        self.modules.append(module)
+
+    def remove_module(self, indx):  # удаление модуля из списка modules по индексу в этом списке.
+        self.modules.pop(indx)
+
+
+course = Course("Python ООП")
+module_1 = Module("Часть первая")
+module_1.add_lesson(LessonItem("Урок 1", 7, 1000))
+module_1.add_lesson(LessonItem("Урок 2", 10, 1200))
+module_1.add_lesson(LessonItem("Урок 3", 5, 800))
+course.add_module(module_1)
+module_2 = Module("Часть вторая")
+module_2.add_lesson(LessonItem("Урок 1", 7, 1000))
+module_2.add_lesson(LessonItem("Урок 2", 10, 1200))
+course.add_module(module_2)
+
 
 #######################################################################
+class LessonItem:  # класс одного занятия (урока)
+    __attrs = {'title': str, 'practices': int, 'duration': int}
+
+    def __init__(self, title: str, practices: int, duration: int):
+        self.title = title
+        self.practices = practices
+        self.duration = duration
+
+    def __setattr__(self, key, value):
+        if type(value) != self.__attrs[key]:
+            raise TypeError("Неверный тип присваиваемых данных.")
+        elif (key == 'practices' or key == 'duration') and value <= 0:
+            raise TypeError("Неверный тип присваиваемых данных.")
+        super().__setattr__(self, key, value)
+
+    def __getattr__(self, item):
+        return False
+
+    def __delattr__(self, item):
+        if item in self.__attrs:
+            raise AttributeError("Атрибут id удалять запрещено.")
+        super().__delattr__(self, item)
+
 
 ########################################################################
+class Course:
+    def __init__(self, name):
+        self.name = name
+        self.modules = []
+
+    def add_module(self, module):
+        self.modules.append(module)
+
+    def remove_module(self, indx):
+        del self.modules[indx]
+
+
+class Module:
+    def __init__(self, name):
+        self.name = name
+        self.lessons = []
+
+    def add_lesson(self, lesson):
+        self.lessons.append(lesson)
+
+    def remove_lesson(self, indx):
+        del self.lessons[indx]
+
+
+class LessonItem:
+    __attr = {
+        'title': lambda x: isinstance(x, str),
+        'practices': lambda x: isinstance(x, int) and x > 0,
+        'duration': lambda x: isinstance(x, int) and x > 0}  # lambda x: isinstance(x, str) x=value
+
+    def __init__(self, title, practices, duration):
+        self.title = title
+        self.practices = practices
+        self.duration = duration
+
+    def __setattr__(self, key, value):
+        if key in self.__attr and not self.__attr[key](value):
+            # lambda x: isinstance(x, str) x=value
+            raise TypeError("Неверный тип присваиваемых данных.")
+        super().__setattr__(key, value)
+        # object.__setattr__(self, key, value)
+
+    def __getattr__(self, item):
+        return False
+
+    def __delattr__(self, item):
+        if item in ('title', 'practices', 'duration'):
+            raise ValueError("Нельзя это удалить")
+        super().__delattr__(item)
+
 
 ########################################################################
+class LessonItem:
+    title: str
+    practices: int
+    duration: int
+
+    def __init__(self, title, practices, duration):
+        self.title = title
+        self.practices = practices
+        self.duration = duration
+
+    def __setattr__(self, key, value):
+        if not isinstance(value, self.__annotations__.get(key)) or type(value) == int and value <= 0:
+            raise TypeError("Неверный тип присваиваемых данных.")
+        return super().__setattr__(key, value)
+
+    def __getattr__(self, item):
+        return False
+
+    def __delattr__(self, item):
+        if item not in self.__annotations__:
+            super().__delattr__(item)
+
 
 #######################################################################
+class LessonItem:
+    attrs = {'title': lambda x: type(x) is str}
+
+    def __init__(self, title, practices, duration):
+        self.title = title
+        self.practices = practices
+        self.duration = duration
+
+    def __getattr__(self, item):
+        return False
+
+    def __setattr__(self, key, value):
+        if not self.attrs.get(key, lambda x: (isinstance(x, int)) and (x > 0))(value):
+            raise TypeError("Неверный тип присваиваемых данных.")
+        else:
+            object.__setattr__(self, key, value)
+
+    ########################################################################
+    def __setattr__(self, key, value):
+        dct = {'title': isinstance(value, str),
+               'practices': isinstance(value, int) and value > 0,
+               'duration': isinstance(value, int) and value > 0}
+        if dct[key]:
+            return object.__setattr__(self, key, value)
+        raise TypeError("Неверный тип присваиваемых данных.")
+
 
 ########################################################################
+# дескрипторы мне больше нравятся для валидации.
+class Value:
+    def __set_name__(self, owner, name):
+        self.name = name
 
-########################################################################
+    def __get__(self, instance, owner):
+        return instance.__dict__[self.name]
+
+    def __set__(self, instance, value):
+        if not self.validate(value):
+            raise TypeError("Неверный тип присваиваемых данных.")
+        instance.__dict__[self.name] = value
+
+    def validate(self, value) -> bool:
+        raise NotImplemented
+
+
+class String(Value):
+    def validate(self, value) -> bool:
+        return isinstance(value, str) and len(value) > 0
+
+
+class PositiveInteger(Value):
+    def validate(self, value) -> bool:
+        return isinstance(value, int) and value >= 0
+
+
+class LessonItem:
+    title = String()
+    practices = PositiveInteger()
+    duration = PositiveInteger()
+
+    def __init__(self, title: str, practices: int, duration: int):
+        self.title, self.practices, self.duration = title, practices, duration
+
+    def __getattr__(self, item):
+        return False
+
+    def __delattr__(self, item):
+        raise AttributeError("Атрибут удалять запрещено.")
+
 
 #######################################################################
+# Подвиг 6. Вам необходимо написать программу описания музеев. Для этого нужно объявить класс Museum, объекты которого
+# формируются командой:mus = Museum(название музея)В объектах этого класса должны формироваться следующие локальные
+# атрибуты:name - название музея (строка);exhibits - список экспонатов (изначально пустой список).
+# Сам класс Museum должен иметь методы:add_exhibit(self, obj) - добавление нового экспоната в музей
+# (в конец списка exhibits);remove_exhibit(self, obj) - удаление экспоната из музея (из списка exhibits по ссылке obj
+# - на экспонат)get_info_exhibit(self, indx) - получение информации об экспонате (строка) по индексу списка
+# (нумерация с нуля).Экспонаты представляются объектами своих классов. Для примера объявите в программе следующие
+# классы экспонатов:Picture - для картин;Mummies - для мумий;Papyri - для папирусов.
+# Объекты этих классов должны создаваться следующим образом (с соответствующим набором локальных атрибутов):
+# p = Picture(название, художник, описание)  локальные атрибуты: name - название; author - художник;
+# descr - описание m = Mummies(имя мумии, место находки, описание)      # локальные атрибуты: name - имя мумии;
+# location - место находки; descr - описание pr = Papyri(название папируса, датировка, описание)
+# локальные атрибуты: name - название папируса; date - датировка (строка); descr - описание
+# Метод get_info_exhibit() класса Museum должен возвращать значение атрибута descr указанного экспоната в формате:
+# "Описание экспоната {name}: {descr}"
+class Museum:
+    def __init__(self, name):
+        self.name = name
+        self.exhibits = []
+
+    def add_exhibit(self, obj):
+        self.exhibits.append(obj)
+
+    def remove_exhibit(self, obj):
+        self.exhibits.remove(obj)
+
+    def get_info_exhibit(self, indx):
+        x = self.exhibits[indx]
+        return f'Описание экспоната {x.name}: {x.descr}'
+
+
+class Picture:
+    def __init__(self, name, author, descr):
+        self.name = name
+        self.author = author
+        self.descr = descr
+
+
+class Mummies:
+    def __init__(self, name, location, descr):
+        self.name = name
+        self.location = location
+        self.descr = descr
+
+
+class Papyri:
+    def __init__(self, name, date, descr):
+        self.name = name
+        self.date = date
+        self.descr = descr
+
 
 ########################################################################
+class Museum:
+    def __init__(self, name):
+        self.name = name
+        self.__exhibits = []
+
+    def add_exhibit(self, obj):
+        self.exhibits.append(obj)
+
+    def remove_exhibit(self, obj):
+        self.exhibits.remove(obj)
+
+    @property
+    def exhibits(self):
+        return self.__exhibits
+
+    @exhibits.setter
+    def exhibit(self, obj):
+        self.__exhibits = obj
+
+    def get_info_exhibit(self, indx):
+        # # x = self.exhibits[indx]
+        return f'Описание экспоната {self.exhibits[indx].name}: {self.__exhibits[indx].descr}'
+
 
 ########################################################################
+class Exhibit:
+    overridable_attr = None
+
+    def __init__(self, name, overridable, descr):
+        self.name = name
+        self.overridable = overridable
+        self.descr = descr
+
+    def __setattr__(self, key, value):
+        if key == 'overridable':
+            key = self.overridable_attr
+        object.__setattr__(self, key, value)
+
+
+class Picture(Exhibit):
+    overridable_attr = 'author'
+
+
+class Mummies(Exhibit):
+    overridable_attr = 'location'
+
+
+class Papyri(Exhibit):
+    overridable_attr = 'date'
+
+
+class Museum:
+    def __init__(self, name: str):
+        self.name = name
+        self.exhibits = []
+
+    def add_exhibit(self, obj):
+        self.exhibits.append(obj)
+
+    def remove_exhibit(self, obj):
+        self.exhibits.remove(obj)
+
+    def get_info_exhibit(self, indx):
+        exhibit = self.exhibits[indx]
+        return f"Описание экспоната {exhibit.name}: {exhibit.descr}"
 
 ########################################################################
+class Arg:
+    def __init__(self, param):
+        self.param = param
 
+    def __set_name__(self, owner, name):
+        self.name = self.param
+
+    def __set__(self, instance, value):
+        setattr(instance, self.name, value)
+
+
+class Expon:
+    def __init__(self, name: str, arg: str, descr: str):
+        self.name = name
+        self.arg = arg
+        self.descr = descr
+
+    def get_info_exhibit(self):
+        return f"Описание экспоната {self.name}: {self.descr}"
+
+
+class Picture(Expon):
+    arg = Arg("author")
+
+
+class Mummies(Expon):
+    arg = Arg("location")
+
+
+class Papyri(Expon):
+    arg = Arg("date")
+
+
+class Museum:
+    def __init__(self, name):
+        self.name = name
+        self.exhibits = []
+
+    def add_exhibit(self, obj: (Picture, Mummies, Papyri)):
+        self.exhibits.append(obj)
+
+    def remove_exhibit(self, obj: (Picture, Mummies, Papyri)):
+        if obj in self.exhibits:
+            self.exhibits.remove(obj)
+
+    def get_info_exhibit(self, indx):
+        if indx < len(self.exhibits):
+            return self.exhibits[indx].get_info_exhibit()
 #######################################################################
+class Exhibit:
 
+    def __init__(self, name, information, descr):
+        self.name = name
+        self.information = information
+        self.descr = descr
+
+
+class Picture(Exhibit):
+
+    def __init__(self, name, name_author, descr):
+        super().__init__(name, name_author, descr)
+
+
+class Mummies(Exhibit):
+
+    def __init__(self, name, place, descr):
+        super().__init__(name, place, descr)
+
+
+class Papyri(Exhibit):
+
+    def __init__(self, name, date, descr):
+        super().__init__(name, date, descr)
 ########################################################################
 
 ########################################################################
