@@ -1990,18 +1990,38 @@ emp.work.display_company_info()
 
 ########################################################################
 # __________Singleton pattern________________
+# Паттерн или шаблон разработки  - это общие способы решения частых задач и проблем
+# Singleton pattern (шаблон одиночка) -шаблон предоставления глобального доступа к состоянию, объекта всегда один
+# MonoState - это шаблон предоставления глобального доступа к состоянию, объекты могут быть разные
+# нужен для одной точки доступа к ресурсам/данным и для того чтобы ресурсоёмкие задачи сделать 1 раз
+# "+" - 1 раз выполняем тяжёлые задачи, имеет один вход для всей системы
+# "-" - общесистемная глобальная переменная
+# Т/О модуль это как бы и есть Singleton
 class Singleton:
     instance = None
-
     def __new__(cls, *args, **kwargs):
         if cls.instance is None:
             cls.instance = super().__new__(cls, *args, **kwargs)
         return cls.instance
 
+    def _do_work(self):
+        print('do some hard work')
+        self.data = 101
+# аналог Singleton pattern - MonoState делает одно и тоже состояние
+class MonoState:
+    _shared_state = {}
 
-first = Singleton()
-second = Singleton()
-print(first is second)
+    def __init__(self):
+        self.__dict__ = self._shared_state
+        if not self._shared_state:
+            print('do some hard work')
+            self.data = 101
+
+if __name__ == '__main__':
+    first = Singleton()
+    second = Singleton()
+    print(first is second)  # True
+
 # ______________________1.6 Магический метод __new__. Пример паттерна Singleton________________________________
 # Подвиг 6. Объявите класс AbstractClass, объекты которого нельзя было бы создавать. При выполнении команды:
 # obj = AbstractClass()переменная obj должна ссылаться на строку с содержимым:
