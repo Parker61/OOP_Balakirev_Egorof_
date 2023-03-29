@@ -1491,6 +1491,7 @@ def f(x):
 
 # способ 2: превратить функцию в экз класса тогда вызывая экз. сработает __call__, в этот __call__ передастся арг. []
 # f = Derivate(f)
+# Вызов декорируемой функции
 print(f([0, 1, 2, 3, 4]))  # передаём арг [] в __cal__
 
 
@@ -1644,7 +1645,7 @@ class LengthValidator:
 
     def __call__(self, *args, **kwargs):
         return self.min_length <= len(args[0]) <= self.max_length
-     # return isinstance(string, str) and self.min_length <= len(string) <= self.max_length
+    # return isinstance(string, str) and self.min_length <= len(string) <= self.max_length
 
 
 class CharsValidator:
@@ -1672,40 +1673,338 @@ lg = LoginForm("Вход на сайт", validators=[LengthValidator(3, 50), Cha
 lg.post({"login": "root", "password": "panda"})
 if lg.is_validate():
     print("Дальнейшая обработка данных формы")
+
+
 ########################################################################
+# Подвиг 5. Объявите класс DigitRetrieve для преобразования данных из строки в числа. Объекты этого класса создаются
+# командой:dg = DigitRetrieve()Затем, их предполагается использовать, например следующим образом:
+# d1 = dg("123")   # 123 (целое число)То есть, целые числа в строке следует приводить к целочисленному типу данных, а
+# все остальные - к значению None.С помощью объектов класса DigitRetrieve должно выполняться преобразование чисел
+# из списка строк следующим образом:
+# st = ["123", "abc", "-56.4", "0", "-5"]digits = list(map(dg, st))  # [123, None, None, 0, -5]
+class DigitRetrieve:
+    def __call__(self, *args, **kwargs):
+        if args[0][0] == '-' and args[0][1:].isdigit():
+            return int(args[0])
+        elif args[0].isdigit():
+            return int(args[0])
+        return None
+        # try:
+        #     return int(args[0])
+        # except:
+        #     return None
+
+
+dg = DigitRetrieve()
+st = ["123", "abc", "-56.4", "0", "-5"]
+digits = list(map(dg, st))  # [123, None, None, 0, -5]
+print(digits)
+
 
 #######################################################################
+class DigitRetrieve:
+    def __call__(self, num):
+        if num.isdigit() or num.startswith('-') and num[1:].isdigit():
+            return int(num)
+
 
 ########################################################################
+import re
+
+
+class DigitRetrieve:
+    def __call__(self, value):
+        if re.fullmatch(r'-?\d+', value):
+            return int(value)
+
 
 ########################################################################
+class DigitRetrieve:
+    def __call__(self, value):
+        if value.lstrip('-').isdigit():
+            return int(value)
+
 
 #######################################################################
+class DigitRetrieve:
+    def __call__(self, st, *args, **kwargs):
+        if (st[1:] if st.startswith('-') else st).isdigit():
+            return int(st)
+
+
+# решение с регулярками - оно еще медленнее работает) так что на первом месте этот вариант со срезами
+# (собственно, я сперва полагал что раз при создании срезов создается новый объект, то это будет отнимать достаточно
+# времени, в то время как в варианте с исключениями такого нет), посерединке вариант с исключениями и на последнем месте
+# через регулярку
+########################################################################
+# Подвиг 6. Предположим, вам необходимо создать программу по преобразованию списка строк, например:
+# lst = ["Пункт меню 1", "Пункт меню 2", "Пункт меню 3"]в следующий фрагмент HTML-разметки (многострочной строки,
+# кавычки выводить не нужно):'''<ul><li>Пункт меню 1</li><li>Пункт меню 2</li><li>Пункт меню 3</li></ul>'''
+# Для этого необходимо объявить класс RenderList, объекты которого создаются командой:
+# render = RenderList(type_list)где type_list - тип списка (принимает значения: "ul" - для списка с тегом <ul> и
+# "ol" - для списка с тегом <ol>). Если значение параметра type_list другое (не "ul" и не "ol"),
+# то формируется список с тегом <ul>.Затем, предполагается использовать объект render следующим образом:
+# html = render(lst) # возвращается многострочная строка с соответствующей HTML-разметкой
+class RenderList:
+    def __init__(self, type_list):
+        self.type_list = type_list
+
+    @property
+    def type_list(self):
+        return self.__type_list
+
+    @type_list.setter
+    def type_list(self, type_list):
+        if type_list == "ol":
+            self.__type_list = "ol"
+        elif type(type_list) == str:
+            self.__type_list = "ul"
+
+    def __call__(self, *args, **kwargs):
+        return "\n".join([f'<{self.type_list}>', *map(lambda x: f'<li>{x}</li>', args[0]), f'</{self.type_list}>'])
+        return f'<{self.type_list}>\n' \
+               f'<li>Пункт меню 1</li>\n' \
+               f'<li>Пункт меню 2</li>\n' \
+               f'<li>Пункт меню 3</li>\n' \
+               f'</{self.type_list}>\n'
+
+        new_list = '\n'.join([f"<li>{el}</li>" for el in lst])
+        return f'<{self.type_list}>\n{new_list}\n</{self.type_list}>'
+
+
+type_list = "ol"
+lst = ["Пункт меню 1", "Пункт меню 2", "Пункт меню 3"]
+render = RenderList(type_list)
+html = render(lst)
+
+
+####################################################################################################################
+def __call__(self, lst, *args, **kwargs):
+    res = f"<{self.type_list}>\n"
+    for item in lst:
+        res += f"<li>{item}</li>\n"
+    res += f"</{self.type_list}>"
+    return res
+
 
 ########################################################################
+# Подвиг 7. Необходимо объявить класс-декоратор с именем HandlerGET, который будет имитировать обработку GET-запросов
+# на стороне сервера. Для этого сам класс HandlerGET нужно оформить так, чтобы его можно было применять к любой функции
+# как декоратор. Например:#
+# @HandlerGET def contact(request):
+# return "Сергей Балакирев"Здесь request - это произвольный словарь с данными текущего запроса, например, такой:
+# {"method": "GET", "url": "contact.html"}. А функция должна возвращать строку.Затем, при вызове декорированной функции:
+# res = contact({"method": "GET", "url": "contact.html"})должна возвращаться строка в формате:"GET: <данные из функции>"
+# В нашем примере - это будет:"GET: Сергей Балакирев"Если ключ method в словаре request отсутствует, то по умолчанию
+# подразумевается GET-запрос. Если же ключ method принимает другое значение, например, "POST", то декорированная
+# функция contact должна возвращать значение None.Для реализации имитации GET-запроса в классе HandlerGET следует
+# объявить вспомогательный метод со следующей сигнатурой:def get(self, func, request, *args, **kwargs): ...
+# Здесь func - ссылка на декорируемую функцию; request - словарь с переданными данными при вызове декорированной
+# функции. Именно в этом методе следует формировать возвращаемую строку в указанном формате: "GET: Сергей Балакирев"
+class HandlerGET:
+    def __init__(self, func):
+        self.func = func
 
-###############################################################################################################################################
+    def get(self, func, request, *args, **kwargs):
+        # print(request)  # ({'method': 'GET', 'url': 'contact.html'},)
+        if request[0].get('POST') == 'GET':
+            return None
+        if request[0].get('method', 'GET') == 'GET':
+            return f'GET: {func(request)}'
+        # return f'GET: {self.func(request)}'
+
+    def __call__(self, *args, **kwargs):
+        return self.get(self.func, args)
+
+
+@HandlerGET
+def contact(request):
+    return "Сергей Балакирев"
+
+
+res = contact({"method": "GET", "url": "contact.html"})
+
 
 ########################################################################
+class HandlerGET:
+    def __init__(self, func):
+        self.func = func
+
+    def get(self, func, request, *args, **kwargs):
+        return f'GET: {func(request)}'
+
+    def __call__(self, request, *args, **kwargs):
+        # print(request)  # {'method': 'GET', 'url': 'contact.html'}
+        if request.get('method', 'GET') == 'GET':
+            return self.get(self.func, request, *args, **kwargs)
+        else:
+            return None
+
+
+@HandlerGET
+def contact(request):
+    return "Сергей Балакирев"
+
+
+res = contact({"method": "GET", "url": "contact.html"})
+print(res)
+
 
 ########################################################################
+class HandlerGET:
 
-########################################################################
+    def __init__(self, func):
+        self._func = func
+
+    def __call__(self, request):
+        return self.get(self._func, request)
+
+    def get(self, func, request, *args, **kwargs):
+        method = request.get('method', 'GET')
+        if method != 'GET':
+            return None
+        return f'GET: {func(request)}'
+
 
 #######################################################################
+class HandlerGET:
+    def __init__(self, func):
+        self.func = func
+
+    def __call__(self, requests, *rgs, **kwargs):
+        if 'method' in requests and requests['method'] != 'GET':
+            return None
+        else:
+            return self.get(self.func, requests)
+
+    def get(self, func, request, *args, **kwargs):
+        return 'GET: ' + func(request)
+
 
 ########################################################################
+def HandlerGET(func):
+    def wrapper(request, *args, **kwargs):
+        if 'method' in request and request['method'] != "GET":
+            return None
+        else:
+            return f"GET: {func(request, *args, **kwargs)}"
+
+    return wrapper
+
 
 ########################################################################
+# __________ Декоратор с параметрами______________________________________________________
+class Decorator:
+    def __init__(self, a, b):
+        self.a = a
+        self.b = b
+
+    def __call__(self, func):
+        def wrapper(x, y=1):
+            return func(x) + y * (self.a + self.b)
+
+        return wrapper
+
+
+@Decorator(4, 8)
+def my_func(x):
+    return x
+
 
 #######################################################################
+def digits_dec(num=0):
+    def decorator(func):
+        def wrapper(x):
+            result = x ** num
+            return result
+
+        return wrapper
+
+    return decorator
+
+
+@digits_dec(2)  # по умолчанию берет степень НОЛЬ измените на @digits_dec(2)
+def a(x):
+    return x
+
+
+print(a(11))
 
 ########################################################################
+# Подвиг 8 (развитие подвига 7). Необходимо объявить класс-декоратор с именем Handler, который можно было бы применять
+# к функциям следующим образом:# @Handler(methods=('GET', 'POST')) # по умолчанию methods = ('GET',)
+# def contact(request):#     return "Сергей Балакирев"# Здесь аргумент methods декоратора Handler содержит список
+# разрешенных запросов для обработки. Сама декорированная функция вызывается по аналогии с предыдущим подвигом:
+# # res = contact({"method": "POST", "url": "contact.html"})# В результате функция contact должна возвращать
+# строку в формате:# "<метод>: <данные из функции>"# В нашем примере - это будет:# "POST: Сергей Балакирев"
+# Если ключ method в словаре request отсутствует, то по умолчанию подразумевается GET-запрос. Если ключ method
+# принимает значение отсутствующее в списке methods декоратора Handler, например, "PUT", то декорированная функция
+# contact должна возвращать значение None.# Для имитации GET и POST-запросов в классе Handler необходимо объявить
+# два вспомогательных метода с сигнатурами:# def get(self, func, request, *args, **kwargs) -
+# для имитации обработки GET-запроса# def post(self, func, request, *args, **kwargs) -
+# для имитации обработки POST-запроса# В зависимости от типа запроса должен вызываться соответствующий метод
+# (его выбор в классе можно реализовать методом __getattribute__()). На выходе эти методы должны формировать
+# строки в заданном формате.# P.S. В программе достаточно объявить только класс. Ничего на экран выводить не нужно.
+# Небольшая справка# Для реализации декоратора с параметрами на уровне класса в инициализаторе
+# __init__(self, methods) прописываем параметр для декоратора, а магический метод __call__() объявляем как
+# полноценный декоратор на уровне функции.
 
-###############################################################################################################################################
+from functools import wraps
 
-########################################################################
 
+class Handler:
+    def __init__(self, methods=None):
+        self.method = methods
+        # print(self.method) # ('GET', 'POST')
+
+    def __call__(self, func, *args, **kwargs):
+        @wraps(func)  # чтобы имя функции contact не заменялось на wrapper
+        def wrapper(request, *args, **kwargs):
+            # print(request) # {'method': 'POST', 'url': 'contact.html'}
+            if request.get('method', 'GET') in self.method:
+                if request.get('method', 'GET') == 'GET':
+                    return self.get(func, request, *args, **kwargs)
+                return self.post(func, request, *args, **kwargs)
+                # self.__getattribute__(method)(func, request)
+            else:
+                return None
+
+        return wrapper
+
+    def get(self, func, request, *args, **kwargs):
+        return f'GET: {func(request)}'
+
+    def post(self, func, request, *args, **kwargs):
+        return f'{request["method"]}: {func(request)}'
+
+
+@Handler(methods=('GET', 'POST'))  # по умолчанию methods = ('GET',)
+def contact(request):
+    return "Сергей Балакирев"
+
+    ###############################################################################################################################################
+    def __call__(self, func, *args, **kwargs):
+        def wrapper(request, *args, **kwargs):
+            if request.get('method', 'GET') in self.__method:
+                method = request.get('method', 'GET').lower()  # перевести GET/POST в  get/post
+                return self.__getattribute__(method)(func, request)
+
+        # автоматически вызов def get или def post и передаём в них (func, request) #
+        # self.__getattribute__(method) - то это будет ссылка на ф. Во вторых скобках указываем аргументы для этой фу
+        # найти и подставить атрибут-метод method)(......) т.е. все лишь зависимый поиск атрибута по
+        # агрументу x self.____getattribute__(x)
+        return wrapper
+
+    ########################################################################
+    def __call__(self, func) -> Any:
+        def wrapper(request: dict):
+            name_method: str = request.get('method', 'GET')
+            if name_method not in self.methods:
+                return None
+            return getattr(self, str.lower(name_method))(func, request)
+            # return getattr(self, str(name_method.lower()))(func, request)
+
+        return wrapper
 ########################################################################
 
 ########################################################################
