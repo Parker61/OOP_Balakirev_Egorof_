@@ -2005,14 +2005,132 @@ def contact(request):
             # return getattr(self, str(name_method.lower()))(func, request)
 
         return wrapper
-########################################################################
+
 
 ########################################################################
+# Подвиг 9. Объявите класс-декоратор InputDigits для декорирования стандартной функции input так, чтобы при вводе
+# строки из целых чисел, записанных через пробел, например:"12 -5 10 83"на выходе возвращался список из целых чисел:
+# [12, -5, 10, 83]Назовите декорированную функцию input_dg и вызовите ее командой:
+class InputDigits:
+    def __init__(self, func):
+        self.func = func
+
+    def __call__(self, *args, **kwargs):
+        lst = self.func().split()
+        return [*map(int, lst)]
+
+
+@InputDigits
+def input_dg():
+    return input()
+
+
+# input_dg = InputDigits(input_dg)
+res = input_dg()
+
+
+########################################################################
+class InputDigits:
+
+    def __call__(self, *args, **kwargs):
+        return [int(i) for i in input().split()]
+
+
+input_dg = InputDigits()
+res = input_dg()
+
+
+########################################################################
+# Подвиг 10 (развитие подвига 9). Объявите класс-декоратор InputValues с параметром render - функция или объект для
+# преобразования данных из строк в другой тип данных. Чтобы реализовать такой декоратор в инициализаторе __init__()
+# следует указать параметр render, а магический метод __call__() определяется как функция-декоратор:
+# class InputValues: В качестве рендера объявите класс с именем RenderDigit, который бы преобразовывал строковые
+# данные в целые числа. Объекты этого класса создаются командой:render = RenderDigit()и применяются следующим образом:
+# d1 = render("123")   # 123 (целое число)d2 = render("45.54")   # None (не целое число)Декорируйте стандартную функцию
+# input декоратором InputValues и объектом рендера класса RenderDigit так, чтобы на выходе при вводе целых чисел
+# через пробел возвращался список из введенных значений. А на месте не целочисленных данных - значение None.
+# Например, при вводе строки:"1 -5.3 0.34 abc 45f -5"должен возвращаться список:[1, None, None, None, None, -5]
+# Назовите декорированную функцию input_dg и вызовите ее командой:res = input_dg()
+class InputValues:
+    def __init__(self, render):  # render - ссылка на функцию или объект для преобразования
+        self.__render = render
+
+    def __call__(self, func):  # func - ссылка на декорируемую функцию
+        def wrapper(*args, **kwargs):
+            return [self.__render(i) for i in func().split()] # [1 -5.3 0.34 abc 45f -5]
+
+        return wrapper
+
+
+class RenderDigit:
+
+    def __call__(self, string, *args, **kwargs):
+        if string.replace('-', '').isdigit():
+            # if string.rstrip('-').isdigit():
+            return int(string)
+        # return None
+
+
+render = RenderDigit()
+
+
+@InputValues(render)
+def input_dg():
+    return input('input: ')
+
+
+# input_dg = InputValues(render)(input)
+res = input_dg()
+print(res)
+
 
 #######################################################################
+#
+class InputValues:
+    def __init__(self, render):  # render - ссылка на функцию или объект для преобразования
+        self.__render = render
+
+    def __call__(self, func):  # func - ссылка на декорируемую функцию
+        def wrapper(*args, **kwargs):
+            return list(map(self.__render, func().split()))
+        # return [*map(self.__render, func().split())]
+
+        return wrapper
+
+
+class RenderDigit:
+
+    def __call__(self, string, *args, **kwargs):
+        try:
+            return int(string)
+        except:
+            return None
+        # if string.replace('-', '').isdigit():
+        #     return int(string)
+        # return None
+
+
+render = RenderDigit()
+
+
+@InputValues(render)
+def input_dg():
+    return input()
+
+
+# input_dg = InputValues(render)(input)
+# input_dg = InputValues(RenderDigit())(input)
+res = input_dg()
+print(res)
+
 
 ########################################################################
-
+class RenderDigit:
+    def __call__(self, *args, **kwargs):
+        try:
+            return int(args[0])
+        except ValueError:
+            return
 ########################################################################
 
 #######################################################################
