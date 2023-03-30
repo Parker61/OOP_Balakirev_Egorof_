@@ -2573,7 +2573,6 @@ cart_billy.order()  # Заказ оплачен
 # ___________Дескрипторы ________________________________________________________________
 '''Общая схема работы дескриптора для класса Point3D'''
 
-
 class Integer:  # Дескриптор
     def __set_name__(self, owner, name):
         # Метод автоматически вызывается когда создается экземпляр класса
@@ -2584,7 +2583,8 @@ class Integer:  # Дескриптор
         # self - ссылка на экземпляр класса
         # instance - ссылка на экзампляр класса из которого был вызван
         # owner - ссылка на класс Point3D
-        return instance.__dict__[self.name]
+        return getattr(instance, self.name)
+        # return instance.__dict__[self.name]
 
     def __set__(self, instance, value):
         # Срабатывает в момент присваивания из инициализатора
@@ -2592,9 +2592,8 @@ class Integer:  # Дескриптор
         # instance - ссылка на экзампляр класса из которого был вызван
         # Value - значение которое будет присвоено
         print(f"__set__:{self.name} = {value}")
-        instance.__dict__[self.name] = value
-
-
+        setattr(instance, self.name, value)
+        # instance.__dict__[self.name] = value
 class Point3D:
     x = Integer()
     y = Integer()
@@ -2605,10 +2604,7 @@ class Point3D:
         self.x = x
         self.y = y
         self.z = z
-
-
 pt = Point3D(1, 2, 3)
-
 
 ############################################################
 class Integer:
