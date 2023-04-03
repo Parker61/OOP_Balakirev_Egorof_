@@ -1,6 +1,205 @@
 ########################################################################
+# Подвиг 1. Каково назначение магических методов __str__ и __repr__?
+# метод __repr__ возвращает строковую информацию об объекте класса для служебного пользования (например, в командную
+# строку), а также может использоваться, если не определен метод __str__
+
+# метод __str__ вызывается (если он определен в классе) для вывода информации об объекте класса в консоль с
+# помощью функций print() и str()
+
+# _______________3.1 Магические методы. Методы __str__ и __repr_
+#######################################################################
+# Создайте класс Person, у которого есть:конструктор __init__, принимающий 3 аргумента: name, surname, gender.
+# Атрибут gender может принимать только 2 значения: "male" и "female", по умолчанию "male". Если в атрибут gender
+# передается любое другое значение, печатать сообщение: "Не знаю, что вы имели ввиду? Пусть это будет мальчик!"
+# и проставить атрибут gender значением "male"переопределить метод __str__ следующим образом:
+# если объект - мужчина (атрибут gender = "male"), возвращать строку "Гражданин <Фамилия> <Имя>"
+# если объект - женщина (атрибут gender = "female"), возвращать строку "Гражданка <Фамилия> <Имя
+class Person:
+    def __init__(self, name, surname, gender='male'):
+        self.name = name
+        self.surname = surname
+        if gender == 'male' or gender == 'female':
+            self.gender = gender
+        else:
+            self.gender = 'male'
+            print(f'Не знаю, что вы имели ввиду? Пусть это будет мальчик!')
+
+    def __str__(self):
+        if self.gender == 'male':
+            return f'Гражданин {self.surname} {self.name}'
+        elif self.gender == 'female':
+            return f'Гражданка {self.surname} {self.name}'
+
+
+########################################################################
+class Person:
+    def __init__(self, name, surname, gender='male'):
+        self.name = name
+        self.surname = surname
+        self.gender = self.check_gender(gender)
+
+    @classmethod
+    def check_gender(cls, gender):
+        # @staticmethod
+        # def check_gender(gender):
+        if gender not in ['male', 'female']:
+            print('Не знаю, что вы имели ввиду? Пусть это будет мальчик!')
+            return 'male'
+        return gender
+
+
+###############################################################################################################################################
+# Создайте класс Vector, который хранит в себе вектор целых чисел.  У класса Vector есть:
+# конструктор __init__, принимающий произвольное количество аргументов. Среди всех переданных аргументов необходимо
+# оставить только целые числа и сохранить их в атрибут values в виде списка;переопределить метод __str__ так, чтобы
+# экземпляр класса Vector выводился следующим образом: «Вектор(<value1>, <value2>, <value3>, ...)», если вектор не
+# пустой. При этом значения должны быть упорядочены по возрастанию (будьте аккуратнее с пробелами, они стоят
+# только после запятых, см. пример ниже);«Пустой вектор», если наш вектор не хранит в себе значения
+class Vector:
+    def __init__(self, *args):
+        self.values = self.func_args(*args)
+
+    @classmethod
+    def func_args(cls, *args):
+        return sorted(x for x in args if type(x) == int)
+
+    # return sorted(filter(lambda x: type(x) is int, args))
+
+    def __str__(self):
+        if self.values:
+            return f'Вектор{tuple(self.values)}'
+        else:
+            return f'Пустой вектор'
+
+
+########################################################################
+# Давайте определим магические методы __str__ и __repr__ для класса GroceryItem, представляющего продуктовый товар:
+# Создайте класс GroceryItem, который имеет следующие методы:метод __init__, который устанавливает значения
+# атрибутов name, price и quantity: название товара, его цену и количествомагический метод __str__, который возвращает
+# строковое представление товара в следующем виде:ame: {name}Price: {price}Quantity: {quantity}магический метод
+# __repr__, который возвращает однозначное строковое представление объектаGroceryItem({name}, {price}, {quantity})
+class GroceryItem:
+    def __init__(self, name, price, quantity):
+        self.name = name
+        self.price = price
+        self.quantity = quantity
+
+    def __str__(self):
+        return f'Name: {self.name}\nPrice: {self.price}\nQuantity: {self.quantity}'
+
+    def __repr__(self):
+        return f'GroceryItem({self.name}, {self.price}, {self.quantity})'
+
+
+########################################################################
+class GroceryItem:
+    def __init__(self, name, price, quantity):
+        self.name = name
+        self.price = price
+        self.quantity = quantity
+
+    def __str__(self):
+        return f"""Name: {self.name}
+Price: {self.price}
+Quantity: {self.quantity}"""
+
+    def __repr__(self):
+        return f'GroceryItem({self.name}, {self.price}, {self.quantity})'
+
+
+########################################################################
+class GroceryItem:
+    def __init__(self, *args):
+        self.name, self.price, self.quantity = args
+        self.attr = ('name', 'price', 'quantity')
+
+    def __str__(self):
+        return '\n'.join(f'{attr.title()}: {getattr(self, attr)}' for attr in self.attr)
+
+    def __repr__(self):
+        return "GroceryItem" + str(tuple(getattr(self, x) for x in self.attr)).replace("'", "")
+
 
 #######################################################################
+# Создайте класс Hero, который имеет следующие методы:метод __len__, который возвращает количество атрибутов экземпляра
+# приватный метод __str__, который возвращает строковое представление героя. Для этого нужно перечислить все атрибуты
+# в алфавитном порядке на отдельной строке, напротив каждого атрибута указать его значение. Вот такой формат должен
+# получится:атрибут_1: значение_атрибут_1атрибут_2: значение_атрибут_2..атрибут_N: значение_атрибут_N
+# Если у экземпляра нету атрибутов, необходимо вернуть пустую строку
+class Hero:
+
+    def __len__(self):
+        return len(self.__dict__)
+
+    def __str__(self):
+        if not len(self.__dict__):
+            return f''
+        else:
+            string = ''
+            for key, value in sorted(self.__dict__.items(), key=lambda x: x[0]):
+                string += f'{key}: {str(value)}\n'
+            return string.rstrip()
+
+    ########################################################################
+    def __str__(self):
+        return "\n".join([f"{key}: {value}" for key, value in sorted(self.__dict__.items())])
+
+
+########################################################################
+# Подвиг 2. Объявите класс с именем Book (книга), объекты которого создаются командой:
+# book = Book(title, author, pages)где title - название книги (строка); author - автор книги (строка);
+# pages - число страниц в книге (целое число).Также при выводе информации об объекте на экран командой:
+# print(book)должна отображаться строчка в формате:"Книга: {title}; {author}; {pages}"Например:
+# "Книга: Муму; Тургенев; 123"Прочитайте из входного потока строки с информацией
+import sys
+
+
+class Book:
+    def __init__(self, title, author, pages):
+        self.title = title
+        self.author = author
+        self.pages = pages
+
+    def __str__(self):
+        return f'Книга: {self.title}; {self.author}; {int(self.pages)}'
+
+
+lst_in = list(map(str.strip, sys.stdin.readlines()))
+book = Book(*lst_in)
+# book = Book(lst_in[0], lst_in[1], int(lst_in[2]))
+
+print(book)
+
+#######################################################################
+#Подвиг 3. Объявите класс с именем Model, объекты которого создаются командой:
+# model = Model()Объявите в этом классе метод query() для формирования записи базы данных. Использоваться этот
+# метод должен следующим образом:model.query(field_1=value_1, field_2=value_2, ..., field_N=value_N)Например:
+# model.query(id=1, fio='Sergey', old=33)Все эти переданные данные должны сохраняться внутри объекта model класса
+# Model. Затем, при выполнении команды:print(model)В консоль должна выводиться информация об объекте в формате:
+# "Model: field_1 = value_1, field_2 = value_2, ..., field_N = value_N"Например:"Model: id = 1, fio = Sergey, old = 33"
+# Если метод query() не вызывался, то в консоль выводится строка:"Model"
+class Model:
+    def __init__(self):
+        self.model = None
+
+    def query(self, *args, **kwargs):
+        # print(kwargs)  # {'id': 1, 'fio': 'Sergey', 'old': 33}
+        self.model = kwargs
+        # print(self.model)
+
+    def __str__(self):
+        if self.model is None:
+            return f'Model'
+        string = ''
+        for k, v in self.model.items():
+            string += f'{k} = {v}, '
+
+        return f'Model: {string.rstrip(", ")}'
+
+
+model = Model()
+model.query(id=1, fio='Sergey', old=33)
+print(model)
 
 ########################################################################
 
@@ -410,25 +609,7 @@
 
 #######################################################################
 
-########################################################################
 
-########################################################################
-
-#######################################################################
-
-########################################################################
-
-###############################################################################################################################################
-
-########################################################################
-
-########################################################################
-
-########################################################################
-
-#######################################################################
-
-# 3.1 Магические методы. Методы __str__ и __repr_
 ########################################################################
 
 ########################################################################
