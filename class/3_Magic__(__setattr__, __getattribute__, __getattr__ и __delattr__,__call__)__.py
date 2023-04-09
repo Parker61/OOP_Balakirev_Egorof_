@@ -2,14 +2,14 @@
 # __________Песнь 10. Магические методы __setattr__, __getattribute__, __getattr__ и __delattr________________________________
 class Magic:
     def __getattribute__(self, item):
-        """Автоматически вызывается, когда идёт обращение к атрибуту через экземпляр класса
+        """Автоматически вызывается, когда идёт обращение к любому атрибуту через экземпляр класса
         self-ссылка на экземпляр,
         item- атрибут к которому идёт обращение + можно запрещать обращаться к атрибуту экз. класса"""
         if item == 'Имя атрибута':
             raise ValueError('Запрещено обращаться к этому атрибуту')
 
     def __getattr__(self, item):
-        """Автоматически вызывается, когда идёт обращение к несуществующему атрибуту экз. класса
+        """Автоматически вызывается, когда идёт обращение только к несуществующему атрибуту экз. класса
         тогда можно вернуть False, чтобы исключить вызов ошибки"""
         return False
 
@@ -30,6 +30,26 @@ class Magic:
         object.__delattr__(self, item)
 
 
+########################################################################
+class ObjList:
+
+    def __init__(self, data):
+        self.data = data
+        self.next = self.prev = None
+
+    def __setattr__(self, attr, value):
+        if attr == 'data' and isinstance(value, str):
+            object.__setattr__(self, '_ObjList__' + attr, value)
+        elif attr in ('prev', 'next') and isinstance(value, (ObjList, type(None))):
+            object.__setattr__(self, '_ObjList__' + attr, value)
+
+    def __getattribute__(self, attr):
+        if attr in ('data', 'prev', 'next'):
+            return object.__getattribute__(self, '_ObjList__' + attr)
+        return object.__getattribute__(self, attr)
+
+
+################################################################
 # 3.1 Методы __setattr__, __getattribute__, __getattr__ и __delattr__
 # Подвиг 3. Объявите класс Book для представления информации о книге. Объекты этого класса должны создаваться командами:
 # book = Book()book = Book(название, автор, число страниц, год издания)В каждом объекте класса Book автоматически должны
@@ -1008,7 +1028,10 @@ def type(arg):
 # Дескрипторы
 class Desc:
     def __set_name__(self, owner, name):
-        self.instance_name = '_' + owner.__name__ + '__' + name
+        self.name = '__' + name
+        # self.instance_name = '_' + owner.__name__ + '__' + name
+        # self.name = f'_{owner.__name__}__{name}'
+        # self.name = '_' + owner.__name__ + '__' + name
 
     def __get__(self, instance, owner):
         if instance:
@@ -2057,7 +2080,7 @@ class InputValues:
 
     def __call__(self, func):  # func - ссылка на декорируемую функцию
         def wrapper(*args, **kwargs):
-            return [self.__render(i) for i in func().split()] # [1 -5.3 0.34 abc 45f -5]
+            return [self.__render(i) for i in func().split()]  # [1 -5.3 0.34 abc 45f -5]
 
         return wrapper
 
@@ -2093,6 +2116,7 @@ class InputValues:
     def __call__(self, func):  # func - ссылка на декорируемую функцию
         def wrapper(*args, **kwargs):
             return list(map(self.__render, func().split()))
+
         # return [*map(self.__render, func().split())]
 
         return wrapper
@@ -2131,5 +2155,3 @@ class RenderDigit:
             return int(args[0])
         except ValueError:
             return
-
-
