@@ -1477,110 +1477,2010 @@ class MaxPooling:
 mp = MaxPooling(step=(2, 2), size=(2, 2))
 res = mp([[1, 2, 3, 4], [5, 6, 7, 8], [9, 8, 7, 6], [5, 4, 3, 2]])  # [[6, 8], [9, 7]]
 print(res)  # [[6, 8], [9, 7]]
+
+
 # ########################################################################
+class MaxPooling:
+    def __init__(self, step: tuple = (2, 2), size: tuple = (2, 2)) -> None:
+        self.step = step
+        self.size = size
+
+    def validateMatrix(self, matrix: list) -> None:
+        rowLength = len(matrix[0])
+        if all(len(row) == rowLength for row in matrix):
+            if all(type(i) in (int, float) for row in matrix for i in row):
+                return
+        raise ValueError("Неверный формат для первого параметра matrix.")
+
+    def __call__(self, matrix: list) -> list:
+        self.validateMatrix(matrix)
+
+        rangeI = range(self.size[1], len(matrix) + 1, self.step[1])
+        rangeJ = range(self.size[0], len(matrix[0]) + 1, self.step[0])
+
+        return [[max(matrix[y][x]
+                     for y in range(i - self.size[1], i)
+                     for x in range(j - self.size[0], j)
+                     ) for j in rangeJ]
+                for i in rangeI]
+
 
 ########################################################################
+class MaxPooling:
+    def __init__(self, step: tuple = (2, 2), size: tuple = (2, 2)) -> None:
+        self.step = step
+        self.size = size
+
+    def validateMatrix(self, matrix: list) -> None:
+        rowLength = len(matrix[0])
+        if all(len(row) == rowLength for row in matrix):
+            if all(type(i) in (int, float) for row in matrix for i in row):
+                return
+        raise ValueError("Неверный формат для первого параметра matrix.")
+
+    def __call__(self, matrix: list) -> list:
+        self.validateMatrix(matrix)
+
+        return [[max(matrix[y][x]
+                     for y in range(i - self.size[1], i)
+                     for x in range(j - self.size[0], j))
+
+                 for j in range(self.size[0], len(matrix[0]) + 1, self.step[0])]
+                for i in range(self.size[1], len(matrix) + 1, self.step[1])]
+
 
 ########################################################################
+class MaxPooling:
+    def __init__(self, step=(2, 2), size=(2, 2)):
+        self.step = step
+        self.size = size
+
+    def __call__(self, m):
+        items_in_1row = len(m[0])
+        for row in m:
+            if len(row) != items_in_1row:
+                raise ValueError("Неверный формат для первого параметра matrix.")
+        for i in range(len(m)):
+            for j in range(len(m[0])):
+                if type(m[i][j]) not in (int, float):
+                    raise ValueError("Неверный формат для первого параметра matrix.")
+
+        # Определяем количество колонок и столбцов в результирующей матрице
+        cols = len(m[0]) // self.step[0]
+        rows = len(m) // self.step[1]
+        # формируем новую матрицу и заполняем её нулями
+        res = [[0 for _ in range(cols)] for _ in range(rows)]
+        # заполняем новую матрицу максимальными значениями из "окна"
+        for i in range(rows):
+            for j in range(cols):
+                res[i][j] = max([m[i * 2][j * 2], m[i * 2 + 1][j * 2], m[i * 2][j * 2 + 1], m[i * 2 + 1][j * 2 + 1]])
+        return res
+
 
 #######################################################################
 # https://docs-python.ru/donate/732618839844207080/
 ########################################################################
+# ___Специальные методы сравнения объектов классов________________________________________________________________
+# Создайте класс  Fruit, который имеет:метод __init__, который устанавливает значения атрибутов name и price:
+# название и цена фрукта
+# при сравнении  с экз других классов или числами как здесь нужно прописывать все методы, а
+# если сравнивать экз одного класаа то достатточно прописать на равенство,меньше, меньше равно
+# обратное действие интерпритатолр сам перевернёт
+class Fruit:
+    def __init__(self, name, price):
+        self.name = name
+        self.price = price
+
+    def __eq__(self, other):
+        # if isinstance(other, Fruit):
+        #     return self.price == other.price
+        return self.price == other
+
+    def __gt__(self, other):
+        return self.price > other
+
+    def __ge__(self, other):
+        return self.price >= other
+
+    def __lt__(self, other):
+        return self.price < other
+
+    def __le__(self, other):
+        return self.price <= other
+
+
+apple = Fruit("Apple", 0.5)
+orange = Fruit("Orange", 1)
+banana = Fruit("Banana", 1.6)
+lime = Fruit("Lime", 1.0)
+
+assert (banana > 1.2) is True
+assert (banana >= 1.2) is True
+assert (banana == 1.2) is False
+assert (banana != 1.2) is True
+assert (banana < 1.2) is False
+assert (banana <= 1.2) is False
+
+assert (apple > orange) is False
+assert (apple >= orange) is False
+assert (apple == orange) is False
+assert (apple != orange) is True
+assert (apple < orange) is True
+assert (apple <= orange) is True
+
+assert (orange == lime) is True
+assert (orange != lime) is False
+assert (orange > lime) is False
+assert (orange < lime) is False
+assert (orange <= lime) is True
+assert (orange >= lime) is True
+print('Good')
+########################################################################
+from functools import total_ordering
+
+
+# Добавляет в пользовательский класс недостающие методы сравнения.
+# Класс должен определять один из методов __lt__(), __le__(), __gt__() или __ge__(). Кроме того, класс должен
+# предоставлять метод __eq__().
+
+@total_ordering
+class Fruit:
+
+    def __init__(self, *args):
+        self.name, self.price = args
+
+    def __eq__(self, other):
+        return self.price == (other.price if isinstance(other, Fruit) else other)
+
+    def __lt__(self, other):
+        return self.price < (other.price if isinstance(other, Fruit) else other)
+
 
 ########################################################################
+# Чтобы не реализовывать все магические методы сравнения, можно использовать декоратор functools.total_ordering,
+# который позволяет  сократить код, реализовав только методы __eq__ и __lt__
+from functools import total_ordering
 
-#######################################################################
 
-########################################################################
+@total_ordering
+class Rectangle:
+    def __init__(self, width, height):
+        self.width = width
+        self.height = height
+
+    @property
+    def area(self):
+        return self.width * self.height
+
+    def __eq__(self, other):
+        return self.area == other
+
+    def __lt__(self, other):
+        return self.area < other
+
 
 ###############################################################################################################################################
+from functools import total_ordering
+
+
+@total_ordering
+class Rectangle:
+    def __init__(self, *args):
+        self.width, self.height = args
+
+    @property
+    def area(self):
+        return self.width * self.height
+
+    def compare(self, func, arg):
+        return getattr(self.area, func)(arg.area if isinstance(arg, Rectangle) else arg)
+
+    def __eq__(self, other):
+        return self.compare('__eq__', other)
+
+    def __gt__(self, other):
+        return self.compare('__gt__', other)
+
 
 ########################################################################
+# Подвиг 3. Объявите класс Track (маршрут), объекты которого создаются командой:track = Track(start_x, start_y)
+# где start_x, start_y - координаты начала маршрута (целые или вещественные числа).Каждый линейный сегмент
+# маршрута определяется классом TrackLine, объекты которого создаются командой:
+# line = TrackLine(to_x, to_y, max_speed)где to_x, to_y - координаты следующей точки маршрута
+# (целые или вещественные числа); max_speed - максимальная скорость на данном участке (целое число).
+# Для формирования и работы с маршрутом в классе Track должны быть объявлены следующие методы:
+# add_track(self, tr) - добавление линейного сегмента маршрута (следующей точки);
+# get_tracks(self) - получение кортежа из объектов класса TrackLine.Также для объектов класса Track должны быть
+# реализованные следующие операции сравнения:
+# n = len(track) # возвращает целочисленную длину маршрута (привести к типу int) для объекта track
+# Создайте два маршрута track1 и track2 с координатами:
+# 1-й маршрут: (0; 0), (2; 4), (5; -4) и max_speed = 1002-й маршрут: (0; 1), (3; 2), (10; 8) и max_speed = 90
+# Сравните их между собой на равенство. Результат сравнения сохраните в переменной res_eq.
+class Track:
+    def __init__(self, start_x=0, start_y=0):
+        self.start_x = start_x
+        self.start_y = start_y
+        self.tracks = []
+
+    def add_track(self, tr):
+        if isinstance(tr, TrackLine):
+            self.tracks.append(tr)
+
+    def get_tracks(self):
+        return tuple(self.tracks)
+
+    def __len__(self):
+        len_1 = ((self.start_x - self.tracks[0].x) ** 2 + (self.start_y - self.tracks[0].y) ** 2) ** 0.5
+        return int(len_1 + sum(self._calc_(i) for i in range(1, len(self.tracks))))
+
+    def _calc_(self, i):
+        return ((self.tracks[i - 1].x - self.tracks[i].x) ** 2 + (self.tracks[i - 1].y - self.tracks[i].y) ** 2) ** 0.5
+
+    def __eq__(self, other):
+        if isinstance(other, Track):
+            return len(self) == len(other)
+
+    def __lt__(self, other):
+        if isinstance(other, Track):
+            return len(self) < len(other)
+
+
+class TrackLine:
+    def __init__(self, to_x, to_y, max_speed):
+        self.to_x = to_x
+        self.to_y = to_y
+        self.max_speed = max_speed
+
+    @property
+    def x(self):
+        return self.to_x
+
+    @property
+    def y(self):
+        return self.to_y
+
+
+track1, track2 = Track(), Track(0, 1)
+track1.add_track(TrackLine(2, 4, 100))
+track1.add_track(TrackLine(5, -4, 100))
+track2.add_track(TrackLine(3, 2, 90))
+track2.add_track(TrackLine(10, 8, 90))
+res_eq = track1 == track2
+
 
 ########################################################################
+class Track:
+    def __init__(self, start_x, start_y):
+        self.start_x = start_x
+        self.start_y = start_y
+        self.track_lines = []
+
+    def add_track(self, track):
+        self.track_lines.append(track)
+
+    def get_tracks(self):
+        return tuple(self.track_lines)
+
+    def __len__(self):
+        ans = 0
+        x1, y1 = self.start_x, self.start_y
+        for obj in self.track_lines:
+            x2, y2 = obj.to_x, obj.to_y
+            ans += ((x1 - x2) ** 2 + (y1 - y2) ** 2) ** (1 / 2)
+            x1, y1 = x2, y2
+        return int(ans)
+
 
 ########################################################################
+from typing import Tuple, Union
+
+
+class TrackLine:
+    def __init__(self, to_x: Union[int, float], to_y: Union[int, float], max_speed: int) -> None:
+        self.to_x = to_x
+        self.to_y = to_y
+        self.max_speed = max_speed
+
+
+class Track:
+    def __init__(self, start_x: Union[int, float], start_y: Union[int, float]) -> None:
+        self.start_x = start_x
+        self.start_y = start_y
+        self.__tracks = []
+
+    def add_track(self, tr: TrackLine):
+        """добавление линейного сегмента маршрута (следующей точки)"""
+        self.__tracks.append(tr)
+
+    def get_tracks(self) -> Tuple[TrackLine]:
+        """получение кортежа из объектов класса TrackLine"""
+        return tuple(self.__tracks)
+
+    def __len__(self) -> int:
+        distance = 0
+        if not self.__tracks:
+            return distance
+
+        x, y = self.start_x, self.start_y
+
+        for point in self.__tracks:
+            distance += ((x - point.to_x) ** 2 + (y - point.to_y) ** 2) ** 0.5
+            x, y = point.to_x, point.to_y
+
+        return int(distance)
+
+    def __eq__(self, other) -> bool:
+        return self.__len__() == len(other)
+
+    def __lt__(self, other) -> bool:
+        return self.__len__() < len(other)
+
 
 #######################################################################
+class Track:
+    def __init__(self, start_x, start_y):
+        self.start_x = start_x
+        self.start_y = start_y
+        self.trackLines = []
+
+    def __setattr__(self, key, value):
+        if key in ('start_x', 'start_y') and isinstance(value, (int, float)):
+            object.__setattr__(self, key, value)
+        elif key == 'trackLines':
+            object.__setattr__(self, key, value)
+        else:
+            raise ValueError("Неверный тип данных.")
+
+    def add_track(self, tr):  # добавление линейного сегмента маршрута (следующей точки)
+        if isinstance(tr, TrackLine):
+            self.trackLines.append(tr)
+
+    def get_tracks(self):  # получение кортежа из объектов класса TrackLine
+        return tuple(self.trackLines)
+
+    def __eq__(self, track):
+        return len(self) == len(track)
+
+    def __gt__(self, track):
+        return len(self) > len(track)
+
+    def __len__(self):  # возвращает целоч. длину маршрута (привести к типу int) для объекта track
+        l = 0
+        x, y = self.start_x, self.start_y
+        for c in self.get_tracks():
+            l += ((c.to_x - x) ** 2 + (c.to_y - y) ** 2) ** 0.5
+            x, y = c.to_x, c.to_y
+        return int(l)
+
+
+class TrackLine:
+    def __init__(self, to_x, to_y, max_speed):
+        self.to_x = to_x
+        self.to_y = to_y
+        self.max_speed = max_speed
+
+    def __setattr__(self, key, value):
+        if key in ('to_x', 'to_y') and isinstance(value, (int, float)):
+            object.__setattr__(self, key, value)
+        elif key == 'max_speed' and isinstance(value, int):
+            object.__setattr__(self, key, value)
+        else:
+            raise ValueError("Неверный тип данных.")
+
 
 ########################################################################
+class TrackLine:
+    def __init__(self, to_x, to_y, max_speed):
+        self.to_x = to_x
+        self.to_y = to_y
+        self.max_speed = max_speed
+
+
+class Track:
+    def __init__(self, start_x, start_y):
+        self.track = [TrackLine(start_x, start_y, 0)]
+
+    def add_track(self, tr):
+        self.track.append(tr)
+
+    def get_tracks(self):
+        return tuple(self.track)
+
+    @staticmethod
+    def __get_dist(start, end):
+        x0, y0 = start.to_x, start.to_y
+        x1, y1 = end.to_x, end.to_y
+        return ((x1 - x0) ** 2 + (y1 - y0) ** 2) ** 0.5
+
+    def __len__(self):
+        track = self.track
+        return int(sum([self.__get_dist(track[i], track[i + 1]) for i in range(len(track) - 1)]))
+
+    def __eq__(self, other):
+        return len(self) == len(other)
+
+    def __lt__(self, other):
+        return len(self) < len(other)
+
+    def __le__(self, other):
+        return len(self) <= len(other)
+
 
 ########################################################################
+# Подвиг 4. Объявите класс Dimensions (габариты) с атрибутами:MIN_DIMENSION = 10MAX_DIMENSION = 10000
+# Каждый объект класса Dimensions должен создаваться командой:d3 = Dimensions(a, b, c)   # a, b, c - габаритные размеры
+# Значения a, b, c должны сохраняться в локальных приватных атрибутах __a, __b, __c объектах этого класса.
+# Для изменения и доступа к приватным атрибутам в классе Dimensions должны быть объявлены объекты-свойства (property)
+# с именами: a, b, c. Причем, в момент присваивания нового значения должна выполняться проверка попадания числа в
+# диапазон [MIN_DIMENSION; MAX_DIMENSION]. Если число не попадает, то оно игнорируется и существующее значение не
+# меняется.С объектами класса Dimensions должны выполняться следующие операторы сравнения:
+# dim1 >= dim2   # True, если объем dim1 больше или равен объему dim2dim1 > dim2    # True, если объем dim1 больше
+# объема dim2dim1 <= dim2   # True, если объем dim1 меньше или равен объему dim2dim1 < dim2
+# True, если объем dim1 меньше объема dim2Объявите в программе еще один класс с именем ShopItem (товар),
+# объекты которого создаются командой:item = ShopItem(name, price, dim)где name - название товара (строка);
+# price - цена товара (целое или вещественное число); dim - габариты товара (объект класса Dimensions).
+# В каждом объекте класса ShopItem должны создаваться локальные атрибуты:
+# name - название товара;price - цена товара;dim - габариты товара (объект класса Dimensions).
+# Создайте список с именем lst_shop из четырех товаров со следующими данными:
+# - кеды; 1024; (40, 30, 120)- зонт;
+# 500.24; (10, 20, 50)
+# - холодильник; 40000; (2000, 600, 500)
+# - табуретка; 2000.99; (500, 200, 200)Сформируйте новый список lst_shop_sorted с упорядоченными по возрастанию
+# объема (габаритов) товаров списка lst_shop, используя стандартную функцию sorted() языка Python и ее параметр
+# key для настройки сортировки. Прежний список lst_shop должен оставаться без изменений.
+
+class Desc:
+
+    def __set_name__(self, owner, name):
+        # self.name = f'_{owner.__name__}__{name}'
+        # self.name = '_' + owner.__name__ + '__' + name
+        self.name = '__' + name
+
+    def __get__(self, instance, owner):
+        return getattr(instance, self.name)
+
+    def __set__(self, instance, value):
+        if self.__validate(instance, value):
+            setattr(instance, self.name, value)
+
+    @staticmethod
+    def __validate(instance, value):
+        return instance.MIN_DIMENSION <= value <= instance.MAX_DIMENSION
+
+
+class Dimensions:
+    MIN_DIMENSION = 10
+    MAX_DIMENSION = 10000
+    a = Desc()
+
+    def __init__(self, a, b, c):
+        self.a = a
+        self.b = b
+        self.c = c
+
+    @property
+    def b(self):
+        return self.__b
+
+    @b.setter
+    def b(self, value):
+        if value in range(self.MIN_DIMENSION, self.MAX_DIMENSION + 1):
+            self.__b = value
+
+    @property
+    def c(self):
+        return self.__c
+
+    @c.setter
+    def c(self, value):
+        if value in range(self.MIN_DIMENSION, self.MAX_DIMENSION + 1):
+            self.__c = value
+
+    def __volume__(self):
+        return int(self.a * self.b * self.c)
+
+    def __le__(self, other):
+        if isinstance(other, Dimensions):
+            return self.__volume__() <= other.__volume__()
+
+    def __lt__(self, other):
+        if isinstance(other, Dimensions):
+            return self.__volume__() < other.__volume__()
+
+
+class ShopItem:
+    def __init__(self, name, price, dim):
+        self.name = name
+        self.price = price
+        self.dim = dim
+
+
+trainers = ShopItem('кеды', 1024, Dimensions(40, 30, 120))
+umbrella = ShopItem('зонт', 500.24, Dimensions(10, 20, 50))
+fridge = ShopItem('холодильник', 40000, Dimensions(2000, 600, 500))
+chair = ShopItem('табуретка', 2000.99, Dimensions(500, 200, 200))
+lst_shop = [trainers, umbrella, fridge, chair]
+lst_shop_sorted = sorted(lst_shop, key=lambda x: x.dim.__volume__())
+
+lst_shop_sorted = sorted(lst_shop, key=lambda x: x.dim)  # dim - габариты товара (объект класса Dimensions).
+# У dim переопределены ge, gt. А sorted с key сам к ним обращается. Похожая ситуация, как key=len, key=get и т.п.
+# Этими методами (ge, gt) обладает объект dim, Ты же не обращаешься к каким-то методам, когда просто сортируешь список
+# чисел, а sorted их дергает
+# Т.О. в key=lambda x: x.dim сравниваются экземпляры класса :
+# d2 = Dimensions(40, 30, 120)
+# d3 = Dimensions(30, 20, 100)
+# assert d2 <= d3, "неверно отработал оператор <="
 
 #######################################################################
+from functools import total_ordering
 
+
+@total_ordering
+class Dimensions:
+    MIN_DIMENSION = 10
+    MAX_DIMENSION = 10_000
+
+    def __init__(self, a, b, c):
+        self.__a = self.__b = self.__c = 0
+        self.a = a
+        self.b = b
+        self.c = c
+
+    @property
+    def volume(self):
+        return self.a * self.b * self.c
+
+    @classmethod
+    def __validate(cls, val):
+        return cls.MIN_DIMENSION <= val <= cls.MAX_DIMENSION
+
+    @property
+    def a(self):
+        return self.__a
+
+    @a.setter
+    def a(self, value):
+        if self.__validate(value):
+            self.__a = value
+
+    @property
+    def b(self):
+        return self.__b
+
+    @b.setter
+    def b(self, value):
+        if self.__validate(value):
+            self.__b = value
+
+    @property
+    def c(self):
+        return self.__c
+
+    @c.setter
+    def c(self, value):
+        if self.__validate(value):
+            self.__c = value
+
+    def __eq__(self, other):
+        return self.volume == other.volume
+
+    def __lt__(self, other):
+        return self.volume < other.volume
+
+
+class ShopItem:
+    def __init__(self, name, price, dim):
+        self.name = name
+        self.price = price
+        self.dim = dim
+
+    def __repr__(self):
+        return self.name
+
+
+s = """- кеды; 1024; (40, 30, 120)
+- зонт; 500.24; (10, 20, 50)
+- холодильник; 40000; (2000, 600, 500)
+- табуретка; 2000.99; (500, 200, 200)"""
+
+lst_shop = []
+
+for line in s.splitlines():
+    name, price, dim = line.lstrip('- ').split('; ')
+    dim = Dimensions(*map(int, dim.strip('()').split(',')))
+    item = ShopItem(name, float(price), dim)
+    lst_shop.append(item)
+
+lst_shop_sorted = sorted(lst_shop, key=lambda x: x.dim.volume)
+
+
+# так как вы научили Python сравнивать объекты, то должно было хватить key=lambda x: x.dim
 ########################################################################
+# Подвиг 5. Имеется стихотворение, представленное следующим списком строк:stich = ["Я к вам пишу – чего же боле?",
+# "Что я могу еще сказать?",        "Теперь, я знаю, в вашей воле",        "Меня презреньем наказать.",
+# "Но вы, к моей несчастной доле",        "Хоть каплю жалости храня,",        "Вы не оставите меня."]
+# Необходимо в каждой строчке этого стиха убрать символы "–?!,.;" в начале и в конце каждого слова и разбить строку
+# по словам (слова разделяются одним или несколькими пробелами). На основе полученного списка слов, создать объект
+# класса StringText командой:st = StringText(lst_words)где lst_words - список из слов одной строчки стихотворения.
+# С объектами класса StringText должны быть реализованы операторы сравнения:st1 > st2   # True, если число слов
+# в st1 больше, чем в st2st1 >= st2  # True, если число слов в st1 больше или равно st2st1 < st2   # True, если число
+# слов в st1 меньше, чем в st2st1 <= st2  # True, если число слов в st1 меньше или равно st2
+# Все объекты класса StringText (для каждой строчки стихотворения) сохранить в списке lst_text. Затем,
+# сформировать новый список lst_text_sorted из отсортированных объектов класса StringText по убыванию числа слов.
+# Для сортировки использовать стандартную функцию sorted() языка Python. После этого преобразовать данный список
+# (lst_text_sorted) в список из строк (объекты заменяются на соответствующие строки, между словами ставится пробел).
+
+# from functools import total_ordering
+#
+#
+# @total_ordering
+class StringText:
+    def __init__(self, lst):
+        # print(lst)
+        self.lst_word = list(lst)  # список из слов одной строчки стихотворения.
+
+    def __len__(self):
+        return len(self.lst_word)
+
+    def __eq__(self, other):
+        return len(self) == len(other)
+
+    def __lt__(self, other):
+        return len(self.lst_word) < len(other.lst_word)
+
+    def __le__(self, other):
+        return len(self.lst_word) <= len(other.lst_word)
+
+    def __str__(self):
+        return f'{self.lst_word}'
+
+
+stich = ["Я к вам пишу – чего же боле?",
+         "Что я могу еще сказать?",
+         "Теперь, я знаю, в вашей воле",
+         "Меня презреньем наказать.",
+         "Но вы, к моей несчастной доле",
+         "Хоть каплю жалости храня,",
+         "Вы не оставите меня."]
+
+lst_text = []
+strip_chars = '–?!,.;'
+for line in stich:
+    lst_text.append(StringText([word.strip(strip_chars) for word in line.split() if word.strip(strip_chars)]))
+# lst_text = [StringText([word.strip('–?!,.;') for word in line.split() if word.strip('–?!,.;')]) for line in stich]
+lst_text_sorted = sorted(lst_text, reverse=True)
+print(lst_text_sorted)  # [<__main__.StringText object at 0x00000216DE138....
+lst_text_sorted = [' '.join(x.lst_word) for x in lst_text_sorted]
+# lst_text_sorted = list(map(lambda x: ' '.join(x.lst_words), lst_text_sorted))
+print(lst_text_sorted)  # ['Я к вам пишу чего же боле', 'Теперь я знаю в вашей воле',....
+
 
 ###############################################################################################################################################
+class RemoveChars:
+    def __init__(self, words):  # "–?!,.;"
+        self.words = words
+
+    def __call__(self, arg):  # 'Я к вам пишу чего же боле'
+        if isinstance(arg, str):
+            for char in self.words:
+                arg = arg.replace(char, '')
+            return arg.split()
+
+
+class StringText:
+    def __init__(self, lst):
+        self.lst = lst
+
+    def __eq__(self, other):
+        if isinstance(other, StringText):
+            return len(self) == len(other)
+        raise AttributeError
+
+    def __gt__(self, other):
+        if isinstance(other, StringText):
+            return len(self) > len(other)
+        raise AttributeError
+
+    def __ge__(self, other):
+        if isinstance(other, StringText):
+            return len(self) >= len(other)
+        raise AttributeError
+
+    def __len__(self):
+        return len(self.lst)
+
+
+parce = RemoveChars("–?!,.;")
+lst_text = [StringText(parce(sentence)) for sentence in stich]
+lst_text_sorted = sorted(lst_text, reverse=True)
+lst_text_sorted = [" ".join(i.lst) for i in lst_text_sorted]
+########################################################################
+import re
+from functools import total_ordering
+
+
+@total_ordering
+class StringText:
+    def __init__(self, lst_words):
+        self.lst_words = lst_words
+
+    def __len__(self):
+        return len(self.lst_words)
+
+    def __eq__(self, other):
+        return len(self) == len(other)
+
+    def __lt__(self, other):
+        return len(self) < len(other)
+
+    def __str__(self):
+        return ' '.join(self.lst_words)
+
+
+stich = ["Я к вам пишу – чего же боле?",
+         "Что я могу еще сказать?",
+         "Теперь, я знаю, в вашей воле",
+         "Меня презреньем наказать.",
+         "Но вы, к моей несчастной доле",
+         "Хоть каплю жалости храня,",
+         "Вы не оставите меня."]
+
+pattern = re.compile(r"[–?!,.;]")
+# re.compile(pattern, flags=0) Функция compile() модуля re компилирует шаблон
+# регулярного выражения pattern в объект регулярного выражения, который может быть использован для поиска
+# совпадений с использованием методов Match.match(), Match.search() и других способов.
+# re.sub(pattern, repl, string, count=0, flags=0) - Функция sub() модуля re возвращает строку, полученную
+# путем замены крайнего левого неперекрывающегося вхождения шаблона регулярного выражения pattern в строке string
+# на строку замены repl.
+lst_text = [StringText(el.split()) for el in map(lambda s: pattern.sub('', s), stich)]
+lst_text_sorted = sorted(lst_text, reverse=True)
+print(lst_text_sorted)  # [<__main__.StringText object at 0x00000274DD75FF90>,
+lst_text_sorted = [*map(str, lst_text_sorted)]
+print(lst_text_sorted)  # ['Я к вам пишу чего же боле', 'Теперь я знаю в вашей воле',....
+########################################################################
+# Подвиг 6. Ваша задача написать программу поиска слова в строке. Задача усложняется тем, что слово должно определяться
+# в разных его формах. Например, слово:программированиеможет иметь следующие формы:программирование, программированию,
+# программированием, программировании, программирования, программированиям, программированиями, программированиях
+# Для решения этой задачи необходимо объявить класс Morph (морфология), объекты которого создаются командой:
+# mw = Morph(word1, word2, ..., wordN)где word1, word2, ..., wordN - возможные формы слова.
+# В классе Morph реализовать методы:add_word(self, word) - добавление нового слова (если его нет в списке слов
+# объекта класса Morph);get_words(self) - получение кортежа форм слов.Также с объектами класса Morph должны
+# выполняться следующие операторы сравнения:mw1 == "word"  # True, если объект mv1 содержит слово "word"
+# (без учета регистра)mw1 != "word"  # True, если объект mv1 не содержит слово "word" (без учета регистра)
+# И аналогичная пара сравнений:"word" == mw1"word" != mw1После создания класса Morph, формируется список dict_words
+# из объектов этого класса, для следующих слов с их словоформами:- связь, связи, связью, связей, связям, связями, связях
+# - формула, формулы, формуле, формулу, формулой, формул, формулам, формулами, формулах
+# - вектор, вектора, вектору, вектором, векторе, векторы, векторов, векторам, векторами, векторах
+# - эффект, эффекта, эффекту, эффектом, эффекте, эффекты, эффектов, эффектам, эффектами, эффектах
+# - день, дня, дню, днем, дне, дни, дням, днями, дняхЗатем, прочитайте строку из входного потока командой:
+# text = input()Найдите все вхождения слов из списка dict_words (используя операторы сравнения) в строке text
+# (без учета регистра, знаков пунктуаций и их словоформы). Выведите на экран полученное число.
+s = """- связь, связи, связью, связи, связей, связям, связями, связях
+- формула, формулы, формуле, формулу, формулой, формул, формулам, формулами, формулах
+- вектор, вектора, вектору, вектором, векторе, векторы, векторов, векторам, векторами, векторах
+- эффект, эффекта, эффекту, эффектом, эффекте, эффекты, эффектов, эффектам, эффектами, эффектах
+- день, дня, дню, днем, дне, дни, дням, днями, днях
+"""
+
+
+class Morph:
+    def __init__(self, *args):
+        self.words = args
+
+    def add_word(self, word):
+        if word not in self.words:
+            self.words += (word,)
+
+    def get_words(self):
+        return tuple(self.words)
+
+    def __eq__(self, other):
+        return other.lower() in self.words
+
+
+text = 'Мы будем устанавливать связь завтра днем.'
+text = text.rstrip('.')
+print([[j.lstrip('- ') for j in i.split(', ')] for i in s.split('\n')])
+print([i.lstrip('- ').split(', ') for i in s.split('\n')])
+print([line.lstrip('- ').split(', ') for line in s.splitlines()])
+# делит текст по символу '\n' print(dict_words)
+
+dict_words = [Morph(*line.lstrip('- ').split(', ')) for line in s.split('\n')]
+# print(dict_words)
+
+
+count = 0
+for word in text.split():
+    for obj in dict_words:
+        if word == obj:
+            count += 1
+
+count = sum(word == obj for word in text.split() for obj in dict_words)
+print(count)
+
 
 ########################################################################
+# Подвиг 7 (на повторение). Перед вами стоит задача выделения файлов с определенными расширениями из списка файлов,
+# например:filenames = ["boat.jpg", "ans.web.png", "text.txt", "www.python.doc", "my.ava.jpg",
+# Для этого необходимо объявить класс FileAcceptor, объекты которого создаются командой:
+# acceptor = FileAcceptor(ext1, ..., extN)где ext1, ..., extN - строки с допустимыми расширениями файлов,
+# например: 'jpg', 'bmp', 'jpeg'.После этого предполагается использовать объект acceptor в стандартной функции
+# filter языка Python следующим образом:filenames = list(filter(acceptor, filenames))То есть, объект acceptor
+# должен вызываться как функция:acceptor(filename) и возвращать True, если файл с именем filename содержит
+# расширения, указанные при создании acceptor, и False - в противном случае. Кроме того, с объектами класса
+# FileAcceptor должен выполняться оператор:acceptor12 = acceptor1 + acceptor2Здесь формируется новый объект
+# acceptor12 с уникальными расширениями первого и второго объектов. Например:acceptor1 = FileAcceptor("jpg", "jpeg",
+# "png")acceptor2 = FileAcceptor("png", "bmp")acceptor12 = acceptor1 + acceptor2    # ("jpg", "jpeg", "png", "bmp")
 
-########################################################################
+class FileAcceptor:
+    def __init__(self, *args):
+        self.filename = args
 
-########################################################################
+    def __call__(self, args):
+        return args.split('.')[-1] in self.filename
+
+    def __add__(self, other):
+        if isinstance(other, self.__class__):
+            self.filename = self.filename + other.filename
+            return self
+
+
+acceptor = FileAcceptor("jpg", "jpeg")
+acceptor1 = FileAcceptor("jpg", "jpeg", "png")
+acceptor2 = FileAcceptor("png", "bmp")
+acceptor12 = acceptor1 + acceptor2  # ("jpg", "jpeg", "png", "bmp")
+print('acceptor12 ', acceptor12)  # acceptor12  <__main__.FileAcceptor object at 0x0000....
+filenames = ["boat.jpg", "ans.web.png", "text.txt", "www.python.doc", "my.ava.jpg", "forest.jpeg", "eq_1.png",
+             "eq_2.xls"]
+filenames = list(filter(acceptor, filenames))
+print(filenames)  # ['boat.jpg', 'my.ava.jpg', 'forest.jpeg']
+
+acceptor_images = FileAcceptor("jpg", "jpeg", "png")
+acceptor_docs = FileAcceptor("txt", "doc", "xls")
+filenames = list(filter(acceptor_images + acceptor_docs, filenames))
+print(filenames)  # ['boat.jpg', 'my.ava.jpg', 'forest.jpeg']
+
 
 #######################################################################
+def __add__(self, other):
+    if isinstance(other, self.__class__):
+        return FileAcceptor(*(self.filename + other.filename))
+    # return FileAcceptor(*self.args + other.args)
+
 
 ########################################################################
+class FileAcceptor:
+    def __init__(self, *extensions):
+        self.extensions = extensions
+
+    def __call__(self, filename):
+        return filename.endswith(self.extensions)
+
+    # x = 'заканчивается указанным суффиксом suffix'>> x.endswith('suffix') True
+
+    def __add__(self, other):
+        return FileAcceptor(*self.extensions + other.extensions)
+
 
 ########################################################################
+class FileAcceptor:
+    def __init__(self, *args):
+        self.extensions = set(args)
+
+    def __call__(self, file: str):
+        if type(file) is str:
+            return file.endswith(tuple('.' + e for e in self.extensions))
+
+    def __add__(self, other):
+        if type(other) is FileAcceptor:
+            return FileAcceptor(*self.extensions.union(other.extensions))
+
 
 #######################################################################
+class FileAcceptor:
+    def __init__(self, *args):
+        self.ext_list = set(args)
+
+    def __call__(self, filename: str):
+        return filename.endswith(tuple(self.ext_list))
+
+    def __add__(self, other):
+        return self.__class__(*(self.ext_list | other.ext_list))
+
 
 ########################################################################
+class FileAcceptor:
+    def __init__(self, *args):
+        self.lst = list(args)
+
+    def __call__(self, item):
+        return any(item.endswith(i) for i in self.lst)
+
+    def __add__(self, other):
+        return FileAcceptor(*self.lst, *other.lst)
+
 
 ###############################################################################################################################################
+# Подвиг 8. В программе необходимо объявить классы для работы с кошельками в разных валютах:
+# MoneyR - для рублевых кошельковMoneyD - для долларовых кошельковMoneyE - для евро-кошельков
+# Объекты этих классов могут создаваться командами:rub = MoneyR()   # с нулевым балансом
+# dl = MoneyD(1501.25) # с балансом в 1501.25 долларовuro = MoneyE(100)  # с балансом в 100 евро
+# В каждом объекте этих классов должны формироваться локальные атрибуты:__cb - ссылка на класс CentralBank
+# (центральный банк, изначально None);__volume - объем денежных средств в кошельке (если не указано, то 0).
+# Также в классах MoneyR, MoneyD и MoneyE должны быть объекты-свойства (property) для работы с локальными атрибутами:
+# cb - для изменения и считывания данных из переменной __cb;volume - для изменения и считывания данных из переменной
+# __volume.Объекты классов должны поддерживать следующие операторы сравнения:rub < dldl >= eurorub == euro
+# значения сравниваются по текущему курсу центрального банка с погрешностью 0.1 (плюс-минус)
+# euro > rubПри реализации операторов сравнения считываются соответствующие значения __volume из сравниваемых
+# объектов и приводятся к рублевому эквиваленту в соответствии с курсом валют центрального банка.
+# Чтобы каждый объект классов MoneyR, MoneyD и MoneyE "знал" текущие котировки, необходимо в программе объявить
+# еще один класс CentralBank. Объекты класса CentralBank создаваться не должны (запретить), при выполнении команды:
+# cb = CentralBank()должно просто возвращаться значение None. А в самом классе должен присутствовать атрибут:
+# rates = {'rub': 72.5, 'dollar': 1.0, 'euro': 1.15}Здесь числа (в значениях словаря) - курс валюты по отношению к
+# доллару. Также в CentralBank должен быть метод уровня класса:register(cls, money) - для регистрации объектов
+# классов MoneyR, MoneyD и MoneyE.При регистрации значение __cb объекта money должно ссылаться на класс CentralBank.
+# Через эту переменную объект имеет возможность обращаться к атрибуту rates класса CentralBank и брать нужные котировки.
+# Если кошелек не зарегистрирован, то при операциях сравнения должно генерироваться исключение:
+# raise ValueError("Неизвестен курс валют.")
+
+# @property
+# def volume(self):
+#     return self.__volume
+#
+# @volume.setter
+# def volume(self, value):
+#     self.__volume = value
+#
+# @property
+# def cb(self):
+#     return self.__cb
+#
+# @cb.setter
+# def cb(self, cb):
+#     self.__cb = cb
+
+
+# @property
+# def volume(self):
+#     return self.__volume
+#
+# @volume.setter
+# def volume(self, value):
+#     self.__volume = value
+#
+# @property
+# def cb(self):
+#     return self.__cb
+#
+# @cb.setter
+# def cb(self, cb):
+#     self.__cb = cb
+
+
+class Desc:
+    def __set_name__(self, owner, name):
+        self.name = '__' + name
+
+    def __get__(self, instance, owner):
+        return getattr(instance, self.name)
+
+    def __set__(self, instance, value):
+        setattr(instance, self.name, value)
+
+
+class Money:
+    type_money = None
+    EPS = 0.1
+    volume = Desc()
+    cb = Desc()
+
+    def __init__(self, volume=0):
+        self.volume = volume
+        self.cb = None
+
+    def __calc__(self, other):
+        if self.cb is None:
+            raise ValueError("Неизвестен курс валют.")
+        if self.type_money is None:
+            raise ValueError("Неизвестный тип кошелька.")
+        v1 = self.volume / self.cb.rates[self.type_money]
+        v2 = other.volume / other.cb.rates[other.type_money]
+        return v1, v2
+
+    def __eq__(self, other):
+        v1, v2 = self.__calc__(other)
+        return abs(v1 - v2) < self.EPS
+        # return round(v1, 1) == round(v2, 1)
+
+    def __lt__(self, other):
+        v1, v2 = self.__calc__(other)
+        return v1 < v2
+
+    def __le__(self, other):
+        v1, v2 = self.__calc__(other)
+        return v1 <= v2
+
+
+class MoneyR(Money):
+    type_money = 'rub'
+
+
+class MoneyD(Money):
+    type_money = 'dollar'
+
+
+class MoneyE(Money):
+    type_money = 'euro'
+
+
+class CentralBank:
+    rates = {'rub': 72.5, 'dollar': 1.0, 'euro': 1.15}
+
+    def __new__(cls, *args, **kwargs):
+        return
+
+    @classmethod
+    def register(cls, money):
+        money.cb = cls
+
+
+CentralBank.rates = {'rub': 72.5, 'dollar': 1.0, 'euro': 1.15}
+
+r = MoneyR(45000)
+d = MoneyD(500)
+
+CentralBank.register(r)
+CentralBank.register(d)
+
+if r > d:
+    print("неплохо")
+else:
+    print("нужно поднажать")
+
 
 ########################################################################
+class Money:
+    def __init__(self, volume=0.):
+        self.cb, self.volume = None, volume
+
+    @property
+    def cb(self): return self.__cb
+
+    @cb.setter
+    def cb(self, value): self.__cb = value
+
+    @property
+    def volume(self): return self.__volume
+
+    @volume.setter
+    def volume(self, value): self.__volume = value
+
+    def __abs__(self):
+        if not self.cb:
+            raise ValueError("Неизвестен курс валют.")
+        return self.cb.convert(self.volume, self.prop, 'rub')
+
+    def __eq__(self, other): return abs(abs(self) - abs(other)) <= 0.1
+
+    def __gt__(self, other): return abs(self) - abs(other) > 0.1
+
+    def __ge__(self, other): return abs(self) - abs(other) >= 0.1
+
+
+class MoneyR(Money): prop = 'rub'
+
+
+class MoneyD(Money): prop = 'dollar'
+
+
+class MoneyE(Money): prop = 'euro'
+
+
+class CentralBank:
+    rates = {'rub': 72.5, 'dollar': 1.0, 'euro': 1.15}
+
+    def __new__(cls):
+        return None
+
+    @classmethod
+    def register(cls, money):
+        if isinstance(money, Money):
+            money.cb = cls
+
+    @classmethod
+    def convert(cls, _value, _from, _to):
+        if _from == _to:  # 'rub'=='rub'
+            return _value
+        return _value * cls.rates.get(_to) / cls.rates.get(_from)
+
 
 ########################################################################
+class CentralBank:
+    rates = {'rub': 72.5, 'dollar': 1.0, 'euro': 1.15}
+
+    def __new__(cls):
+        return None
+
+    @classmethod
+    def register(cls, money):
+        if isinstance(money, Money):
+            money.cb = cls
+
+
+class Money:
+    def __init__(self, volume=0):
+        self.__cb = None
+        self.__volume = volume
+
+    def __eq__(self, other):
+        if isinstance(other, Money):
+            return self.valuate() == other.valuate()
+
+    def __lt__(self, other):
+        if isinstance(other, Money):
+            return self.valuate() < other.valuate()
+
+    def __le__(self, other):
+        if isinstance(other, Money):
+            return self.valuate() <= other.valuate()
+
+    def valuate(self):
+        if self.cb:
+            return round(self.volume / self.cb.rates[self.currency_name], 1)
+        raise ValueError("Неизвестен курс валют.")
+
+    @property
+    def cb(self):
+        return self.__cb
+
+    @cb.setter
+    def cb(self, value):
+        if value is CentralBank:
+            self.__cb = value
+
+    @property
+    def volume(self):
+        return self.__volume
+
+    @volume.setter
+    def volume(self, value):
+        if type(value) in (int, float):
+            self.__volume = value
+
+
+class MoneyR(Money):
+    currency_name = 'rub'
+
+
+class MoneyD(Money):
+    currency_name = 'dollar'
+
+
+class MoneyE(Money):
+    currency_name = 'euro'
+
 
 ########################################################################
+class BaseMoney:
+    account = 'base'
+
+    def __init__(self, volume=0):
+        self.cb = None
+        self.volume = volume
+
+    @property
+    def cb(self):
+        return self.__cb
+
+    @cb.setter
+    def cb(self, value):
+        self.__cb = value
+
+    @property
+    def volume(self):
+        return self.__volume
+
+    @volume.setter
+    def volume(self, value):
+        self.__volume = value
+
+    def valuate(self):
+        if self.cb:
+            return self.volume / self.cb.rates[self.account] * self.cb.rates['rub']
+        raise ValueError("Неизвестен курс валют.")
+
+    def __eq__(self, other):
+        return round(self.valuate(), 1) == round(other.valuate(), 1)
+
+    def __ge__(self, other):
+        return self.valuate() >= other.valuate()
+
+    def __gt__(self, other):
+        return self.valuate() > other.valuate()
+
+
+class CentralBank:
+    def __new__(cls, *args, **kwargs):
+        return None
+
+    rates = {'rub': 72.5, 'dollar': 1.0, 'euro': 1.15}
+
+    @classmethod
+    def register(cls, money: BaseMoney):
+        money.cb = cls
+
+
+class MoneyR(BaseMoney):
+    account = 'rub'
+
+
+class MoneyD(BaseMoney):
+    account = 'dollar'
+
+
+class MoneyE(BaseMoney):
+    account = 'euro'
+
 
 #######################################################################
+# Может мое решение будет кому интересно. Использовал isclose из библиотеки math. Достаточно удобная вещь
+# Функция math.isclose() возвращает True если в пределах указанной точности, числа a и b близки настолько,
+# что их можно считать равными.math.isclose(a, b, *, rel_tol=1e-09, abs_tol=0.0):
+from math import isclose
+
+
+class DescriptorMoney():
+    def __set_name__(self, owner, name):
+        self.name = f'_{type(self).__name__}__{name}'
+
+    def __get__(self, instance, owner):
+        return getattr(instance, self.name)
+
+    def __set__(self, instance, value):
+        setattr(instance, self.name, value)
+
+
+class CentralBank:
+    rates = {'rub': 72.5, 'dollar': 1.0, 'euro': 1.15}
+
+    def __new__(self, *args, **kwargs):
+        return
+
+    @classmethod
+    def register(cls, money):
+        money.cb = cls
+
+
+class Money:
+    cb = DescriptorMoney()
+    volume = DescriptorMoney()
+
+    def __init__(self, volume=0):
+        self.cb = None
+        self.volume = volume
+
+    def __eq__(self, other):
+        return isclose(self.converter(self), self.converter(other), rel_tol=0.1)
+
+    # Аргумент rel_tol это относительный допуск, определяемый как максимально допустимая разница между числами a и b
+    # относительно большего из них по модулю. По умолчанию rel_tol=1e-09, что гарантирует, что числа a и b будут
+    # одинаковы, в пределах 9 десятичных цифр. Чтобы числа считались равными, если они, допустим, отличаются меньше
+    # чем на 0.1%, то достаточно установить rel_tol=0.001, но в любом случае данный параметр, должен быть больше нуля:
+    def __lt__(self, other):
+        return self.converter(self) < self.converter(other)
+
+    def __le__(self, other):
+        return (self < other) or (self == other)
+
+    def converter(self, obj):
+        self.registered(obj)
+        return obj.volume * obj.cb.rates['rub'] / obj.cb.rates[obj.val]
+
+    @staticmethod
+    def registered(obj):
+        if not obj.cb:
+            raise ValueError("Неизвестен курс валют.")
+
+
+class MoneyR(Money): val = 'rub'
+
+
+class MoneyD(Money): val = 'dollar'
+
+
+class MoneyE(Money): val = 'euro'
+
 
 ########################################################################
+# Подвиг 9 (релакс). Необходимо объявить класс Body (тело), объекты которого создаются командой:
+# body = Body(name, ro, volume)где name - название тела (строка); ro - плотность тела (число: вещественное или
+# целочисленное); volume - объем тела  (число: вещественное или целочисленное).Для объектов класса Body должны
+# быть реализованы операторы сравнения:body1 > body2  # True, если масса тела body1 больше массы тела body2
+# body1 == body2 # True, если масса тела body1 равна массе тела body2
+# body1 < 10     # True, если масса тела body1 меньше 10body2 == 5     # True, если масса тела body2 равна 5
+# Масса тела вычисляется по формуле:m = ro * volume
+# Задача только на первый взгляд кажется простой (релакс). На самом деле здесь есть очень нетривиальная вещь -
+# сравнение вещественных чисел. В python выражение 0.1 + 0.2 == 0.3 возвращает False,  а 0.8 - 0.1 > 0.7 возвращает
+# True. Если вы не знаете про метод math.isclose , то вы практически наверняка сделали задачу неверно
+# (даже если она проходит тесты). Вот здесь неплохое объяснение проблемы:
+# https://www.youtube.com/watch?v=6kPbj5o5aqA
+# https://www.youtube.com/watch?v=c7tpUDT1Zmc
+# https://davidamos.dev/the-right-way-to-compare-floats-in-python/
+# В частности там рассказано почему не работает метод round и сравнение abs(a - b) < epsilon, в чем отличие
+# absolute_tolerance и relative_tolerance. З.Ы. насчет своего решения тоже полной уверенности нет, но то
+# что оно "ближе к истине" в этом не сомневаюсь.
+from math import isclose
+
+from functools import total_ordering
+
+
+@total_ordering
+class Body:
+    def __init__(self, name, ro, volume):
+        self.name = name
+        self.ro = ro
+        self.volume = volume
+
+    def __setattr__(self, key, value):
+        if key == 'volume' and type(value) in (int, float):
+            object.__setattr__(self, key, value)
+        elif key == 'ro' and type(value) in (int, float):
+            object.__setattr__(self, key, value)
+        else:
+            object.__setattr__(self, key, value)
+
+    def __mass__(self):
+        return self.volume * self.ro
+
+    def __eq__(self, other):
+        if isinstance(other, (int, float)):
+            return isclose(self.__mass__(), other, rel_tol=1e-09, abs_tol=0.0)
+        return isclose(self.__mass__(), other.__mass__())
+
+    def __lt__(self, other):
+        if isinstance(other, (int, float)):
+            return round(self.__mass__(), 25) < round(other, 25)
+        return round(self.__mass__(), 25) < round(other.__mass__(), 25)
+
 
 ########################################################################
+def mass_arg(func):
+    def wrapper(instance, other, *args):
+        if isinstance(other, Body):
+            return func(instance, other.mass)
+        elif isinstance(other, (int, float)):
+            return func(instance, other)
+        else:
+            raise TypeError(f"Not supported type {type(other)} in {func}")
+
+    return wrapper
+
+
+class Body:
+    def __init__(self, name, ro, volume):
+        self.name = name
+        self.ro = ro
+        self.volume = volume
+
+    @property
+    def mass(self):
+        return (self.ro * self.volume)
+
+    @mass_arg
+    def __lt__(self, other):
+        return (self.mass < other)
+
+    @mass_arg
+    def __eq__(self, other):
+        return self.mass == other
+
+    @mass_arg
+    def __gt__(self, other):
+        return self.mass > other
+
 
 #######################################################################
+from functools import total_ordering
+
+
+@total_ordering
+class Body:
+    def __init__(self, name, ro, volume):
+        self.name = name
+        self.ro = ro
+        self.volume = volume
+
+    @property
+    def mass(self):
+        return self.volume * self.ro
+
+    def __eq__(self, other):
+        val = other.mass if isinstance(other, Body) else other
+        return self.mass == val
+
+    def __lt__(self, other):
+        val = other.mass if isinstance(other, Body) else other
+        return self.mass < val
+
 
 ########################################################################
+# Подвиг 10. Объявите в программе класс с именем Box (ящик), объекты которого должны создаваться командой:
+# box = Box()А сам класс иметь следующие методы:
+# add_thing(self, obj) - добавление предмета obj (объект другого класса Thing) в ящик;
+# get_things(self) - получение списка объектов ящика.Для описания предметов необходимо объявить еще один класс Thing.
+# Объекты этого класса должны создаваться командой:obj = Thing(name, mass)где name - название предмета (строка);
+# mass - масса предмета (число: целое или вещественное).Объекты класса Thing должны поддерживать операторы сравнения:
+# obj1 == obj2obj1 != obj2Предметы считаются равными, если у них одинаковые названия name (без учета регистра) и
+# массы mass.Также объекты класса Box должны поддерживать аналогичные операторы сравнения:
+# box1 == box2box1 != box2Ящики считаются равными, если одинаковы их содержимое (для каждого объекта класса
+# Thing одного ящика и можно найти ровно один равный объект из второго ящика).
+
+class Thing:
+    def __init__(self, name, mass):
+        self.name = name
+        self.mass = mass
+
+    def __eq__(self, other):
+        return self.name.lower() == other.name.lower() and self.mass == other.mass
+
+    def __lt__(self, other):
+        return self.mass < other.mass
+
+
+class Box:
+    def __init__(self):
+        self.lst = list()
+
+    def add_thing(self, obj):
+        self.lst.append(obj)
+
+    def get_things(self):
+        return self.lst
+
+    def __eq__(self, other):
+        return all((value.name == sorted(other.lst, key=lambda x: x.mass)[i].name)
+                   for i, value in enumerate(sorted(self.lst, key=lambda x: x.mass))) \
+            and len(self.lst) == len(other.lst)
+
 
 ###############################################################################################################################################
+class Thing:
+    def __init__(self, name, mass):
+        self.name = name.lower()
+        self.mass = mass
+
+    def __eq__(self, other):
+        return self.name == other.name and self.mass == other.mass
+
+    def __lt__(self, other):
+        return self.mass < other.mass
+
+
+class Box:
+    def __init__(self):
+        self.dct = dict()
+
+    def add_thing(self, obj):
+        if obj.name in self.dct:
+            self.dct[obj.name] = sum([self.dct[obj.name], obj.mass])
+        else:
+            self.dct[obj.name] = obj.mass
+
+    def get_things(self):
+        return [*self.dct.items()]
+
+    def __eq__(self, other):
+        return all(value == other.dct[key] if other.dct[key] else None \
+                   for key, value in self.dct.items())
+
 
 ########################################################################
+class Box:
+    def __init__(self):
+        self.things = {}
+
+    def add_thing(self, obj):
+        self.things.setdefault(obj, 0)
+        self.things[obj] += 1
+
+    def get_things(self):
+        return self.things
+
+    def __eq__(self, other):
+        return self.things == other.things
+
+
+class Thing:
+    def __init__(self, name, mass):
+        self.name = name
+        self.mass = mass
+
+    def __eq__(self, other):
+        return hash(self) == hash(other)
+
+    def __hash__(self):
+        return hash((self.name.lower(), self.mass))
+
 
 ########################################################################
+class Box:
+    def __init__(self):
+        self.content = []
+
+    def __eq__(self, other):
+        if type(other) is Box:
+            return sorted(self.content) == sorted(other.content)
+
+    def add_thing(self, obj):
+        if type(obj) is Thing:
+            self.content.append(obj)
+
+    def get_things(self):
+        return self.content
+
+
+class Thing:
+    def __init__(self, name, mass):
+        self.name = name
+        self.mass = mass
+
+    def __eq__(self, other):
+        if type(other) is Thing:
+            return self.name.lower() == other.name.lower() and self.mass == other.mass
+
+    def __lt__(self, other):
+        if type(other) is Thing:
+            return (self.name, self.mass) < (other.name, other.mass)
+
 
 ########################################################################
+from collections import Counter
+
+
+# Подсчет количества повторений элементов в последовательности.
+
+class Box:
+    def __init__(self):
+        self.things = []
+
+    def add_thing(self, obj):
+        self.things.append(obj)
+
+    def get_things(self):
+        return self.things
+
+    def __eq__(self, other):
+        return Counter(self.things) == Counter(other.things)
+
+
+class Thing:
+    def __init__(self, name, mass):
+        self.name = name
+        self.mass = mass
+
+    def __eq__(self, other):
+        return self.name.lower() == other.name.lower() and self.mass == other.mass
+
+    def __hash__(self):
+        return hash((self.name, self.mass))
+
 
 #######################################################################
+# __________________________________Методы __eq__ и __hash________________________________________
+
+class Point:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
+    def __hash__(self):
+        return hash((self.x, self.y))  # т.е. hash((1, 2))  <----
+
+
+p1 = Point(1, 2)
+a = (1, 2)
+#  hash((1,2)) == hash((1, 2)) --------------------------------|
+
+print(hash(p1) == hash(a))  # True, хэши в переменной "а" и с экземпляре класса вычисляются одинаково, отсюда и равные
+
+
+# хеши, но не равные объекты
+###################################################################
+# Объекты равны, хеши не равны:
+
+class Point:
+    def __init__(self, x, y, z=0):
+        self.x = x
+        self.y = y
+        self.z = z
+
+    def __hash__(self):
+        return hash((self.x, self.y, self.z))
+
+    def __eq__(self, other):
+        return isinstance(other, Point) and self.x == other.x and self.y == other.y
+
+
+a = Point(1, 2)
+b = Point(1, 2, 3)
+print(a == b, hash(a) == hash(b))  # True False
+
 
 ########################################################################
+# Подвиг 4. Объявите в программе класс с именем Rect (прямоугольник), объекты которого создаются командой:
+# rect = Rect(x, y, width, height)где x, y - координата верхнего левого угла (числа: целые или вещественные);
+# width, height - ширина и высота прямоугольника (числа: целые или вещественные).
+# В этом классе определите магический метод, чтобы хэши объектов класса Rect с равными width, height были равны.
+class Rect:
+    def __init__(self, x, y, width, height):
+        self.x = x
+        self.y = y
+        self.width = width
+        self.height = height
+
+    def __eq__(self, other):
+        return (self.width, self.height) == (other.width, other.height)
+        # return self.__hash__() == other.__hash__()
+
+    def __hash__(self):
+        return hash((self.width, self.height))
+
+
+# По примеру указанному в задаче, идет проверка хешей записанных в переменную, и потом эти переменные сравниваются.
+# Не идет сравнение объектов, а их хешей
+r1 = Rect(10, 5, 100, 50)
+r2 = Rect(-10, 4, 100, 50)
+
+h1, h2 = hash(r1), hash(r2)  # h1 == h2
+
 
 ########################################################################
+class Rect:
+    def __init__(self, *args):
+        if not all([isinstance(x, (int, float)) for x in args]):
+            raise TypeError()
+        self.x, self.y, self.width, self.height = args
+
+    def __hash__(self):
+        return hash((abs(self.x), self.width, self.height))
+
 
 #######################################################################
+class Index:
+    START_INDEX = 0
 
+    def __init__(self):
+        self.id = Index.START_INDEX
+        Index.START_INDEX += 1
+
+    def __hash__(self):
+        return hash(str(self.id))
+
+
+# И делается попытка создать словарь с ключами из объектов этого класса:
+
+id1 = Index()
+id2 = Index()
+d = {id1: id1, id2: id2}
+# словарь будет успешно создан и к его значениям можно обращаться, например, командой: d[id1].id
+# Судя по id, объекты разные (у меня id были 2479904554144 и 2479904553664). Они и должны быть разными,
+# так как у первого локальный атрибут = 0, а у второго = 1.
+# прикол с тем что сначала index = 0 а потом 1 от того и разные хеши
 ########################################################################
+# Подвиг 6. Объявите класс с именем ShopItem (товар), объекты которого создаются командой:
+# item = ShopItem(name, weight, price)где name - название товара (строка); weight - вес товара
+# (число: целое или вещественное); price - цена товара (число: целое или вещественное).Определите в этом классе
+# магические методы:__hash__() - чтобы товары с одинаковым названием (без учета регистра), весом и ценой имели бы
+# равные хэши;__eq__() - чтобы объекты с одинаковыми хэшами были равны.Затем, из входного потока прочитайте
+# строки командой:lst_in = list(map(str.strip, sys.stdin.readlines()))Строки имеют следующий формат:
+# название товара 1: вес_1 цена_1...название товара N: вес_N цена_NНапример:
+# Системный блок: 1500 75890.56Монитор Samsung: 2000 34000Клавиатура: 200.44 545Монитор Samsung: 2000 34000
+# Как видите, товары в этом списке могут совпадать.Необходимо для всех этих строчек сформировать соответствующие
+# объекты класса ShopItem и добавить в словарь с именем shop_items. Ключами словаря должны выступать сами объекты,
+# а значениями - список в формате:[item, total]где item - объект класса ShopItem; total - общее количество
+# одинаковых объектов (с одинаковыми хэшами). Подумайте, как эффективно программно наполнять такой словарь,
+# проходя по списку lst_in один раз.
+import sys
 
+lst_in = ['Системный блок: 1500 75890.56',
+          'Монитор Samsung: 2000 34000',
+          'Клавиатура: 200.44 545',
+          'Монитор Samsung: 2000 34000']
+
+
+class ShopItem:
+    def __init__(self, name, weight, price):
+        self.name = name
+        self.weight = weight
+        self.price = price
+
+    def __hash__(self):
+        return hash((self.name.lower(), self.weight, self.price))
+
+    def __eq__(self, other):
+        return hash(self) == hash(other)
+
+
+lst_in = list(map(str.strip, sys.stdin.readlines()))  # список lst_in в программе не менять!
+
+shop_items = dict()
+# total = 1
+for i in lst_in:
+    name, v = i.split(':')
+    weight, price = map(float, v.split())
+    if ShopItem(name, weight, price) in shop_items:
+        # total += 1
+        # shop_items[ShopItem(name, weight, price)] = [ShopItem(name, weight, price), total]
+        shop_items[ShopItem(name, weight, price)][1] += 1
+    else:
+        # shop_items[ShopItem(name, weight, price)] = [ShopItem(name, weight, price), total]
+        shop_items[ShopItem(name, weight, price)] = [ShopItem(name, weight, price), 1]
+    # shop_items[ShopItem(name, weight, price)] = [ShopItem(name, weight, price),
+    # total + 1 if ShopItem(name, weight,price) in shop_items else total]
 ###############################################################################################################################################
+for item in lst_in:
+    name, weight, price = item.rsplit(maxsplit=2)  # Разбивает строку по символу/подстроке начиная справа.
+    # maxsplit=-1 - int, сколько раз делить строку. По умолчанию -1 - неограниченно.
 
+    # obj = ShopItem(name[:-1], weight, price)
+    obj = ShopItem(name.rstrip(':'), weight, price)
+    # v1
+    shop_items.setdefault(obj, [obj, 0])[1] += 1
+    # Метод dict.setdefault() вернет значение словаря dict, соответствующее ключу key.
+    # Если указанный ключ key отсутствует, вставит его в словарь dict со значением default и вернет значение default.
+    # v2
+    shop_items[obj] = shop_items.get(obj, [obj, 0])  # значение по умолчанию если ключа нет.
+    shop_items[obj][1] += 1
 ########################################################################
+from collections import Counter
 
-########################################################################
+items = []
+for line in lst_in:
+    name, data = line.split(':')
+    weight, price = map(float, data.split())
+    items.append(ShopItem(name, weight, price))
 
+shop_items = {k: [k, v] for k, v in Counter(items).items()}
+# Подсчет количества повторений элементов в последовательности.Это коллекция, в которой элементы хранятся в
+# виде словарных ключей, а их счетчики хранятся в виде значений словаря.
 ########################################################################
+lst = []
+shop_items = {}
+for i in lst_in:
+    i = i.split(":")
+    item = ShopItem(i[0], i[1].split()[0], i[1].split()[1])
+    if item not in shop_items.keys():
+        shop_items[item] = [item, 1]
+    else:
+        shop_items[item] = [item, shop_items[item][1] + 1]
+########################################################################
+shop_items = {}
+for s in lst_in:
+    s = s.split(':')
+    name = s[0].strip()
+    weight, price = map(float, s[1].strip().split())
+    obj = ShopItem(name, weight, price)
+    shop_items[obj] = [obj, shop_items.get(obj)[1] + 1 if obj in shop_items else 1]
+
 
 #######################################################################
+# Реализация с дескриптором, в котором решил попробовать добавить __repr__ для более красивого и наглядного вывода
+# ошибок при проверке типов данных. При переборе входящих данных циклом перед добавлением в словарь также реализовал
+# проверку price и weight на принадлежность к int или float.
+class DataDescriptor:
+    def __set_name__(self, owner, name):
+        self.name = f'_{owner.__name__}__{name}'
+
+    def __repr__(self):
+        return self.name.split('__')[-1]
+
+    def __get__(self, instance, owner):
+        return getattr(instance, self.name)
+
+    def __set__(self, instance, value):
+        self.__check_value(instance, value)
+        setattr(instance, self.name, value)
+
+    def __check_value(self, instance, value):
+        attr_to_check = str(self)
+        if attr_to_check == 'name' and type(value) != str:
+            raise ValueError(f'для атрибута "{attr_to_check}" значение должно быть типа str')
+        if attr_to_check in ('weight', 'price') and type(value) not in (int, float):
+            raise ValueError(f'для атрибута "{attr_to_check}" значение должно быть типа int или float')
+
+
+class ShopItem:
+    name = DataDescriptor()
+    weight = DataDescriptor()
+    price = DataDescriptor()
+
+    def __init__(self, name, weight, price):
+        self.name = name
+        self.weight = weight
+        self.price = price
+
+    def __eq__(self, other):
+        return hash(self) == hash(other)
+
+    def __hash__(self):
+        return hash((self.name.lower(), self.weight, self.price))
+
+
+# lst_in = list(map(str.strip, sys.stdin.readlines()))
+shop_items = {}
+for line in lst_in:
+    name, other = line.split(': ')
+    weight, price = other.split()
+    weight = float(weight) if '.' in weight else int(weight)
+    price = float(price) if '.' in price else int(price)
+    obj = ShopItem(name, weight, price)
+    if obj in shop_items.keys():
+        shop_items[obj][1] += 1
+    else:
+        shop_items[obj] = [obj, 1]
+
 
 ########################################################################
+class ShopItem:
+    def __init__(self, name, weight, price):
+        self.name = name
+        self.weight = weight
+        self.price = price
 
+    def __setattr__(self, key, value):
+        if key == 'name' and type(value) == str:
+            object.__setattr__(self, key, value)
+            # super().__setattr__(key, value)
+        elif key in ('weight', 'price') and type(value) in (int, float):
+            super().__setattr__(key, value)
+        else:
+            raise TypeError('Неверный формат данных')
+
+    def __hash__(self):
+        return hash((self.name.lower(), self.weight, self.price))
+
+    def __eq__(self, other):
+        return hash(self) == hash(other)
+
+
+def get_ShopItem(item_string):
+    name = item_string.split(':')[0].strip()
+    weight = float(item_string.split(':')[1].split()[0].strip())
+    price = float(item_string.split(':')[1].split()[1].strip())
+    return ShopItem(name, weight, price)
+
+
+shop_items = {get_ShopItem(i): [get_ShopItem(i), lst_in.count(i)] for i in lst_in}
+# сколько раз указанный элемент i появился в последовательности lst_in.
 ########################################################################
+shop_items = {}
+for i in lst_in:
+    s = re.split(': |\s+(?=\d)', i)
+    # Функция split() модуля re делит строку по появлению шаблона регулярного выражения pattern и возвращает
+    # список получившихся подстрок
+    k = ShopItem(name=s[0], weight=s[1], price=s[2])
+    if k not in shop_items:
+        shop_items[k] = [k, 1]
+    else:
+        shop_items[k][1] += 1
+
 
 #######################################################################
+# Подвиг 7. Объявите класс с именем DataBase (база данных - БД), объекты которого создаются командой:
+# db = DataBase(path)где path - путь к файлу с данными БД (строка).Также в классе DataBase нужно объявить следующие
+# методы:write(self, record) - для добавления новой записи в БД, представленной объектом record;
+# read(self, pk) - чтение записи из БД (возвращает объект Record) по ее уникальному идентификатору pk
+# (уникальное целое положительное число); запись ищется в значениях словаря (см. ниже)
+# Каждая запись БД должна описываться классом Record, а объекты этого класса создаваться командой:
+# record = Record(fio, descr, old)где fio - ФИО некоторого человека (строка); descr - характеристика человека
+# (строка); old - возраст человека (целое число).В каждом объекте класса Record должны формироваться следующие
+# локальные атрибуты:pk - уникальный идентификатор записи (число: целое, положительное);
+# формируется автоматически при создании каждого нового объекта;fio - ФИО человека (строка);
+# descr - характеристика человека (строка);old - возраст человека (целое число).
+# Реализовать для объектов класса Record вычисление хэша по атрибутам: fio и old (без учета регистра).
+# Если они одинаковы для разных записей, то и хэши должны получаться равными. Также для объектов класса Record  с
+# одинаковыми хэшами оператор == должен выдавать значение True, а с разными хэшами - False.
+# Хранить записи в БД следует в виде словаря dict_db (атрибут объекта db класса DataBase),
+# ключами которого являются объекты класса Record, # dict_db[rec1] = [rec1, rec2, ..., recN]где rec1, rec2, ..., recN
+# - значениями словаря должен быть список из объектов  класса Rect с набором атрибутов: descr (строка), fio (строка),
+# old (целое число) Для наполнения БД прочитайте строки из входного потока с помощью команды:
+# lst_in = list(map(str.strip, sys.stdin.readlines()))где каждая строка представлена в формате:
+# "ФИО; характеристика; возраст"Например:Балакирев С.М.; программист; 33Кузнецов А.В.; разведчик-нелегал; 35
+# уворов А.В.; полководец; 42Иванов И.И.; фигурант всех подобных списков; 26Балакирев С.М.; преподаватель; 37
+# Каждая строка должна быть представлена объектом класса Record и записана в БД db (в словарь db.dict_db).
 
+class DataBase:
+    def __init__(self, path):
+        self.path = path
+        self.dict_db = {}
+
+    def write(self, record):
+        self.dict_db.setdefault(record, []).append(record)
+
+        # setdefault вернёт пустой список, если ключа нет, а если есть, то его значение,
+        # Метод dict.setdefault() вернет значение словаря dict, соответствующее ключу key.
+        # Если указанный ключ key отсутствует, вставит его в словарь dict со значением default и вернет значение
+        # default. Если значение по умолчанию default не установлено и ключ отсутствует, метод вставит ключ в словарь
+        # со значением None, при этом никакое значение не возвращается.
+
+        # ч/з key == pk :
+        # self.dict_db.setdefault(record.pk, []).append(record)
+        # print(self.dict_db.items())
+        # dict_items([(1, [<__main__.Record object at 0x0000022469570250>]), (2, [<__main__.Re....
+
+        # for item in self.dict_db.items():  # item: [<__main__.Record object at 0x000001C4133B0650>]
+        #     for value in item[1]:  # value: <__main__.Record object at 0x000001C4133B0710>
+
+    def read(self, pk):
+        for row in self.dict_db.values():
+            for i in row:  # row:  [<__main__.Record object at 0x00000156F4C60B10>]
+                if i.pk == pk:  # i 7
+                    return i  # <__main__.Record object at 0x000001FE18000610>
+
+    # obj = [i for item in self.dict_db.values() for i in item if i.pk == pk]
+    # return obj[0]
+
+    # r = (x for row in self.dict_db.values() for x in row)
+    # obj = tuple(filter(lambda x: x.pk == pk, r))
+    # return obj[0] if len(obj) > 0 else None
+
+
+class Record:
+    record_count = 0
+
+    def __init__(self, fio, descr, old):
+        self.descr = descr
+        self.old = old
+        self.fio = fio
+        self.pk = self.__count()
+
+    @classmethod
+    def __count(cls):
+        cls.record_count += 1
+        return cls.record_count
+
+    def __hash__(self):
+        return hash((self.fio.lower(), self.old))
+
+    # hash(()) -> выч-ся на основе кортежа
+
+    def __eq__(self, other):
+        return hash(self) == hash(other)
+
+
+# lst_in = list(map(str.strip, sys.stdin.readlines()))
+lst_in = ['Балакирев С.М.; программист; 33',
+          'Кузнецов Н.И.; разведчик-нелегал; 35',
+          'Суворов А.В.; полководец; 42',
+          'Иванов И.И.; фигурант всех подобных списков; 26',
+          'Балакирев С.М.; преподаватель; 33']
+
+db = DataBase('bdDatabase')
+for l in lst_in:
+    args = list(map(str.strip, l.split(';')))
+    args[-1] = int(args[-1])
+    db.write(Record(*args))
+
+db22345 = DataBase('123')
+r1 = Record('fio', 'descr', 10)
+r2 = Record('fio', 'descr', 10)
+assert r1.pk != r2.pk, "равные значения атрибута pk у разных объектов класса Record"
+
+db22345.write(r2)
+r22 = db22345.read(r2.pk)
+assert r22.pk == r2.pk and r22.fio == r2.fio and r22.descr == r2.descr and r22.old == r2.old, "при операциях write и read прочитанный объект имеет неверные значения атрибутов"
+
+assert len(db22345.dict_db) == 1, "неверное число объектов в словаре dict_db"
+
+fio = lst_in[0].split(';')[0].strip()
+v = list(db.dict_db.values())
+if fio == "Балакирев С.М.":
+    assert len(v[0]) == 2 and len(v[1]) == 1 and len(v[2]) == 1 and len(
+        v[3]) == 1, "неверно сформирован словарь dict_db"
+
+if fio == "Гейтс Б.":
+    assert len(v[0]) == 2 and len(v[1]) == 2 and len(v[2]) == 1 and len(
+        v[3]) == 1, "неверно сформирован словарь dict_db"
 ########################################################################
 
 ###############################################################################################################################################
