@@ -1478,11 +1478,77 @@ mp = MaxPooling(step=(2, 2), size=(2, 2))
 res = mp([[1, 2, 3, 4], [5, 6, 7, 8], [9, 8, 7, 6], [5, 4, 3, 2]])  # [[6, 8], [9, 7]]
 print(res)  # [[6, 8], [9, 7]]
 # ########################################################################
+class MaxPooling:
+    def __init__(self, step: tuple = (2, 2), size: tuple = (2, 2)) -> None:
+        self.step = step
+        self.size = size
 
+    def validateMatrix(self, matrix: list) -> None:
+        rowLength = len(matrix[0])
+        if all(len(row) == rowLength for row in matrix):
+            if all(type(i) in (int, float) for row in matrix for i in row):
+                return
+        raise ValueError("Неверный формат для первого параметра matrix.")
+
+    def __call__(self, matrix: list) -> list:
+        self.validateMatrix(matrix)
+
+        rangeI = range(self.size[1], len(matrix) + 1, self.step[1])
+        rangeJ = range(self.size[0], len(matrix[0]) + 1, self.step[0])
+
+        return [[max(matrix[y][x]
+                     for y in range(i - self.size[1], i)
+                     for x in range(j - self.size[0], j)
+                     ) for j in rangeJ]
+                for i in rangeI]
 ########################################################################
+class MaxPooling:
+    def __init__(self, step: tuple = (2, 2), size: tuple = (2, 2)) -> None:
+        self.step = step
+        self.size = size
 
+    def validateMatrix(self, matrix: list) -> None:
+        rowLength = len(matrix[0])
+        if all(len(row) == rowLength for row in matrix):
+            if all(type(i) in (int, float) for row in matrix for i in row):
+                return
+        raise ValueError("Неверный формат для первого параметра matrix.")
+
+    def __call__(self, matrix: list) -> list:
+        self.validateMatrix(matrix)
+
+        return [[max(matrix[y][x]
+                     for y in range(i - self.size[1], i)
+                     for x in range(j - self.size[0], j))
+
+                 for j in range(self.size[0], len(matrix[0]) + 1, self.step[0])]
+                for i in range(self.size[1], len(matrix) + 1, self.step[1])]
 ########################################################################
+class MaxPooling:
+    def __init__(self, step=(2, 2), size=(2,2)):
+        self.step = step
+        self.size = size
 
+    def __call__(self, m):
+        items_in_1row = len(m[0])
+        for row in m:
+            if len(row) != items_in_1row:
+                raise ValueError("Неверный формат для первого параметра matrix.")
+        for i in range(len(m)):
+            for j in range(len(m[0])):
+                if type(m[i][j]) not in (int, float):
+                    raise ValueError("Неверный формат для первого параметра matrix.")
+
+        # Определяем количество колонок и столбцов в результирующей матрице
+        cols = len(m[0]) // self.step[0]
+        rows = len(m) // self.step[1]
+        # формируем новую матрицу и заполняем её нулями
+        res = [[0 for _ in range(cols)] for _ in range(rows)]
+        # заполняем новую матрицу максимальными значениями из "окна"
+        for i in range(rows):
+            for j in range(cols):
+                res[i][j] = max([m[i*2][j*2], m[i*2+1][j*2], m[i*2][j*2+1], m[i*2+1][j*2+1]])
+        return res
 #######################################################################
 # https://docs-python.ru/donate/732618839844207080/
 ########################################################################
