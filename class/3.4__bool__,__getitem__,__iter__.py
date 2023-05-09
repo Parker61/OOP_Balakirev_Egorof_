@@ -1,0 +1,3085 @@
+# _______________bool________________Egorof______
+
+# магический метод __bool__ так, чтобы он возвращал False ,если название города заканчивается на любую гласную букву
+# латинского алфавита (a, e, i, o, u), в противном случае True
+class City:
+    def __init__(self, name):
+        self.name = ' '.join(list(map(str.capitalize, name.split())))
+
+    def __str__(self):
+        return f'{self.name}'
+
+    def __bool__(self):
+        return self.name[-1] not in 'aeiou'
+        # return not any(self.name.endswith(i) for i in 'aeiou')
+
+
+################################################################
+# Сейчас вам нужно создать класс Quadrilateral(четырехугольник), в котором есть:метод __init__. Он должен сохранять в
+# экземпляр класса два атрибута: width и height. При этом в сам метод __init__ может передаваться один аргумент(тогда
+# в width и height присваивать это одно одинаковое значение, тем самым делать квадрат), либо два аргумента( первый идет
+# в атрибут width, второй - в height)метод __str__ , который работает следующим образом: если width и height одинаковые
+# , возвращать строку «Квадрат размером <width>х<height>»в противном случае, возвращать строку «Прямоугольник
+# размером <width>х<height>»переопределить метод __bool__ так, чтобы он возвращал True, если объект является
+# квадратом, и False в противном случае
+class Quadrilateral:
+    def __init__(self, *args):
+
+        if len(args) == 2:
+            self.width = args[0]
+            self.height = args[1]
+        else:
+            self.width = self.height = args[0]
+
+    def __str__(self):
+        if self.__bool__():
+            return f'Квадрат размером {self.width}х{self.height}'
+        return f'Прямоугольник размером {self.width}х{self.height}'
+
+    def __bool__(self):
+        return self.width == self.height
+
+
+################################################################
+class Quadrilateral:
+    def __init__(self, width, height=None):
+        self.width, self.height = width, height if height else width
+
+    def __str__(self):
+        return f"{['Прямоугольник', 'Куб'][bool(self)]} размером {self.width}х{self.height}"
+
+    def __bool__(self):
+        return self.width == self.height
+
+
+########################################################################
+class Quadrilateral:
+    def __init__(self, width, height=None):
+        self.width = width
+        self.height = height or width
+
+    # логика такая:для or:
+    # Выбирается первое значение, которое при преобразовании к bool даст True
+    # Если таких значений нет, то вернётся первое не None значение
+    # Если оба None, то вернёт None
+    # для and:
+    # Если в одном из двух значений есть None, то вернёт None
+    # Если None нет, то выбирается первое значение, которое при преобразовании к bool даст False
+    # Если таких нет, то выбирается второе значение
+    def __str__(self):
+        if self.width == self.height:
+            return f'Куб размером {self.width}х{self.height}'
+        return f'Прямоугольник размером {self.width}х{self.height}'
+
+    def __bool__(self):
+        return self.width == self.height
+
+
+################################################################
+class Quadrilateral:
+
+    def __init__(self, width, height=None):
+        if height is None:
+            height = width
+        self.width = width
+        self.height = height
+
+    def __str__(self):
+        return f'Квадрат размером {self.width}х{self.height}' if self.width == self.height \
+            else f'Прямоугольник размером {self.width}х{self.height}'
+
+    def __bool__(self):
+        return str(self).startswith('К')
+
+
+# _____________________Balakirev________________________________________________________________
+# Подвиг 4. Объявите в программе класс Player (игрок), объекты которого создаются командой:
+# player = Player(name, old, score)где name - имя игрока (строка); old - возраст игрока (целое число);
+# score - набранные очки в игре (целое число). В каждом объекте класса Player должны создаваться аналогичные локальные
+# атрибуты: name, old, score.С объектами класса Player должна работать функция:bool(player)которая возвращает True,
+# если число очков больше нуля, и False - в противном случае.С помощью команды:
+# lst_in = list(map(str.strip, sys.stdin.readlines()))считываются строки из входного потока в список строк lst_in.
+# Каждая строка записана в формате:"имя; возраст; очки"Например:Балакирев; 34; 2048Mediel; 27; 0Влад; 18; 9012
+# Nina P; 33; 0Каждую строку списка lst_in необходимо представить в виде объекта класса Player с соответствующими
+# данными. И из этих объектов сформировать список players.Отфильтруйте этот список (создайте новый: players_filtered),
+# оставив всех игроков с числом очков больше нуля. Используйте для этого стандартную функцию filter() совместно
+# с функцией bool() языка Python.
+class Player:
+    def __init__(self, name, old, score):
+        self.name = name
+        self.score = int(score)
+        self.old = old
+
+    def __bool__(self):
+        return self.score > 0
+
+
+# lst_in = list(map(str.strip, sys.stdin.readlines()))
+lst_in = ['Балакирев; 34; 2048', 'Mediel; 27; 0', 'Влад; 18; 9012', 'Nina P; 33; 0']
+
+players = [Player(*item.split(';')) for item in lst_in]
+players_filtered = list(filter(lambda x: bool(x), players))  # 2 objects
+players_filtered = list(filter(bool, players))  # 2 objects
+###############################################################################################################################################
+players_filtered = list(filter(None, players))
+
+
+# 'Если функция None, то все элементы iterablу, которые являются ложными - удаляются'
+########################################################################
+
+class RestrictedTypeValue:
+    def __init__(self, *args, condition=lambda x: True, message="Неверный тип данных."):
+        self.__types = args
+        self.condition = condition
+        self.message = message
+
+    def __set_name__(self, owner, name):
+        self.name = f'_{owner.__name__}__{name}'
+
+    def __get__(self, instance, owner):
+        if instance == None:
+            return property()
+        return instance.__dict__[self.name]
+
+    def __set__(self, instance, value):
+        check_1, check_2 = (type(value) in self.__types), (self.condition(value))
+        if not (check_1 and check_2):
+            raise ValueError(self.message)
+        instance.__dict__[self.name] = value
+
+
+class Player:
+    name = RestrictedTypeValue(str)
+    old = RestrictedTypeValue(int)
+    score = RestrictedTypeValue(int)
+
+    def __init__(self, name, old, score) -> None:
+        self.name = name
+        self.old = old
+        self.score = score
+
+    def __str__(self):
+        return f'{self.name}; {self.old}; {self.score}'
+
+    def __bool__(self):
+        return self.score > 0
+
+
+players = []
+for w in lst_in:
+    name, old, score = w.split(';')
+    players.append(Player(name, int(old), int(score)))
+players_filtered = list(filter(bool, players))
+########################################################################
+# Подвиг 5. Объявите в программе класс MailBox (почтовый ящик), объекты которого создаются командой:
+# mail = MailBox()Каждый объект этого класса должен содержать локальный публичный атрибут:
+# inbox_list - список из принятых писем.Также в классе MailBox должен присутствовать метод:
+# receive(self) - прием новых писемЭтот метод должен читать данные из входного потока командой:
+# lst_in = list(map(str.strip, sys.stdin.readlines())) результате формируется список lst_in из строк.
+# Каждая строка записана в формате:"от кого; заголовок; текст письма"Например:sc_lib@list.ru; От Балакирева;
+# Успехов в IT!mail@list.ru; Выгодное предложение; Вам одобрен кредит.mail123@list.ru; Розыгрыш; Вы выиграли 1 млн.
+# руб. Переведите 30 тыс. руб., чтобы его получить.Каждая строчка списка lst_in должна быть представлена объектом
+# класса MailItem, объекты которого создаются командой:item = MailItem(mail_from, title, content)
+# где mail_from - email отправителя (строка); title - заголовок письма (строка), content - содержимое письма (строка).
+# В каждом объекте класса MailItem должны формироваться соответствующие локальные атрибуты (с именами: mail_from, title,
+# content). И дополнительно атрибут is_read (прочитано ли) с начальным значением False.В классе MailItem должен быть
+# реализован метод:set_read(self, fl_read) - для отметки, что письмо прочитано (метод должен устанавливать атрибут
+# is_read = fl_read, если True, то письмо прочитано, если False, то не прочитано).С каждым объектом класса MailItem
+# должна работать функция:bool(item)которая возвращает True для прочитанного письма и False для непрочитанного.
+# Вызовите метод:mail.receive()Отметьте первое и последнее письмо в списке mail.inbox_list, как прочитанное
+# (используйте для этого метод set_read). Затем, сформируйте в программе список (глобальный) с именем
+# inbox_list_filtered из прочитанных писем, используя стандартную функцию filter() совместно с функцией bool()
+
+import sys
+
+
+class MailBox:
+    def __init__(self):
+        self.inbox_list = []
+        self.lst_in = None
+
+    def receive(self):
+        # self.lst_in = list(map(str.strip, sys.stdin.readlines()))
+        self.lst_in = ['sc_lib@list.ru; От Балакирева; Успехов в IT!',
+                       'mail@list.ru; Выгодное предложение; Вам одобрен кредит.',
+                       'Python ООП; Балакирев С.М.; 2022',
+                       'mail123@list.ru; Розыгрыш; Вы выиграли 1 млн. руб. Переведите 30 тыс. руб., чтобы его получить.']
+        self.inbox_list = [MailItem(*item.split(';')) for item in self.lst_in]
+
+
+class MailItem:
+    def __init__(self, mail_from, title, content):
+        self.mail_from = mail_from
+        self.title = title
+        self.content = content
+        self.is_read = False
+
+    def set_read(self, fl_read):
+        if isinstance(fl_read, bool):
+            self.is_read = fl_read
+
+    def __bool__(self):
+        return self.is_read
+
+
+mail = MailBox()
+mail.receive()
+mail.inbox_list[0].set_read(True)
+mail.inbox_list[-1].set_read(True)
+inbox_list_filtered = list(filter(bool, mail.inbox_list))
+
+########################################################################
+for i in (0, -1):
+    mail.inbox_list[i].set_read(True)
+inbox_list_filtered = list(filter(bool, mail.inbox_list))
+#######################################################################
+# Подвиг 6 (релакс). Объявите класс Line, объекты которого создаются командой:line = Line(x1, y1, x2, y2)
+# где x1, y1, x2, y2 - координаты начала линии (x1, y1) и координаты конца линии (x2, y2).
+# Могут быть произвольными числами. В объектах класса Line должны создаваться соответствующие локальные атрибуты с
+# именами x1, y1, x2, y2. классе Line определить магический метод __len__() так, чтобы функция:
+# bool(line)# возвращала False, если длина линии меньше 1.
+from math import hypot
+
+
+class Line:
+    def __init__(self, x1, y1, x2, y2):
+        self.x1 = x1
+        self.y1 = y1
+        self.x2 = x2
+        self.y2 = y2
+
+    def __len__(self):
+        return int(hypot(self.x1 - self.x2, self.y1 - self.y2))
+        # return int(((self.x2 - self.x1)**2 + (self.y2 - self.y1)**2)**0.5)
+        # return False if (pow(self.x2 - self.x1, 2) + pow(self.y2 - self.y1, 2)) ** 0.5 < 1 else True
+
+
+########################################################################
+# Подвиг 7. Объявите класс Ellipse (эллипс), объекты которого создаются командами:
+# el1 = Ellipse()  # без создания локальных атрибутов x1, y1, x2, y2el2 = Ellipse(x1, y1, x2, y2)
+# где x1, y1 - координаты (числа) левого верхнего угла; x2, y2 - координаты (числа) нижнего правого угла.
+# Первая команда создает объект класса Ellipse без локальных атрибутов x1, y1, x2, y2.
+# Вторая команда создает объект с локальными атрибутами x1, y1, x2, y2 и соответствующими переданными значениями.
+# В классе Ellipse объявите магический метод __bool__(), который бы возвращал True, если все локальные атрибуты
+# x1, y1, x2, y2 существуют и False - в противном случае.Также в классе Ellipse нужно реализовать метод:
+# get_coords() - для получения кортежа текущих координат объекта.Если координаты отсутствуют
+# (нет локальных атрибутов x1, y1, x2, y2), то метод get_coords() должен генерировать исключение командой:
+# raise AttributeError('нет координат для извлечения')Сформируйте в программе список с именем lst_geom, содержащий
+# четыре объекта класса Ellipse. Два объекта должны быть созданы командой Ellipse()и еще два - командой:
+# Ellipse(x1, y1, x2, y2)Переберите список в цикле и вызовите метод get_coords() только для объектов,
+# имеющих координаты x1, y1, x2, y2. (Помните, что для этого был определен магический метод __bool__()).
+from random import randint
+
+
+class Ellipse:
+    def __init__(self, *args):
+        if len(args) == 4:
+            self.x1, self.y1, self.x2, self.y2 = args
+
+    def __setattr__(self, key, value):
+        if value is not None:  # if value != None:
+            object.__setattr__(self, key, value)
+
+    def __bool__(self):
+        return hasattr(self, 'x1')
+        # return all(hasattr(self, a) for a in ('x1', 'x2', 'y1', 'y2'))
+
+    def get_coords(self):
+        # if self.__bool__():
+        if self:
+            return self.x1, self.y1, self.x2, self.y2
+        raise AttributeError('нет координат для извлечения')
+
+
+lst_geom = [Ellipse() for i in range(2)] + [Ellipse(*[randint(0, 20) for _ in range(4)]) for i in range(2)]
+
+for i in lst_geom:
+    if bool(i):
+        # if i:
+        i.get_coords()  # (1, 1, 1, 1) (2, 2, 2, 2)
+
+
+########################################################################
+class Ellipse:
+    __slots__ = ('x1', 'y1', 'x2', 'y2')
+
+    def __init__(self, *args):
+        [setattr(self, name, args[id]) for id, name in enumerate(self.__slots__) if len(args) == len(self.__slots__)]
+
+    def __bool__(self): return all(
+        map(lambda v: isinstance(v, int), (getattr(self, name, None) for name in self.__slots__)))
+
+    def get_coords(self):
+        if self: return self.x1, self.y1, self.x2, self.y2
+        raise AttributeError('нет координат для извлечения')
+
+
+lst_geom = [Ellipse(*params) for params in ((), (), (1, 2, 3, 4), (9, 8, 7, 6))]
+[geom.get_coords() for geom in lst_geom if geom]
+
+
+#######################################################################
+class Ellipse:
+    def __init__(self, *args):
+        if len(args) == 4:
+            self.x1, self.y1, self.x2, self.y2 = args
+
+    def __bool__(self):
+        return bool(self.__dict__)
+
+    def get_coords(self):
+        if not self:
+            raise AttributeError('нет координат для извлечения')
+        return self.x1, self.y1, self.x2, self.y2
+
+
+lst_geom = [Ellipse(), Ellipse(), Ellipse(1, 2, 3, 4), Ellipse(5, 6, 7, 8)]
+
+for obj in lst_geom:
+    if obj:
+        obj.get_coords()
+
+
+########################################################################
+class Ellipse:
+    def __init__(self, *args):
+        if len(args) == 4:
+            self.x1, self.y1, self.x2, self.y2 = args
+
+    def __bool__(self):
+        return len(self.__dict__) == 4
+
+    def get_coords(self):
+        if self:
+            return tuple((item for item in self.__dict__.values()))
+        raise AttributeError('нет координат для извлечения')
+
+
+lst_geom = [Ellipse(), Ellipse(), Ellipse(1, 1, 1, 1), Ellipse(1, 1, 1, 1)]
+for geom in lst_geom:
+    if geom:
+        geom.get_coords()
+
+
+###############################################################################################################################################
+class Ellipse:
+    NAME_COORDS = ('x1', 'y1', 'x2', 'y2')
+
+    def __init__(self, *args):
+        [setattr(self, key, val) for key, val in zip(self.NAME_COORDS, args)]
+
+    def __bool__(self):
+        return sum(map(lambda x: hasattr(self, x), self.NAME_COORDS)) == 4
+
+    def get_coords(self):
+        if bool(self):
+            return tuple(getattr(self, key) for key in self.NAME_COORDS)
+        raise AttributeError('нет координат для извлечения')
+
+
+lst_geom = [Ellipse(i, i, i + 2, i + 2) if i % 2 else Ellipse() for i in range(4)]
+
+lst_geom_coords = [item.get_coords() for item in lst_geom if bool(item)]
+lst_geom_coords = [item.get_coords() for item in filter(bool, lst_geom)]
+lst_geom_coords = [*map(lambda x: x.get_coords(), filter(bool, lst_geom))]
+
+
+########################################################################
+# Подвиг 9 (на повторение). Объявите в программе класс Vector, объекты которого создаются командой:
+# v = Vector(x1, x2, x3,..., xN)где x1, x2, x3,..., xN - координаты вектора (числа: целые или вещественные).
+# С каждым объектом класса Vector должны выполняться операторы:v1 + v2 # суммирование соответствующих координат векторов
+# v1 - v2 # вычитание соответствующих координат векторовv1 * v2 # умножение соответствующих координат векторов
+# v1 += 10 # прибавление ко всем координатам вектора числа 10v1 -= 10 # вычитание из всех координат вектора числа 10
+# v1 += v2
+# v2 -= v1
+# v1 == v2 # True, если соответствующие координаты векторов равны
+# v1 != v2 # True, если хотя бы одна пара координат векторов не совпадает
+# При реализации бинарных операторов +, -, * следует создавать новые объекты класса Vector с новыми (вычисленными)
+# координатами. При реализации операторов +=, -= координаты меняются в текущем объекте, не создавая новый.
+# Если число координат (размерность) векторов v1 и v2 не совпадает, то при операторах +, -, * должно генерироваться
+# исключение командой:raise ArithmeticError('размерности векторов не совпадают')
+class Vector:
+    def __init__(self, *args):
+        self.v = list(args)
+
+    def __is_check(self, other):
+        if len(other.v) != len(self.v) and isinstance(other, Vector):
+            raise ArithmeticError('размерности векторов не совпадают')
+        return True
+
+    def __add__(self, other):
+        if self.__is_check(other):
+            return Vector(*[val + other.v[i] for i, val in enumerate(self.v)])
+            # return Vector(sum(*zip(self.v, other.v)))
+
+    def __sub__(self, other):
+        if self.__is_check(other):
+            return self.__class__(*(val - other.v[i] for i, val in enumerate(self.v)))
+
+    def __mul__(self, other):
+        if self.__is_check(other):
+            return self.__class__(*[val * other.v[i] for i, val in enumerate(self.v)])
+
+    def __iadd__(self, other):
+        if type(other) in (int, float):
+            self.v = list(i + other for i in self.v)
+        elif self.__is_check(other):
+            self.v = list(val + other.v[i] for i, val in enumerate(self.v))
+        return self
+
+    def __isub__(self, other):
+        if type(other) in (int, float):
+            self.v = list(i - other for i in self.v)
+        elif self.__is_check(other):
+            self.v = list(val - other.v[i] for i, val in enumerate(self.v))
+        return self
+
+    def __radd__(self, other):
+        if self.__is_check(other):
+            return self + other
+
+    def __rsub__(self, other):
+        if self.__is_check(other):
+            return self - other
+
+    def __eq__(self, other):
+        if self.__is_check(other):
+            return self.v == other.v
+
+
+v1 = Vector(1, 2, 3)
+v2 = Vector(4, 5, 6)
+print((v1 + v2).v)  # [5, 7, 9]
+print((v1 - v2).v)  # [-3, -3, -3]
+print((v1 * v2).v)  # [4, 10, 18]
+v1 += 10
+print(v1.v)  # [11, 12, 13]
+v1 -= 10
+print(v1.v)  # [1, 2, 3]
+v1 += v2
+print(v1.v)  # [5, 7, 9]
+v2 -= v1
+print(v2.v)  # [-1, -2, -3]
+print(v1 == v2)  # False
+print(v1 != v2)  # True
+
+########################################################################
+import operator as op
+
+
+class Vector:
+    def __init__(self, *args):
+        self.coords = args
+
+    def __len__(self):
+        return len(self.coords)
+
+    def __do(self, other, f_name, new_object=True):
+        if isinstance(other, self.__class__) and len(other) == len(self):
+            new_coords = (f_name(a, b) for a, b in zip(self.coords, other.coords))
+        elif isinstance(other, (int, float)):
+            new_coords = (f_name(b, other) for b in self.coords)
+        else:
+            raise ArithmeticError('размерности векторов не совпадают')
+        if new_object:
+            return self.__class__(*new_coords, )
+        else:
+            self.coords = (*new_coords,)
+            return self
+
+    def __add__(self, other):
+        return self.__do(other, op.add)
+
+    def __sub__(self, other):
+        return self.__do(other, op.sub)
+
+    def __mul__(self, other):
+        return self.__do(other, op.mul)
+
+    def __iadd__(self, other):
+        return self.__do(other, op.add, False)
+
+    def __isub__(self, other):
+        return self.__do(other, op.sub, False)
+
+    def __imul__(self, other):
+        return self.__do(other, op.mul, False)
+
+    def __eq__(self, other):
+        if isinstance(other, self.__class__):
+            return self.coords == other.coords
+        raise TypeError('Сравнение векторов не возможно!')
+
+
+########################################################################
+from operator import sub, add, mul
+
+
+class Vector:
+
+    def __init__(self, *args):
+        self.args = args
+
+    @staticmethod
+    def check_len(self, other):
+        if not type(other) == int and len(self.args) != len(other.args):
+            raise ArithmeticError('размерности векторов не совпадают')
+        return True
+
+    def __sub__(self, other):
+        self.check_len(self, other)
+        other = other.args if isinstance(other, Vector) else [other for i in range(other)]
+        return Vector(*map(lambda x: sub(*x), zip(self.args, other)))
+
+    def __add__(self, other):
+        self.check_len(self, other)
+        other = other.args if isinstance(other, Vector) else [other for i in range(other)]
+        return Vector(*map(lambda x: add(*x), zip(self.args, other)))
+
+    def __mul__(self, other):
+        self.check_len(self, other)
+        other = other.args if isinstance(other, Vector) else [other for i in range(other)]
+        return Vector(*map(lambda x: mul(*x), zip(self.args, other)))
+
+    def __eq__(self, other):
+        return self.args == other.args
+
+
+#######################################################################
+class Vector:
+    def __init__(self, *vector):
+        self.vector = [*vector]
+
+    def __math(self, other, sign):
+        if isinstance(other, Vector):
+            if len(self.vector) != len(other.vector):
+                raise ArithmeticError('размерности векторов не совпадают')
+            vector = f"[i{sign}j for i,j in zip({getattr(self, 'vector')},{getattr(other, 'vector')})]"
+            # Функция getattr() в Python, значение атрибута по имени
+        else:
+            vector = f"[i{sign}{other} for i in {getattr(self, 'vector')}]"
+        return eval(vector)
+
+    def __add__(self, other):
+        return Vector(*self.__math(other, '+'))
+
+    def __radd__(self, other):
+        return self + other
+
+    def __iadd__(self, other):
+        self.vector = self.__math(other, '+')
+        return self
+
+    def __sub__(self, other):
+        return Vector(*self.__math(other, '-'))
+
+    def __rsub__(self, other):
+        return self - other
+
+    def __isub__(self, other):
+        self.vector = self.__math(other, '-')
+        return self
+
+    def __mul__(self, other):
+        return Vector(*self.__math(other, '*'))
+
+    def __rmul__(self, other):
+        return self * other
+
+    def __imul__(self, other):
+        self.vector = self.__math(other, '*')
+        return self
+
+    def __eq__(self, other):
+        return self.vector == other.vector
+
+
+########################################################################
+class Vector:
+    def __init__(self, *args):
+        self.v = args
+
+    def __is_check(self, other, sign):
+        if isinstance(other, Vector):
+            if len(self.v) != len(other.v):
+                raise ArithmeticError('размерности векторов не совпадают')
+            # vector = f'[i{sign}j for i, j in zip(self.v, other.v)]'
+            vector = f"[i{sign}j for i,j in zip({getattr(self, 'v')},{getattr(other, 'v')})]"
+            # Функция getattr() в Python, значение атрибута по имени
+        else:
+            # vector = f'[i{sign}{other} for i in self.v]'
+            vector = f"[i{sign}{other} for i in {getattr(self, 'v')}]"
+        return eval(vector)
+
+    def __add__(self, other):
+        return Vector(*self.__is_check(other, '+'))
+
+    def __sub__(self, other):
+        return Vector(*self.__is_check(other, '+'))
+
+    def __mul__(self, other):
+        return Vector(*self.__is_check(other, '+'))
+
+    def __iadd__(self, other):
+        self.v = self.__is_check(other, '+')
+        return self
+
+    def __isub__(self, other):
+        self.v = self.__is_check(other, '+')
+        return self
+
+    def __radd__(self, other):
+        return self + other
+
+    def __rsub__(self, other):
+        return self - other
+
+    def __eq__(self, other):
+        return self.v == other.v
+
+    def __str__(self):
+        return f'{self.v}'
+
+
+########################################################################
+import numpy
+
+
+class Vector:
+    def __init__(self, *args, **kwargs):
+        self.points = args
+
+    def check_vector(func):
+        def wrapper(self, vector, *args, **kwargs):
+            if not (type(vector) in (int, float)):
+                if len(vector.points) != len(self.points):
+                    raise ArithmeticError('размерности векторов не совпадают')
+            return func(self, vector)
+
+        return wrapper
+
+    @check_vector
+    def __add__(self, other):
+        return Vector(*[i + y for i, y in zip(self.points, other.points)])
+        # return Vector(*[sum(i) for i in zip(self.points, other.points)])
+
+    @check_vector
+    def __sub__(self, other):
+        return Vector(*[i - y for i, y in zip(self.points, other.points)])
+
+    @check_vector
+    def __mul__(self, other):
+        return Vector(*[i * y for i, y in zip(self.points, other.points)])
+
+    @check_vector
+    def __iadd__(self, other):
+        if type(other) in (int, float):
+            self.points = tuple(numpy.array(self.points) + other)
+        else:
+            self.points = tuple(numpy.array(self.points) + numpy.array(other.points))
+        return self
+
+    @check_vector
+    def __isub__(self, other):
+        if type(other) in (int, float):
+            self.points = tuple(numpy.array(self.points) - other)
+        else:
+            self.points = tuple(numpy.array(self.points) - numpy.array(other.points))
+        return self
+
+    def __eq__(self, other):
+        return self and other and self.points == other.points
+
+    def __ne__(self, other):
+        return self and other and self.points != other.points
+
+    def __len__(self):
+        return len(self.points)
+
+
+#######################################################################
+# Большой подвиг 8. Вы начинаете разрабатывать игру "Сапер". Для этого вам нужно уметь представлять и управлять игровым
+# полем. Будем полагать, что оно имеет размеры N x M клеток. Каждая клетка будет представлена объектом класса Cell и
+# содержать либо число мин вокруг этой клетки, либо саму мину.Для начала в программе объявите класс GamePole,
+# который будет создавать и управлять игровым полем. Объект этого класса должен формироваться командой:
+# pole = GamePole(N, M, total_mines)И, так как поле в игре одно, то нужно контролировать создание только одного объекта
+# класса GamePole (используйте паттерн Singleton, о котором мы с вами говорили, когда рассматривали магический
+# метод __new__()).Объект pole должен иметь локальный приватный атрибут:__pole_cells - двумерный (вложенный) кортеж,
+# размерами N x M элементов (N строк и M столбцов), состоящий из объектов класса Cell.Для доступа к этой коллекции
+# объявите в классе GamePole объект-свойство (property):pole - только для чтения (получения) ссылки на коллекцию
+# __pole_cells.Далее, в самом классе GamePole объявите следующие методы:init_pole() - для инициализации начального
+# состояния игрового поля (расставляет мины и делает все клетки закрытыми);open_cell(i, j) - открывает ячейку с
+# индексами (i, j); нумерация индексов начинается с нуля; метод меняет значение атрибута __is_open объекта Cell в
+# ячейке (i, j) на True;show_pole() - отображает игровое поле в консоли (как именно сделать - на ваше усмотрение,
+# этот метод - домашнее задание).Расстановку мин выполняйте случайным образом по игровому полю (для этого удобно
+# воспользоваться функцией randint модуля random). После расстановки всех total_mines мин, вычислите их количество
+# вокруг остальных клеток (где нет мин). Область охвата - соседние (прилегающие) клетки (8 штук).В методе open_cell()
+# необходимо проверять корректность индексов (i, j). Если индексы указаны некорректно, то генерируется исключение
+# командой:raise IndexError('некорректные индексы i, j клетки игрового поля')Следующий класс Cell описывает состояние
+# одной ячейки игрового поля. Объекты этого класса создаются командой:cell = Cell()При этом в самом объекте создаются
+# следующие локальные приватные свойства:__is_mine - булево значение True/False; True - в клетке находится мина,
+# False - мина отсутствует;__number - число мин вокруг клетки (целое число от 0 до 8);__is_open - флаг того, открыта
+# клетка или закрыта: True - открыта; False - закрыта.Для работы с этими приватными атрибутами объявите в классе Cell
+# следующие объекты-свойства с именами:is_mine - для записи и чтения информации из атрибута __is_mine;
+# number - для записи и чтения информации из атрибута __number;is_open - для записи и чтения информации из атрибута
+# __is_open.В этих свойствах необходимо выполнять проверку на корректность переданных значений (либо булево значение
+# True/False, либо целое число от 0 до 8). Если передаваемое значение некорректно, то генерировать исключение командой:
+# raise ValueError("недопустимое значение атрибута")С объектами класса Cell должна работать функция:
+# bool(cell)которая возвращает True, если клетка закрыта и False - если открыта.
+
+from random import randint
+
+
+class GamePole:
+    __isinstance = None
+
+    def __new__(cls, *args, **kwargs):
+        if cls.__isinstance is None:
+            cls.__isinstance = super().__new__(cls)
+        return cls.__isinstance
+
+    def __del__(self):
+        GamePole.__isinstance = None  # если instance будет уделён
+
+    def __init__(self, N, M, total_mines):  # создается поле размерами 10x20 с общим числом мин 10
+        self.N = N
+        self.M = M
+        self.total_mines = total_mines
+        # self.__pole_cells = tuple(tuple(Cell() for _ in range(M)) for _ in range(N))
+        self.__pole_cells = [[Cell() for _ in range(M)] for _ in range(N)]
+        self.init_pole()  # чтобы проинициилизировать (создать новый объект) ещё раз когда потребуется
+        # не создовая новый объект класса GamePole
+
+    @property
+    def pole(self):
+        return self.__pole_cells
+
+    def init_pole(self):
+        for i in self.__pole_cells:  # сбросить состояние поля
+            for j in i:
+                j.is_open = False
+                j.is_mine = False
+        m = 0
+        while m < self.total_mines:
+            i = randint(0, self.N - 1)  # возвращает случайное целое число i из интервала a <= i <= b.
+            j = randint(0, self.M - 1)
+            if self.pole[i][j].is_mine:
+                continue
+            self.__pole_cells[i][j].is_mine = True
+            m += 1
+
+        indx = (-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)
+        for x in range(self.N):
+            for y in range(self.M):
+                if not self.pole[x][y].is_mine:
+                    mines = sum(
+                        self.pole[x + i][y + j].is_mine for i, j in indx if 0 <= x + i < self.N and 0 <= y + j < self.M)
+                    self.pole[x][y].number = mines
+
+    def open_cell(self, i, j):
+        if not 0 <= i < self.N or not 0 <= j <= self.M:
+            raise IndexError('некорректные индексы i, j клетки игрового поля')
+        self.pole[i][j].is_open = True
+
+    def show_pole(self):
+        for row in self.pole:
+            print(*map(lambda x: '#' if not x.is_open else x.number if not x.is_mine else '*', row))
+
+
+class Cell:
+    def __init__(self):
+        self.__is_mine = False  # True - в клетке находится мина, False - мина отсутствует;
+        self.__number = 0  # число мин вокруг клетки (целое число от 0 до 8);
+        self.__is_open = False  # True - открыта; False - закрыта.
+
+    def __bool__(self):
+        return not self.__is_open  # True клетка закрыта и False -  открыта.
+
+    @property
+    def is_mine(self):
+        return self.__is_mine
+
+    @is_mine.setter
+    def is_mine(self, value):
+        if type(value) != bool:
+            raise ValueError("недопустимое значение атрибута")
+        self.__is_mine = value
+
+    @property
+    def number(self):
+        return self.__number
+
+    @number.setter
+    def number(self, value):
+        if value > 8 or value < 0 or type(value) != int:
+            # if not (0 < value < 8) or type(value) != int: - так не работает почемуто ???
+            raise ValueError("недопустимое значение атрибута")
+        self.__number = value
+
+    @property
+    def is_open(self):
+        return self.__is_open
+
+    @is_open.setter
+    def is_open(self, value):
+        if type(value) != bool:
+            raise ValueError("недопустимое значение атрибута")
+        self.__is_open = value
+
+
+pole = GamePole(10, 20, 10)  # создается поле размерами 10x20 с общим числом мин 10
+pole.init_pole()
+if pole.pole[0][1]:
+    pole.open_cell(0, 1)
+if pole.pole[3][5]:
+    pole.open_cell(3, 5)
+pole.open_cell(30, 100)  # генерируется исключение IndexError
+pole.show_pole()
+########################################################################
+from random import sample as S
+
+
+class D:
+    def __set_name__(self, owner, name):
+        self.name = f'__{name}'
+
+    def __get__(self, obj, owner):
+        if obj is None:
+            return property()
+        return getattr(obj, self.name)
+
+    def __set__(self, obj, value):
+        namedct = {'__is_mine': type(value) == bool,
+                   '__number': type(value) == int and value in range(0, 9),
+                   '__is_open': type(value) == bool}
+        if not self.name in namedct:
+            setattr(obj, self.name, value)
+        elif namedct[self.name]:
+            setattr(obj, self.name, value)
+        else:
+            raise ValueError("недопустимое значение атрибута")
+
+
+class GamePole:
+    pole_cells = D()
+    inst = None
+
+    def __new__(cls, *args):
+        if not cls.inst:
+            cls.inst = super().__new__(cls)
+        return cls.inst
+
+    def __init__(self, N, M, total_mines):
+        self.rows, self.cols = N, M
+        self.total_mines = total_mines
+        self.pole = tuple(tuple(Cell((i, j)) for j in range(M)) for i in range(N))
+        self.init_pole()
+
+    def init_pole(self):
+        unpack = [j for i in self.pole for j in i]
+        for i in unpack:
+            i.is_mine, i.is_open = False, False
+        mined = set(S(unpack, self.total_mines))
+        for i in mined:
+            i.is_mine = True
+        non_mined = set(unpack) - mined
+        for i in non_mined:
+            x1, x2 = i.pos[0] - 1 if i.pos[0] > 0 else 0, i.pos[0] + 2 if i.pos[0] < self.rows else self.rows - 1
+            y1, y2 = i.pos[1] - 1 if i.pos[1] > 0 else 0, i.pos[1] + 2 if i.pos[1] < self.cols else self.cols - 1
+            eps = set(j for i in self.pole[x1:x2] for j in i[y1:y2])
+            i.number = sum(map(lambda x: x.is_mine, eps))
+
+    def open_cell(self, i, j):
+        if all([type(i) == int == type(j), i in range(self.rows), j in range(self.cols)]):
+            self.pole[i][j].is_open = True
+        else:
+            raise IndexError('некорректные индексы i, j клетки игрового поля')
+
+    def show_pole(self):
+        for i in self.pole:
+            for j in i:
+                if j.is_open:
+                    print(' *' if j.is_mine else f' {j.number}', end='')
+                else:
+                    print('[]', end='')
+            print()
+
+
+class Cell:
+    is_mine, number, is_open, pos = D(), D(), D(), D()
+
+    def __init__(self, pos=None):
+        self.is_mine, self.number, self.is_open = False, 0, False
+        self.pos = pos
+
+    def __bool__(self):
+        return not self.is_open
+
+
+###############################################################################################################################################
+
+
+class GamePole:
+    _instance = None
+
+    def __new__(cls, *argc, **kwargs):
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+        return cls._instance
+
+    def __init__(self, N, M, total_mines):
+        if '_total_mines' not in self.__dict__:
+            self.__N, self.__M, self.__total_mines = N, M, total_mines
+            self.__pole_cells = tuple(tuple(Cell() for _ in range(M)) for _ in range(N))
+            # - двумерный (вложенный) кортеж, размерами N x M элементов (N строк и M столбцов), состоящий из объектов класса Cell.
+            if '_debug' in globals():
+                print(*self.__pole_cells, sep='\n')
+                print(len(self.__pole_cells))
+
+    @property
+    def pole(self):
+        return self.__pole_cells
+
+    def init_pole(self):
+        ''' - для инициализации начального состояния игрового поля расставляет мины и делает все клетки закрытыми);'''
+        from random import randrange
+        mines = set()
+        # Сначала создадим множество точек для минирования
+        while len(mines) < self.__total_mines:
+            coords = (randrange(0, self.__N), randrange(0, self.__M))
+            mines.add(coords)
+
+        # Теперь проведём собственно минирование нужных точек и разминирование остальных
+        for i in range(self.__N):
+            for j in range(self.__M):
+                self.__pole_cells[i][j].is_open = False
+                self.__pole_cells[i][j].is_mine = ((i, j) in mines)
+                if not self.__pole_cells[i][j].is_mine:
+                    self.__pole_cells[i][j].number = len([*filter(
+                        lambda x: x in mines,
+                        (
+                            (i - 1, j - 1), (i - 1, j), (i - 1, j + 1),
+                            (i, j - 1), (i, j + 1),
+                            (i + 1, j - 1), (i + 1, j), (i + 1, j + 1),
+                        )
+                    )])
+        self.__mines = mines
+
+    def open_cell(self, i, j):
+        ''' - открывает ячейку с индексами (i, j);
+        нумерация индексов начинается с нуля; метод меняет значение атрибута __is_open
+        объекта Cell в ячейке (i, j) на True;'''
+        self.__pole_cells[i][j].is_open = True
+
+    def show_pole(self):
+        '''show_pole() - отображает игровое поле в консоли
+        как именно сделать - на ваше усмотрение, этот метод - домашнее задание).
+        '''
+        for i in range(self.__N):
+            for j in range(self.__M):
+                cl = self.__pole_cells[i][j]
+
+                if cl:
+                    print('?', end='')
+                else:
+                    print('*' if cl.is_mine else cl.number, end='')
+
+            print()
+
+    def show_pole_all(self):
+        for i in range(self.__N):
+            for j in range(self.__M):
+                cl = self.__pole_cells[i][j]
+                print('*' if cl.is_mine else cl.number, end='')
+            print()
+
+
+class Cell:
+    def __init__(self):
+        self.__is_mine = False
+        # - булево значение True/False; True - в клетке находится мина, False - мина отсутствует;
+        self.__number = 0
+        # - число мин вокруг клетки (целое число от 0 до 8);
+        self.__is_open = False
+        # - флаг того, открыта клетка или закрыта: True - открыта; False - закрыта.
+
+    @property
+    def is_mine(self):
+        return self.__is_mine
+
+    @is_mine.setter
+    def is_mine(self, value):
+        if not isinstance(value, bool):
+            raise ValueError("недопустимое значение атрибута")
+        self.__is_mine = value
+
+    @property
+    def number(self):
+        return self.__number
+
+    @number.setter
+    def number(self, value):
+        if not isinstance(value, int) or not 0 <= value <= 8:
+            raise ValueError("недопустимое значение атрибута")
+        self.__number = value
+
+    @property
+    def is_open(self):
+        return self.__is_open
+
+    @is_open.setter
+    def is_open(self, value):
+        if not isinstance(value, bool):
+            raise ValueError("недопустимое значение атрибута")
+        self.__is_open = value
+
+    def __bool__(self):
+        return not self.__is_open
+
+
+#########################################################################
+# _________3.8 Методы __getitem__, __setitem__ и __delitem________________________________
+# __________Egorof________________
+# Нам необходимо создать класс Building. Мы должны научиться создавать здание определенной этажности и уметь
+# бронировать за компанией определенный этаж в здании. Важно, что в нашем классе за одним этажом может быть закреплена
+# только одна компанияДля этого в классе Building должно быть реализованыметод __init__, который принимает количество
+# этажей в зданииметод __setitem__, который закрепляет за определенным этажом компанию. Если этаж был занят другой
+# компанией, нужно заменить название другой компаниейметод __getitem__, который возвращает название компании с этого
+# этажа. В случае, если этаж пустует, следует вернуть Noneметод __delitem__, который высвобождает этаж
+
+class Building:
+    def __init__(self, floors):
+        # self.floors = [None]*floors
+        self.floors = {}
+
+        # self.floors = {floor: None for floor in range(floors)}
+        #
+        # for floor in range(floors):
+        #     self.floors[floor] = None
+
+    def __setitem__(self, key, value):
+        # if key < len(self.floors):
+        #     self.floors[key] = value
+
+        if key in self.floors:
+            # self.__dict__[key] = value
+            self.floors[key] = value
+
+    def __getitem__(self, item):
+        return self.floors[item]
+
+    def __delitem__(self, key):
+        self.floors[key] = None
+
+
+################################
+class Building:
+    # С применением декоратора, проверяющего наличие этажа в здании
+    def __init__(self, floors):
+        self.numb_of_floors = floors
+        self.floors = [None] * floors
+
+    def examination(func):
+        def wrap(*args):
+            if args[0].numb_of_floors >= args[1]:
+                return func(*args)
+            raise ValueError(f'Этажа №{args[1] + 1} не существует в этом здании')
+
+        return wrap
+
+    @examination
+    def __setitem__(self, key, value):
+        self.floors[key] = value
+
+    @examination
+    def __getitem__(self, key):
+        return self.floors[key]
+
+    @examination
+    def __delitem__(self, key):
+        self.floors[key] = None
+
+
+################################################################
+# ______Balakirev________________________________
+class Student:
+
+    def __init__(self, name, marks):
+        self.name = name
+        self.marks = marks
+
+    def __getitem__(self, item):
+        if item not in self.marks:
+            raise KeyError(f"Ключ {item} не существует или был удален")
+        return self.marks[item]
+
+    def __setitem__(self, key, value):
+        if key in self.marks:
+            self.marks[key] = value
+
+    def __delitem__(self, key):
+        if key in self.marks:
+            del self.marks[key]
+            print(f"Ключ {key} удален")
+
+
+student_1 = Student('Lesha', {'Math': 3, 'History': 5})
+print(student_1['Math'])  # 3
+
+student_1['Math'] = 5
+print(student_1['Math'])  # 5
+
+del student_1['Math']  # Ключ Math удален
+
+print(student_1['Math'])  # Ключ Math не существует или был удален
+
+
+################################################################
+# метод __init__, который сохраняет в экземпляре два атрибута title и artist: название песни и исполнитель
+# Класс Playlist должен содержать:метод __init__. , который создает в экземпляре атрибут songs. Изначально должен
+# ыть пустым списком; метод __getitem__ , который возвращает песню из атрибута songs по индексуметод __setitem__ ,
+# который добавляет песню в атрибут songs в указанный индекс. При этом нужно сдвинуть уже имеющиеся песни вправо, у
+# которых индекс был до момента вставки равен или больше переданного
+
+class Song:
+    def __init__(self, title, artist):
+        self.title = title
+        self.artist = artist
+
+
+class Playlist:
+    def __init__(self):
+        self.songs = []
+
+    def __getitem__(self, item):
+        return self.songs[item]
+
+    def __setitem__(self, item, value):
+        self.songs.insert(item, value)
+
+    def add_song(self, song):
+        self.__setitem__(-1, song)
+
+
+########################################################################
+# В этой задаче мы создадим аналог корзины покупок и для этого нам понадобиться реализовать класс ShoppingCart. В нем
+# должно содержаться следующее:метод __init__. , который создает в экземпляре атрибут items. Изначально должен быть
+# пустым словарем, в нем будут содержаться покупки;метод __getitem__ , который возвращает по названию товара его
+# текущее количество или 0, если товар отсутствует в корзине метод __setitem__ , который проставляет по названию
+# товара его количество в корзине. Если товар отсутствовал, его необходимо добавить, если присутствовал - нужно
+# проставить ему новое количествометод __delitem__ , который удаляет товар из корзиныметод add_item, который добавляет
+# товар к текущим. Это значит, что если товар уже присутствовал в корзине, то необходимо увеличить его количество.
+# Если товар отсутствовал, нужно его добавить. Данный метод принимает обязательно название товара и необязательно
+# его количество (по умолчанию количество равно 1). метод remove_item, который удаляет некоторое количество товара
+# из корзины. Если хотят удалить из корзины столько же товара, чем там имеется или больше, необходимо удалить его из
+# корзины.  В остальных случаях уменьшаем количество товара на переденное количество. Данный метод принимает
+# обязательно название товара и необязательно его количество (по умолчанию количество равно 1). Предусмотрите
+# ситуацию, когда удаляемый товар отсутствует в корзине
+class ShoppingCart:
+    def __init__(self):
+        self.items = {}
+
+    def __getitem__(self, product):
+        return self.items.get(product, 0)
+
+    def __setitem__(self, items, value):
+        self.items[items] = value
+
+    def add_item(self, product, value=1):
+        if product in self.items:
+            self.items[product] += value
+        else:
+            self.__setitem__(product, value)
+            # self.items[product] = value
+
+    def __delitem__(self, items):
+        del self.items[items]
+
+    def remove_item(self, product, value=1):
+        if product in self.items:
+            if self.items[product] >= value:
+                self.items[product] -= value
+            else:
+                self.__delitem__(product)
+                # del self.items[product]
+
+
+########################################################################
+# Подвиг 2. Объявите класс Record (запись), который описывает одну произвольную запись из БД. Объекты этого класса
+# создаются командой:r = Record(field_name1=value1,... , field_nameN=valueN)где field_nameX - наименование поля
+# БД; valueX - значение поля из БД.В каждом объекте класса Record должны автоматически создаваться локальные
+# публичные атрибуты по именам полей (field_name1,... , field_nameN) с соответствующими значениями. Например:
+# r = Record(pk=1, title='Python ООП', author='Балакирев')В объекте r появляются атрибуты:r.pk # 1r.title # Python ООП
+# r.author # БалакиревТакже необходимо обеспечить доступ к этим полям (чтение/запись) через индексы следующим образом:
+# r[0] = 2 # доступ к полю pkr[1] = 'Супер курс по ООП' # доступ к полю titler[2] = 'Балакирев С.М.' # доступ к полю
+# authorprint(r[1]) # Супер курс по ООПr[3] # генерируется исключение IndexError
+# Если указывается неверный индекс (не целое число или некорректное целое число), то должно генерироваться
+# исключение командой:raise IndexError('неверный индекс поля')P.S. В программе нужно объявить только класс.
+# Выводить на экран ничего не нужно.P.P.S. Для создания локальных атрибутов используйте коллекцию __dict__ объекта
+# класса Record.
+class Record:
+    def __init__(self, **kwargs):
+        self.__dict__.update(kwargs)
+
+        # for k, v in kwargs.items():
+        #     self.__dict__[k] = v
+
+        # self.__dict__ = kwargs
+
+        # for arg in kwargs:
+        #     self.__dict__[arg] = kwargs[arg]
+
+        self.__total_attrs = len(kwargs)
+        # self.__total_attrs = len(self.__dict__)
+
+        self.__attrs = tuple(self.__dict__.keys())
+
+    def __check_attrs_(self, indx):
+        if type(indx) != int or not (-self.__total_attrs <= indx < self.__total_attrs):
+            raise IndexError('неверный индекс поля')
+
+    def __getitem__(self, indx):
+        self.__check_attrs_(indx)
+        return getattr(self, self.__attrs[indx])
+
+    def __setitem__(self, key, value):
+        self.__check_attrs_(key)
+        setattr(self, self.__attrs[key], value)
+
+
+#######################################################################
+class Record:
+    def __init__(self, **kwargs):
+        self.__dict__ = kwargs
+
+    def __getitem__(self, item):
+        try:
+            return self.__dict__[(*self.__dict__.keys(),)[item]]
+        except IndexError:
+            raise IndexError('неверный индекс поля')
+
+    def __setitem__(self, item, value):
+        try:
+            self.__dict__[(*self.__dict__.keys(),)[item]] = value
+        except IndexError:
+            raise IndexError('неверный индекс поля')
+
+
+########################################################################
+# Подвиг 3. Вам необходимо для навигатора реализовать определение маршрутов. Для этого в программе нужно объявить класс
+# Track, объекты которого создаются командой:tr = Track(start_x, start_y)где start_x, start_y - координата начала пути.
+# В этом классе должен быть реализован следующий метод:add_point(x, y, speed) - добавление новой точки маршрута
+# (линейный сегмент), который можно пройти со средней скоростью speed.Также с объектами класса Track должны выполняться
+# команды:coord, speed = tr[indx] # получение координаты (кортеж с двумя числами) и скорости (число) для линейного
+# сегмента маршрута с индексом indxtr[indx] = speed # изменение средней скорости линейного участка маршрута по
+# индексу indxЕсли индекс (indx) указан некорректно (должен быть целым числом от 0 до N-1, где N - число линейных
+# сегментов в маршруте), то генерируется исключение командой:raise IndexError('некорректный индекс')
+class Track:
+    def __init__(self, start_x, start_y):
+        self.start_x = start_x
+        self.start_y = start_y
+        self.speed = []
+
+    def __setitem__(self, key, value):
+        self.speed[key] = value
+
+    def add_point(self, x, y, speed):
+        self.speed.append(speed)
+        self.start_x = x
+        self.start_y = y
+
+    def __getitem__(self, item):
+        if item > len(self.speed) - 1:
+            raise IndexError('некорректный индекс')
+        return tuple([self.start_x, self.start_y]), self.speed[item]
+
+
+tr = Track(10, -5.4)
+tr.add_point(20, 0, 100)  # первый линейный сегмент: indx = 0
+tr.add_point(50, -20, 80)  # второй линейный сегмент: indx = 1
+tr.add_point(63.45, 1.24, 60.34)  # третий линейный сегмент: indx = 2
+
+tr[2] = 60
+c, s = tr[2]
+print(c, s)
+
+res = tr[3]  # IndexError
+
+
+########################################################################
+class Track:
+    def __init__(self, start_x, start_y):
+        self.start_x = start_x
+        self.start_y = start_y
+        self.traffic = {}
+
+    def __setitem__(self, key, value):
+        self.traffic[list(self.traffic.keys())[key]] = value
+
+    def add_point(self, x, y, speed):
+        self.traffic[(x, y)] = speed
+
+    def __getitem__(self, item):
+        if item > len(self.traffic):
+            raise IndexError('некорректный индекс')
+        return tuple(self.traffic.keys())[item], self.traffic.get(list(self.traffic.keys())[item])
+
+
+#######################################################################
+class Track:
+    def __init__(self, start_x, start_y):
+        self.start_x = start_x
+        self.start_y = start_y
+        self.points = []
+
+    def add_point(self, x, y, speed):
+        self.points.append([(x, y), speed])
+
+    def __check(self, idx):
+        if type(idx) != int or idx > (len(self.points)):
+            raise IndexError('некорректный индекс')
+
+    def __setitem__(self, key, value):
+        self.__check(key)
+        self.points[key][1] = value
+
+    def __getitem__(self, item):
+        self.__check(item)
+        return self.points[item]
+
+
+########################################################################
+from typing import Union
+
+U = Union[int, float]
+
+
+class Track:
+    def __init__(self, start_x: U, start_y: U):
+        self.start_y = start_y
+        self.start_x = start_x
+        self.points = []
+
+    @staticmethod
+    def validator(method):
+        def wrapper(self: "Track", key: int, *args, **kwargs):
+            if 0 <= key < len(self.points):
+                return method(self, key, *args, **kwargs)
+            raise IndexError('некорректный индекс')
+
+        return wrapper
+
+    @validator.__get__(0)
+    def __getitem__(self, item: int):
+        return self.points[item]
+
+    @validator.__get__(0)
+    def __setitem__(self, key: int, value):
+        point = self.points[key]
+        self.points[key] = (point[0][0], point[0][1]), value
+
+    def add_point(self, x: U, y: U, speed: U):
+        self.points.append(((x, y), speed))
+
+
+###############################################################################################################################################
+class Track:
+    def __init__(self, *args):
+        self.tracks = {}
+
+    def add_point(self, x, y, speed):
+        self.tracks[len(self.tracks)] = [(x, y), speed]
+
+    def __getitem__(self, idx):
+        try:
+            return self.tracks[idx]
+        except KeyError:
+            raise IndexError('некорректный индекс')
+
+    def __setitem__(self, idx, value):
+        self[idx][1] = value
+
+
+# self[idx][1] в этой композиции self[idx] как раз идет через __getitem__ (tr[2]), возвращает self.tracks[idx] и уже у
+# этого # возвращенного значения мы меняем значение по индексу 1(tr[2] = 60). и по той же причине в __setitem__ не
+# требуется проверка, она в __getitem__ исполняется красиво
+########################################################################
+# Подвиг 4. Вам необходимо написать программу по работе с массивом однотипных данных (например, только числа или строки
+# и т.п.). Для этого нужно объявить класс с именем Array, объекты которого создаются командой:
+# aar = Array(max_length, cell)где max_length - максимальное количество элементов в массиве; cell - ссылка на класс,
+# описывающий отдельный элемент этого массива (см. далее, класс Integer). Начальные значения в ячейках массива
+# (в объектах класса Integer) должны быть равны 0.Для работы с целыми числами объявите в программе еще один класс с
+# именем Integer, объекты которого создаются командой:cell = Integer(start_value)где start_value - начальное значение
+# ячейки (в данном случае - целое число).В классе Integer должно быть следующее свойство (property):
+# value - для изменения и считывания значения из ячейки (само значение хранится в локальной приватной переменной;
+# имя придумайте сами).При попытке присвоить не целое число должно генерироваться исключение командой:
+# raise ValueError('должно быть целое число')Для обращения к отдельным элементам массива в классе Array необходимо
+# определить набор магических методов для следующих операций:value = ar[0] # получение значения из первого элемента
+# (ячейки) массива arar[1] = value # запись нового значения во вторую ячейку массива arr
+# Если индекс не целое число или число меньше нуля или больше либо равно max_length, то должно генерироваться
+# исключение командой:raise IndexError('неверный индекс для доступа к элементам массива')
+class Array:
+    def __init__(self, max_length, cell):
+        self.max_length = max_length
+        self.__cell = cell
+        self.__array = [self.__cell() for _ in range(self.max_length)]  # self.__cell() вызов класса Integer()
+        # self.__array = [cell() for _ in range(self.max_length)]
+
+        # self.__array = [self.__cell()] * self.max_length  # не подойдёт такой способ при изм
+        # одного эл (ar_int[1] = 10) меняются все в списке 10 10 10 10 10 10 10 10 10 10
+
+    def __check(self, item):
+        if type(item) != int or not (-self.max_length <= item < self.max_length):
+            raise IndexError('неверный индекс для доступа к элементам массива')
+
+    def __getitem__(self, item):
+        self.__check(item)
+        return self.__array[item].value
+
+    def __setitem__(self, item, value):
+        self.__check(item)
+        self.__array[item].value = value
+
+    def __repr__(self):
+        return ' '.join(map(str, self.__array))
+
+
+class Integer:
+    def __init__(self, start_value=0):
+        self.__value = start_value
+
+    @property
+    def value(self):
+        return self.__value
+
+    @value.setter
+    def value(self, value):
+        if type(value) != int:
+            raise ValueError('должно быть целое число')
+        self.__value = value
+
+    def __repr__(self):
+        return f'{self.__value}'
+    # без repr в классе Array return ' '.join(map(str, self.__array)) будет выдавать
+    # <__main__.Integer object at 0x000002022230F190> <__main__.Intege....
+    # будут отображаться  просто ссылки на объекты из списка
+
+
+ar_int = Array(10, cell=Integer)
+print(ar_int[3])
+print(ar_int)  # должны отображаться все значения массива в одну строчку через пробел
+ar_int[1] = 10
+print(ar_int)
+
+
+# ar_int[1] = 10.5 # должно генерироваться исключение ValueError
+# ar_int[10] = 1 # должно генерироваться исключение IndexError
+
+########################################################################
+class Num:
+    NUM_TYPE = None
+    INIT_VALUE = None
+    NUM_TYPE_STR = {int: 'целое', float: "вещественное"}
+
+    def __init__(self, start_value):
+        self.__except_message = f'должно быть {self.NUM_TYPE_STR.get(self.NUM_TYPE)} число'
+        self.value = start_value
+
+    def __repr__(self):
+        return str(self.value)
+
+    @property
+    def value(self):
+        return self.__value
+
+    @value.setter
+    def value(self, value):
+        if type(value) != self.NUM_TYPE:
+            raise ValueError(self.__except_message)
+        self.__value = value
+
+
+class Integer(Num):
+    NUM_TYPE = int
+    INIT_VALUE = 0
+
+
+class Float(Num):
+    NUM_TYPE = float
+    INIT_VALUE = 0.0
+
+
+class Array:
+    def __init__(self, max_length, cell):
+        self.__max_length = max_length
+        self.__type = cell
+        self.__elements = [self.__type(self.__type.INIT_VALUE) for _ in range(max_length)]
+
+    def __check(self, idx):
+        if type(idx) != int or idx not in range(self.__max_length):
+            raise IndexError('неверный индекс для доступа к элементам массива')
+
+    def __getitem__(self, item):
+        self.__check(item)
+        return self.__elements[item].value if item < len(self.__elements) else self.__type.INIT_VALUE
+
+    def __setitem__(self, key, value):
+        self.__check(key)
+        self.__elements[key].value = value
+
+    def __str__(self):
+        return ' '.join(map(str, self.__elements))
+
+
+########################################################################
+class Types:
+    def __init__(self, start_value=None):
+        self.value = start_value or self.value_start
+
+    @property
+    def value(self):
+        return self.__value
+
+    @value.setter
+    def value(self, new_value):
+        if not isinstance(new_value, self.value_type):
+            raise ValueError(self.value_msg)
+        self.__value = new_value
+
+    def __str__(self):
+        return str(self.__value)
+
+
+class Integer(Types):
+    value_start = 0
+    value_type = int
+    value_msg = 'должно быть целое число'
+
+
+class Float(Types):
+    value_start = .0
+    value_type = float
+    value_msg = 'должно быть вещественное число'
+
+
+class Array:
+
+    def __init__(self, max_length, cell):
+        self.max_length, self.cell = max_length, cell
+        self.__cells = [cell() for _ in range(self.max_length)]
+
+    def set_raise(self, key):
+        if not isinstance(key, int) or key not in range(self.max_length):
+            # if not 0 <= indx < len(self):
+            raise IndexError('некорректный индекс')
+
+    def __getitem__(self, key):
+        self.set_raise(key)
+        return self.__cells[key].value
+
+    def __setitem__(self, key, value):
+        self.set_raise(key)
+        self.__cells[key].value = value
+
+    def __str__(self, *args, **kwargs):
+        return ' '.join(map(str, self.__cells))
+
+
+#######################################################################
+# Подвиг 7 (познание срезов). Объявите в программе класс с именем RadiusVector (радиус-вектор), объекты которого
+# создаются командой:v = RadiusVector(x1, x2,..., xN)где x1, x2,..., xN - координаты радиус-вектора (числа: целые или
+# вещественные).В каждом объекте класса RadiusVector должен быть локальный атрибут:coords - список из координат
+# радиус-вектора.P.S. При передаче среза в магических методах __setitem__() и __getitem__() параметр индекса становится
+# объектом класса slice. Его можно указывать непосредственно в квадратных скобках упорядоченных коллекций (списков,
+# кортежей и т.п.).
+class RadiusVector:
+    def __init__(self, *args):
+        self.coords = list(args)
+
+    def __getitem__(self, key):
+        if isinstance(key, slice):
+            return tuple(self.coords[key])
+        return self.coords[key]
+
+    def __setitem__(self, indx, value):
+        self.coords[indx] = value
+
+    def __repr__(self):
+        return f'{self.coords}'
+
+
+v = RadiusVector(1, 1, 1, 1)
+print(v)
+print(v[1])  # 1
+v[:] = 1, 2, 3, 4
+print(v[2])  # 3
+print(v[1:])  # (2, 3, 4)
+v[0] = 10.5
+print(v[0])
+
+
+########################################################################
+class RadiusVector(list):
+    def __getitem__(self, i):
+        res = super().__getitem__(i)
+        return tuple(res) if isinstance(res, list) else res
+
+    def __init__(self, *args):
+        super().__init__(args)
+
+
+########################################################################
+class RadiusVector:
+
+    def __init__(self, *args):
+        self.coords = args
+
+    def __getitem__(self, key):
+        if isinstance(key, slice):
+            return self.coords[slice(key.start, key.stop, key.step)]
+        else:
+            return self.coords[key]
+
+    def __setitem__(self, key, value):
+        tl = list(self.coords)
+        if isinstance(key, slice):
+            tl[slice(key.start, key.stop, key.step)] = value
+        else:
+            tl[key] = value
+        self.coords = tl
+
+
+#######################################################################
+# Большой подвиг 5. Вам необходимо написать программу для удобного обращения с таблицами однотипных данных (чисел, строк,
+# булевых значений и т.п.), то есть, все ячейки таблицы должны представлять какой-то один указанный тип.
+# Для этого в программе необходимо объявить три класса:TableValues - для работы с таблицей в целом;CellInteger - для
+# операций с целыми числами;IntegerValue - дескриптор данных для работы с целыми числами.Начнем с дескриптора
+# IntegerValue. Это должен быть дескриптор данных (то есть, и для записи и считывания значений).
+# Если присваиваемое значение не является целым числом, должно генерироваться исключение командой:
+# raise ValueError('возможны только целочисленные значения')Следующий класс CellInteger описывает одну ячейку
+# таблицы для работы с целыми числами. В этом классе должен быть публичный атрибут (атрибут класса):
+# value - объект дескриптора, класса IntegerValue.А объекты класса CellInteger должны создаваться командой:
+# cell = CellInteger(start_value)где start_value - начальное значение ячейки (по умолчанию равно 0 и сохраняется в
+# ячейке через дескриптор value).Наконец, объекты последнего класса TableValues создаются командой:
+# table = TableValues(rows, cols, cell=CellInteger)где rows, cols - число строк и столбцов (целые числа);
+# cell - ссылка на класс, описывающий работу с отдельными ячейками таблицы. Если параметр cell не указан, то
+# генерировать исключение командой:raise ValueError('параметр cell не указан')Иначе, в объекте table класса
+# TableValues создается двумерный (вложенный) кортеж с именем cells размером rows x cols, состоящий из объектов
+# указанного класса (в данном примере - класса CellInteger).Также в классе TableValues предусмотреть возможность
+# обращения к отдельной ячейке по ее индексам, например:value = table[1, 2] # возвращает значение ячейки с индексом
+# (1, 2)table[0, 0] = value # записывает новое значение в ячейку (0, 0)Обратите внимание, по индексам сразу должно
+# возвращаться значение ячейки, а не объект класса CellInteger. И то же самое с присваиванием нового значения.
+# P.S. В программе нужно объявить только классы. Выводить на экран ничего не нужно.
+# P.P.S. В качестве домашнего задания создайте класс CellString для работы со строками и используйте тот же класс
+# TableValues для этого нового типа данных.Последнее: дескрипторы здесь для повторения. В реальной разработке лучше
+# использовать в таких задачах объекты-свойства (property).
+class IntegerValue:
+    def __set_name__(self, owner, name):
+        self.name = '__' + name
+
+    def __get__(self, instance, owner):
+        return getattr(instance, self.name)
+
+    def __set__(self, instance, value):
+        if type(value) != int:
+            raise ValueError('возможны только целочисленные значения')
+        setattr(instance, self.name, value)
+
+
+class CellInteger:
+    value = IntegerValue()
+
+    def __init__(self, start_value=0):
+        self.value = start_value
+
+
+class TableValues:
+    def __init__(self, rows, cols, cell=None):
+        if not cell:
+            raise ValueError('параметр cell не указан')
+        self.rows = rows
+        self.cols = cols
+        # self.cells = tuple(tuple(cell() for _ in [self.cols]) for _ in [self.rows])
+        self.cells = tuple(tuple(cell() for _ in range(cols)) for _ in range(rows))
+
+    # self.__cells = tuple([tuple([cell()]) * cols for _ in range(rows)])
+    # Копируется уже измененный объект по всей строке.
+    # Просто приму во внимание. Помнится с матрицами нормально работало. Видимо в классе при работе с объектами другие
+    # приоритеты. ААА! Они же одинаковые! ОДИНАКОВЫЕ. По любому хэш же тогда один. Зараза =)
+    # cell() * n - вы создаете один объект, а потом размножаете ссылку на него. получается матрица, состоящая из ссылок
+    # на один объект
+
+    def __check_index(self, index):
+        r, c = index
+        if type(r) != int or not (0 <= r < self.rows) or type(c) != int or not (0 <= c < self.cols):
+            raise IndexError
+
+    def __getitem__(self, index):
+        self.__check_index(index)
+        return self.cells[index[0]][index[1]].value
+
+    def __setitem__(self, index, value):
+        self.__check_index(index)
+        self.cells[index[0]][index[1]].value = value
+
+
+table = TableValues(2, 3, cell=CellInteger)
+print(table[0, 1])
+table[1, 1] = 10
+table[0, 0] = 1.45  # генерируется исключение ValueError
+
+for row in table.cells:
+    for x in row:
+        print(x.value, end=' ')
+
+
+########################################################################
+class ValueDescriptor:
+    TYPE = None
+    TYPE_STR = {int: "целочисленные", str: "строковые"}
+
+    def __set_name__(self, owner, name):
+        self.name = f'__{name}'
+        self.__except_message = f'возможны только {self.TYPE_STR.get(self.TYPE, None)} значения'
+
+    def __get__(self, instance, owner):
+        return getattr(instance, self.name)
+
+    def __set__(self, instance, value):
+        if type(value) != self.TYPE:
+            raise ValueError(self.__except_message)
+        setattr(instance, self.name, value)
+
+
+class IntegerValue(ValueDescriptor):
+    TYPE = int
+
+
+class StringValue(ValueDescriptor):
+    TYPE = str
+
+
+class Cell:
+    def __init__(self, value):
+        self.value = value
+
+    def __repr__(self):
+        return str(self.value)
+
+
+class CellInteger(Cell):
+    INIT_VALUE = 0
+    value = IntegerValue()
+
+
+class CellString(Cell):
+    INIT_VALUE = ''
+    value = StringValue()
+
+
+class TableValues:
+    def __init__(self, rows, cols, cell=None):
+        if not issubclass(cell, Cell):
+            raise ValueError('параметр cell не указан')
+        self.cells = [[cell(cell.INIT_VALUE) for _ in range(cols)] for _ in range(rows)]
+
+    def __getitem__(self, item):
+        r, c = item
+        return self.cells[r][c].value
+
+    def __setitem__(self, key, value):
+        r, c = key
+        self.cells[r][c].value = value
+
+
+#####################################################################################################################
+class CellDescriptor:
+    TYPES = {int: "целочисленные", str: "строковые"}
+
+    def __set_name__(self, owner, name):
+        self.name = f'__{name}'
+
+    def __get__(self, instance, owner):
+        return property() if instance is None else getattr(instance, self.name)
+
+    def __set__(self, instance, new_value):
+        if not isinstance(new_value, self.value_type):
+            raise ValueError(f'возможны только {self.TYPES.get(self.value_type)} значения')
+        setattr(instance, self.name, new_value)
+
+
+class IntegerValue(CellDescriptor):
+    value_type = int
+
+
+class StringValue(CellDescriptor):
+    value_type = str
+
+
+class CellValue:
+    def __init__(self, start_value=None):
+        self.value = start_value or self.value_start
+
+    def __str__(self):
+        return str(self.value)
+
+
+class CellInteger(CellValue):
+    value_start = 0
+    value = IntegerValue()
+
+
+class CellString(CellValue):
+    value_start = ''
+    value = StringValue()
+
+
+class TableValues:
+
+    def __init__(self, *args, **kwargs):
+        self.__rows, self.__cols = args
+        if kwargs.get('cell') is None:
+            raise ValueError('параметр cell не указан')
+        self.cells = [[kwargs['cell']() for _ in range(self.__cols)] for _ in range(self.__rows)]
+
+    def __getitem__(self, item):
+        return self.cells[item[0]][item[1]].value
+
+    def __setitem__(self, item, value):
+        self.cells[item[0]][item[1]].value = value
+
+    def __str__(self, *args, **kwargs):
+        return '\n'.join(' '.join(map(str, row)) for row in self.cells)
+
+
+########################################################################
+# Подвиг 6. Ранее вы уже создавали стек-подобную структуру, когда один объект ссылается на следующий и так по цепочке до
+# последнего:Для этого в программе объявлялись два класса: StackObj - для описания объектов стека;
+# Stack - для управления стек-подобной структурой.И, далее, объекты класса StackObj следовало создавать командой:
+# obj = StackObj(data)где data - это строка с некоторым содержимым объекта (данными). При этом каждый объект класса
+# StackObj должен иметь следующие локальные атрибуты:data - ссылка на строку с данными, указанными при создании объекта;
+# next - ссылка на следующий объект класса StackObj (при создании объекта принимает значение None).
+# Класс Stack предполагается использовать следующим образом:st = Stack() # создание объекта стек-подобной структуры
+# В каждом объекте класса Stack должен быть локальный публичный атрибут:top - ссылка на первый объект стека
+# (если стек пуст, то top = None).А в самом классе Stack следующие методы:push(self, obj) - добавление
+# объекта класса StackObj в конец стека;pop(self) - извлечение последнего объекта с его удалением из стека;
+# Дополнительно в классе Stack нужно объявить магические методы для обращения к объекту стека по его индексу, например:
+# obj_top = st[0] # получение первого объектаobj = st[4] # получение 5-го объекта стекаst[2] = StackObj("obj3") #
+# замена прежнего (3-го) объекта стека на новыйЕсли индекс не целое число или число меньше нуля или больше числа
+# объектов в стеке, то должно генерироваться исключение командой:raise IndexError('неверный индекс')
+
+class StackObj:
+    def __init__(self, data):
+        self.data = data
+        self.__next = None
+
+
+class Stack:
+    def __init__(self):
+        self.top = None
+        self.__count_obj = 0
+
+    def push(self, obj):
+        last = self[self.__count_obj - 1] if self.__count_obj > 0 else None
+        if last:
+            last.next = obj
+        if self.top is None:
+            self.top = obj
+        self.__count_obj += 1
+
+    def pop(self):
+        if self.__count_obj == 0:
+            return None
+
+        last = self[self.__count_obj - 1]
+
+        if self.__count_obj == 1:
+            self.top = None
+        else:
+            self[self.__count_obj - 2].next = None
+        self.__count_obj -= 1
+        return last
+
+    def __check_index(self, item):
+        if type(item) != int or not (0 <= item < self.__count_obj):
+            raise IndexError('неверный индекс')
+
+    def __getitem__(self, item):
+        self.__check_index(item)
+        count = 0
+        h = self.top
+        while h and count < item:
+            h = h.next
+            count += 1
+        return h
+
+    def __setitem__(self, key, value):
+        self.__check_index(key)
+        obj = self[key]  # отрабатывает _getitem_
+        prev = self[key - 1] if key > 0 else None
+        value.next = obj.next
+        if prev:
+            prev.next = value
+
+
+st = Stack()
+st.push(StackObj("obj1"))
+st.push(StackObj("obj2"))
+st.push(StackObj("obj3"))
+st[1] = StackObj("new obj2")
+print(st[2].data)  # obj3
+print(st[1].data)  # new obj2
+res = st[3]  # исключение IndexError
+
+
+########################################################################
+class StackObj:
+    def __init__(self, data):
+        self.data = data
+        self.next = None
+
+    def __str__(self):
+        return str(self.data)
+
+    def __repr__(self):
+        return str(self)
+
+
+class Stack:
+    def __init__(self):
+        self.top = None
+        self.__count = 0
+
+    def __check(self, idx):
+        if idx not in range(self.items):
+            raise IndexError('неверный индекс')
+
+    @property
+    def items(self):
+        return self.__count
+
+    def push(self, obj):
+        self.__count += 1
+        if self.top is None:
+            self.top = obj
+        else:
+            el = self.top
+            while el.next is not None:
+                el = el.next
+            el.next = obj
+
+    def pop(self):
+        el = self.top
+        if el and self.top.next is None:
+            self.top = None
+            self.__count -= 1
+        elif el and el.next:
+            self.__count -= 1
+            last = el
+            el = el.next
+            while el.next:
+                last = el
+                el = el.next
+            last.next = None
+        return el
+
+    def __get_obj(self, idx):
+        cnt = 0
+        el = self.top
+        while cnt != idx:
+            el = el.next
+            cnt += 1
+        return el
+
+    def __getitem__(self, item):
+        self.__check(item)
+        return self.__get_obj(item)
+
+    def __setitem__(self, key, value):
+        self.__check(key)
+        if key == 0:
+            value.next = self.top.next
+            self.top = value
+        else:
+            prev = self.__get_obj(key - 1)
+            cur = prev.next
+            prev.next = value
+            value.next = cur.next
+
+
+########################################################################
+# Подвиг 8. Вам нужно реализовать в программе игровое поле для игры "Крестики-нолики". Для этого требуется объявить
+# класс TicTacToe (крестики-нолики), объекты которого создаются командой:game = TicTacToe()Каждый объект game должен
+# иметь публичный атрибут:pole - игровое поле: кортеж размером 3х3 с объектами класса Cell.
+# Каждая клетка игрового поля представляется объектом класса Cell и создается командой:cell = Cell()
+# Объекты класса Cell должны иметь следующие публичные локальные атрибуты:is_free - True, если клетка свободна;
+# False в противном случае;value - значение поля: 1 - крестик; 2 - нолик (по умолчанию 0).Также с каждым объектом
+# класса Cell должна работать функция:bool(cell)которая возвращает True, если клетка свободна (cell.is_free=True)
+# и False в противном случае.Класс TicTacToe должен иметь следующий метод:clear() - очистка игрового поля
+# (все клетки заполняются нулями и переводятся в закрытое состояние);А объекты этого класса должны иметь следующую
+# функциональность (обращение по индексам):game[0, 0] = 1 # установка нового значения, если поле закрыто
+# res = game[1, 1] # получение значения центральной ячейки поля (возвращается число)Если указываются некорректные
+# индексы, то должно генерироваться исключение командой:raise IndexError('неверный индекс клетки')Если идет попытка
+# присвоить новое значение в открытую клетку поля, то генерировать исключение:raise ValueError('клетка уже занята')
+# Также должны быть реализованы следующие полные срезы при обращении к клеткам игрового поля:slice_1 = game[:, indx]
+# выбираются все элементы (кортеж) столбца с индексом indxslice_2 = game[indx, :] # выбираются все элементы (кортеж)
+# строки с индексом indxP.S. В программе нужно объявить только классы. Выводить на экран ничего не нужно.
+# P.P.S. При передаче среза в магических методах __setitem__() и __getitem__() параметр индекса становится объектом
+# класса slice. Его можно указывать непосредственно в квадратных скобках упорядоченных коллекций (списков, кортежей и т
+
+class TicTacToe:
+    def __init__(self):
+        self.n = 3
+        self.pole = tuple(tuple(Cell() for _ in range(self.n)) for _ in range(self.n))
+
+    def clear(self):
+        for row in self.pole:
+            for cell in row:
+                cell.value = 0
+                cell.is_free = True
+
+    def check_pole(self, item):
+        if type(item) != tuple or len(item) != 2:
+            raise IndexError('неверный индекс клетки')
+
+        for i in item:
+            if type(i) != slice:
+                if 0 > i > self.n:
+                    raise IndexError('неверный индекс клетки')
+        # if any(not (0 <= i < self.n) for i in item if type(i) != slice):
+        #     raise IndexError('неверный индекс клетки')
+
+    def __getitem__(self, item):
+        self.check_pole(item)
+        r, c = item
+        if isinstance(item[0], slice):
+            return tuple(self.pole[i][item[1]].value for i in range(self.n))  # срез для столбцов cols
+        elif type(c) == slice:
+            return tuple(self.pole[r][i].value for i in range(self.n))  # #срез для строк rows
+            # return tuple(self.pole[item[1]][i].value for i in range(self.n))  #срез для строк rows
+
+        return self.pole[item[0]][item[1]].value
+
+    def __setitem__(self, item, value):
+        self.check_pole(item)
+        # if not self.pole[item[0]][item[1]].is_free:
+        if not self.pole[item[0]][item[1]]:
+            raise ValueError('клетка уже занята')
+        self.pole[item[0]][item[1]].value = value
+        self.pole[item[0]][item[1]].is_free = False
+
+
+class Cell:
+    def __init__(self):
+        self.is_free = True
+        self.value = 0  # значение поля: 1 - крестик; 2 - нолик (по умолчанию 0).
+
+    def __bool__(self):
+        return self.is_free
+
+
+game = TicTacToe()
+game.clear()
+game[0, 0] = 1
+game[1, 0] = 2
+# формируется поле:
+# 1 0 0
+# 2 0 0
+# 0 0 0
+# game[3, 2] = 2  # генерируется исключение IndexError
+if game[0, 0] == 0:
+    game[0, 0] = 2
+v1 = game[0, :]  # 1, 0, 0
+v2 = game[:, 0]  # 1, 2, 0
+
+
+#######################################################################
+class Cell:
+    """Класс описывающий клетку игрового поля в крестики-нолики"""
+
+    # 1 крестик; 2 нолик; 0 пустое место
+    # is_free == True (клетка свободна, можно размещать);
+    # is_free == False (клетка закрыта, размещать нельзя)
+    def __init__(self):
+        self.is_free = True
+        self.value = 0
+
+    # ниже объект свойство контролирует чтобы значение ячейки игрового поля менялось
+    # только в том случае - если эта ячейка свободна, иначе вызываем исключение
+
+    @property
+    def value(self):
+        return self.__value
+
+    @value.setter
+    def value(self, v: int):
+        if not self.is_free:
+            raise ValueError("клетка уже занята")
+        self.__value = v
+
+    def __bool__(self):
+        return self.is_free
+
+
+class TicTacToe:
+    """Класс описывающий игровое поле"""
+
+    def __init__(self):
+        # игровое поле представленное в виде двумерного кортежа
+        self.pole = tuple(tuple(Cell() for col in range(3)) for row in range(3))
+
+    def clear(self):
+        """Очищает игровое поле (убирает все крестики и нолики, закрывает клетки)"""
+
+        # Циклом проходимся по каждой клетке
+        for row in range(3):
+            for col in range(3):
+                self.pole[row][col].is_free = True
+                self.pole[row][col].value = 0
+
+    @staticmethod
+    def __validate_coordinate(coordinate: int):
+        """Проверяет чтобы координата не выходила за пределы размеров поля"""
+        if coordinate not in range(3):
+            raise IndexError("неверный индекс")
+
+    def __getitem__(self, item: tuple):
+        """Получение значения по координатам x, y (одна из координат может быть
+        представлена срезом (slice). В этом случае выбираются все значения, находящиеся
+        на той координате, которая представлена целым числом). Если обе координаты
+        представлены целыми числами - просто возвращаем элемент поля находящийся на
+        соответствующей координате"""
+
+        row, col = item
+
+        # Возвращается конкретная клетка
+        if isinstance(row, int) and isinstance(col, int):
+            self.__validate_coordinate(row)  # Проверяем координату (см. выше)
+            self.__validate_coordinate(col)  # Проверяем координату (см. выше)
+            return self.pole[row][col].value
+
+        # Возвращаются все клетки, находящиеся под столбцом col
+        elif isinstance(row, slice) and isinstance(col, int):
+            self.__validate_coordinate(col)  # Проверяем координату (см. выше)
+            return tuple(self.pole[r][col].value for r in range(3))
+
+        # Возвращаются все клетки, находящиеся под строкой row
+        elif isinstance(row, int) and isinstance(col, slice):
+            self.__validate_coordinate(row)  # Проверяем координату (см. выше)
+            return tuple(self.pole[row][c].value for c in range(3))
+
+    def __setitem__(self, key, value):
+        """Устанавливает значение конкретной клетке игрового поля"""
+
+        row, col = key
+        self.__validate_coordinate(row)  # Проверяем координату (см. выше)
+        self.__validate_coordinate(col)  # Проверяем координату (см. выше)
+
+        self.pole[row][col].value = value  # Срабатывает сеттер из класса Cell
+        # (см. выше)
+        self.pole[row][col].is_free = False
+
+
+########################################################################
+class TicTacToe:
+    def __init__(self):
+        self.pole = [[Cell() for _ in range(3)] for __ in range(3)]
+
+    def clear(self):
+        self.__init__()
+
+    def valid(self, coord):
+        if not all([i in range(3) for i in coord if type(i) is int]):
+            raise IndexError('неверный индекс клетки')
+
+    def __getitem__(self, item):
+        self.valid(item)
+        pole_ = tuple(zip(*self.pole)) if type(item[0]) is slice else self.pole
+        cell_ = pole_[item[0]][item[1]]
+        return cell_.value if type(cell_) is Cell else tuple([i.value for i in cell_])
+
+    def __setitem__(self, key, value):
+        self.valid(key)
+        if not self.pole[key[0]][key[1]].is_free:
+            raise ValueError('клетка уже занята')
+        self.pole[key[0]][key[1]].value = value
+        self.pole[key[0]][key[1]].is_free = False
+
+
+class Cell:
+    def __init__(self):
+        self.is_free, self.value = True, 0
+
+    def __bool__(self):
+        return self.is_free == True
+
+
+########################################################################
+class Cell:
+    def __init__(self):
+        self.value = 0
+        self.is_free = True
+
+    def __bool__(self):
+        return self.is_free
+
+
+class TicTacToe:
+    def __init__(self):
+        self.pole = tuple([[Cell() for _ in range(3)] for _ in range(3)])
+
+    def clear(self):
+        for rows in self.pole:
+            for cell in rows:
+                cell.value = 0
+                cell.is_free = True
+
+    def __setitem__(self, key, value):
+        if not 0 <= key[0] < len(self.pole) or not 0 <= key[0] <= len(self.pole[0]) - 1:
+            raise IndexError('неверный индекс клетки')
+        else:
+            if self.pole[key[0]][key[1]]:
+                self.pole[key[0]][key[1]].value = value
+            else:
+                raise ValueError('клетка уже занята')
+
+    def __str__(self):
+        return f"{[[cell.value for cell in rows] for rows in self.pole]}"
+
+    def __getitem__(self, item):
+
+        if isinstance(item[0], int) and isinstance(item[1], slice):
+            return tuple(x.value for x in self.pole[item[0]][item[1]])
+        elif isinstance(item[0], slice) and isinstance(item[1], int):
+            return tuple(map(lambda x: x.value, tuple(zip(*self.pole))[item[1]]))
+        else:
+            return self.pole[item[0]][item[1]].value
+
+
+#######################################################################
+class TicTacToe:
+    def __init__(self):
+        self.pole = tuple(tuple(Cell() for _ in range(3)) for __ in range(3))
+
+    def clear(self):
+        for row in self.pole:
+            for obj in row:
+                obj.is_free = True
+                obj.value = 0
+
+    @staticmethod
+    def __check_index(ind):
+        for i in ind:
+            if not (type(i) is slice or type(i) is int and 0 <= i <= 2):
+                raise IndexError('неверный индекс клетки')
+
+    def __getitem__(self, item):
+        self.__check_index(item)
+
+        if type(item[0]) is slice:
+            return tuple(row[item[1]].value for row in self.pole)
+
+        if type(item[1]) is slice:
+            return tuple(map(lambda x: x.value, self.pole[item[0]]))
+
+        return self.pole[item[0]][item[1]].value
+
+    def __setitem__(self, key, value):
+        self.__check_index(key)
+
+        if not self.pole[key[0]][key[1]].is_free:
+            raise IndexError('неверный индекс клетки')
+
+        self.pole[key[0]][key[1]].is_free = False
+        self.pole[key[0]][key[1]].value = value
+
+
+class Cell:
+    def __init__(self):
+        self.is_free = True
+        self.value = 0
+
+    def __bool__(self):
+        return self.is_free
+
+
+########################################################################
+class Cell:
+    def __init__(self):
+        self.is_free, self.value = True, 0
+
+    def __bool__(self):
+        return self.is_free
+
+
+class TicTacToe:
+
+    def __init__(self):
+        self.pole = [[Cell() for _ in 'XXX'] for _ in 'OOO']
+
+    def clear(self):
+        self.__init__()
+
+    @staticmethod
+    def set_raise(key):
+        if not all(k in range(3) or isinstance(k, slice) for k in key):
+            raise IndexError('неверный индекс клетки')
+
+    def __getitem__(self, key):
+        self.set_raise(key)
+        if isinstance(key[0], slice):
+            return tuple(row[key[1]].value for row in self.pole)
+        elif isinstance(key[1], slice):
+            return tuple(cell.value for cell in self.pole[key[0]])
+        return self.pole[key[0]][key[1]].value
+
+    def __setitem__(self, key, value):
+        self.set_raise(key)
+        if not self.pole[key[0]][key[1]]:
+            raise ValueError('клетка уже занята')
+        self.pole[key[0]][key[1]].value = value
+
+
+###############################################################################################################################################
+# Подвиг 9 (релакс). Объявите в программе класс Bag (сумка), объекты которого создаются командой:bag = Bag(max_weight)
+# где max_weight - максимальный суммарный вес предметов, который можно положить в сумку.Каждый предмет описывается
+# классом Thing и создается командой:t = Thing(name, weight)где name - название предмета (строка); weight - вес
+# предмета (вещественное или целочисленное значение). В объектах класса Thing должны автоматически формироваться
+# локальные свойства с теми же именами: name и weight.В классе Bag должен быть реализован метод:
+# add_thing(thing) - добавление нового объекта thing класса Thing в сумку.Добавление выполняется только если
+# суммарный вес вещей не превышает параметра max_weight. Иначе, генерируется исключение:raise ValueError
+# ('превышен суммарный вес предметов')Также с объектами класса Bag должны выполняться следующие команды:
+# t = bag[indx] # получение объекта класса Thing по индексу indx (в порядке добавления вещей, начиная с 0)
+# bag[indx] = t # замена прежней вещи на новую t, расположенной по индексу indxdel bag[indx] # удаление вещи из сумки,
+# расположенной по индексу indxЕсли индекс в этих командах указывается неверно, то должно генерироваться исключение:
+# raise IndexError('неверный индекс')
+class Bag:
+    def __init__(self, max_weight):
+        self.max_weight = max_weight
+        self.lst = []
+
+    def add_thing(self, thing):
+        if (sum(i.weight for i in self.lst) + thing.weight) > self.max_weight:
+            raise ValueError('превышен суммарный вес предметов')
+        self.lst.append(thing)
+
+    def __check_index(self, item):
+        if not (0 <= item < len(self.lst)):
+            raise IndexError('неверный индекс')
+
+    def __getitem__(self, item):
+        self.__check_index(item)
+        return self.lst[item]
+
+    def __setitem__(self, item, value):
+        self.__check_index(item)
+        l = self.lst[:]
+        l[item] = value
+        if sum(i.weight for i in l) > self.max_weight:
+            raise ValueError('превышен суммарный вес предметов')
+        self.lst[item] = value
+
+        self.lst[item] = value
+
+    def __delitem__(self, item):
+        del self.lst[item]
+
+
+bag = Bag(1000)
+bag.add_thing(Thing('книга', 100))
+bag.add_thing(Thing('носки', 200))
+bag.add_thing(Thing('рубашка', 500))
+# bag.add_thing(Thing('ножницы', 300))  # генерируется исключение ValueError
+print(bag[2].name)  # рубашка
+bag[1] = Thing('платок', 100)
+print(bag[1].name)  # платок
+del bag[0]
+print(bag[0].name)  # платок
+
+
+# t = bag[4]  # генерируется исключение IndexError
+########################################################################
+class Bag:
+    def __init__(self, max_weight):
+        self.max_weight = max_weight
+        self.lst = []
+        self.things = 0
+
+    def add_thing(self, thing):
+        self.__check_weight(thing)
+        self.lst.append(thing)
+        self.things += thing.weight
+
+    def __check_weight(self, new_thing, old_thing=0):
+        if (self.things + new_thing.weight - old_thing) > self.max_weight:
+            raise ValueError('превышен суммарный вес предметов')
+
+    def __check_index(self, item):
+        if not (0 <= item < len(self.lst)):
+            raise IndexError('неверный индекс')
+
+    def __getitem__(self, item):
+        self.__check_index(item)
+        return self.lst[item]
+
+    def __setitem__(self, item, value):
+        self.__check_index(item)
+        w = self.lst[item].weight
+        self.__check_weight(value, w)
+        self.lst[item] = value
+        self.things += (value.weight - w)
+
+    def __delitem__(self, item):
+        self.__check_index(item)
+        w = self.lst.pop(item)
+        self.things -= w.weight
+
+
+class Thing:
+    def __init__(self, name, weight):
+        self.name = name
+        self.weight = weight
+
+
+########################################################################
+class Bag:
+    def __init__(self, max_weight):
+        self.max_weight = max_weight
+        self.things = []
+
+    def check_weight(self, weight):
+        if sum([i.weight for i in self.things]) + weight > self.max_weight:
+            raise ValueError('превышен суммарный вес предметов')
+
+    def check_index(self, indx):
+        a = len(self.things)
+        if indx not in range(-a, a):
+            raise IndexError('неверный индекс')
+
+    def add_thing(self, thing):
+        self.check_weight(thing.weight)
+        self.things.append(thing)
+
+    def __getitem__(self, item):
+        self.check_index(item)
+        return self.things[item]
+
+    def __setitem__(self, key, value):
+        self.check_index(key)
+        self.check_weight(value.weight - self[key].weight)
+        self.things[key] = value
+
+    def __delitem__(self, key):
+        self.check_index(key)
+        del self.things[key]
+
+
+########################################################################
+# Подвиг 10. Вам необходимо описывать в программе очень большие и разреженные таблицы данных (с большим числом пропусков
+# ). Для этого предлагается объявить класс SparseTable, объекты которого создаются командой:st = SparseTable()
+# В каждом объекте этого класса должны создаваться локальные публичные атрибуты:rows - общее число строк таблицы
+# (начальное значение 0);cols - общее число столбцов таблицы (начальное значение 0).В самом классе SparseTable должны
+# быть объявлены методы:add_data(row, col, data) - добавление данных data (объект класса Cell) в таблицу по индексам
+# row, col (целые неотрицательные числа);remove_data(row, col) - удаление ячейки (объект класса Cell) с индексами
+# (row, col).При удалении/добавлении новой ячейки должны автоматически пересчитываться атрибуты rows, cols объекта
+# класса SparseTable. Если происходит попытка удалить несуществующую ячейку, то должно генерироваться исключение:
+# raise IndexError('ячейка с указанными индексами не существует')Ячейки таблицы представляют собой объекты класса Cell,
+# которые создаются командой:data = Cell(value)где value - данные ячейки (любой тип).Хранить ячейки следует в словаре,
+# ключами которого являются индексы (кортеж) i, j, а значениями - объекты класса Cell.Также с объектами класса
+# SparseTable должны выполняться команды:res = st[i, j] # получение данных из таблицы по индексам (i, j)
+# st[i, j] = value # запись новых данных по индексам (i, j)Чтение данных возможно только для существующих ячеек. Если
+# ячейки с указанными индексами нет, то генерировать исключение командой:raise ValueError('данные по указанным
+# индексам отсутствуют')При записи новых значений их следует менять в существующей ячейке или добавлять новую,
+# если ячейка с индексами (i, j) отсутствует в таблице. (Не забывайте при этом пересчитывать атрибуты rows и cols).
+
+class SparseTable:
+    def __init__(self):
+        self.table = {}
+        self.rows = self.cols = 0
+
+    def __check_keys(self, row, col):
+        if (row, col) not in self.table:
+            raise IndexError('ячейка с указанными индексами не существует')
+
+    def __update_index(self):
+        self.rows = max(key[0] for key in self.table) + 1
+        self.cols = max(key[1] for key in self.table) + 1
+        # self.rows = max(self.table, key=lambda x: x[0])[0] + 1
+        # self.cols = max(self.table, key=lambda x: x[1])[1] + 1
+
+    def add_data(self, row, col, data):
+        self.table[(row, col)] = data
+        self.__update_index()
+
+    def remove_data(self, row, col):
+        self.__check_keys(row, col)
+        del self.table[(row, col)]
+        self.__update_index()
+
+    def __getitem__(self, item):
+        try:
+            return self.table[(item[0], item[1])].value
+        except KeyError:
+            raise ValueError('данные по указанным индексам отсутствуют')
+
+    def __setitem__(self, key, value):
+        item = (key[0], key[1])
+        if item not in self.table:
+            self.table[item] = Cell(value)
+            self.__update_index()
+        else:
+            self.table[item] = Cell(value)
+
+
+class Cell:
+    def __init__(self, value):
+        self.value = value
+
+
+st = SparseTable()
+st.add_data(2, 5, Cell("cell_25"))
+st.add_data(0, 0, Cell("cell_00"))
+st[2, 5] = 25  # изменение значения существующей ячейки
+st[11, 7] = 'cell_117'  # создание новой ячейки
+print(st[0, 0])  # cell_00
+st.remove_data(2, 5)
+print(st.rows, st.cols)  # 12, 8 - общее число строк и столбцов в таблице
+
+
+# val = st[2, 5]  # ValueError
+# st.remove_data(12, 3)  # IndexError
+
+#######################################################################
+class Cell:
+    def __init__(self, value):
+        self.value = value
+
+
+class SparseTable:
+    def __init__(self):
+        self.tbl = {}
+
+    @property
+    def rows(self):
+        return max(i[0] for i in self.tbl) + 1 if self.tbl else 0
+
+    @property
+    def cols(self):
+        return max(i[1] for i in self.tbl) + 1 if self.tbl else 0
+
+    def add_data(self, row, col, data):
+        self.tbl[row, col] = data
+
+    def remove_data(self, row, col):
+        if not (row, col) in self.tbl:
+            raise IndexError('ячейка с указанными индексами не существует')
+        del self.tbl[row, col]
+
+    def __getitem__(self, key):
+        if not key in self.tbl:
+            raise ValueError('данные по указанным индексам отсутствуют')
+        return self.tbl[key].value
+
+    def __setitem__(self, key, v):
+        # self.tbl[key] = Cell(v)
+        self.tbl.setdefault(key, Cell(None)).value = v
+
+
+########################################################################
+class SparseTable:
+    def __init__(self, rows=0, cols=0):
+        self.rows = rows
+        self.cols = cols
+        self.table = {}
+
+    def update_col_row(self):
+        self.rows = max(key[0] for key in self.table) + 1
+        self.cols = max(key[1] for key in self.table) + 1
+
+    def add_data(self, row, col, data):
+        self.table[(row, col)] = data
+        self.update_col_row()
+
+    def remove_data(self, row, col):
+        try:
+            del self.table[(row, col)]
+        except:
+            raise IndexError('ячейка с указанными индексами не существует')
+
+    def __getitem__(self, item):
+        try:
+            return self.table[(item[0], item[1])].value
+        except:
+            raise ValueError('данные по указанным индексам отсутствуют')
+
+    def __setitem__(self, key, value):
+        # if (key[0], key[1]) not in self.table:
+        self.table[(key[0], key[1])] = Cell(value)
+        self.update_col_row()
+        # else:
+        #     self.table[(key[0], key[1])] = value
+
+
+class Cell:
+    def __init__(self, value):
+        self.value = value
+
+
+########################################################################
+class SparseTable:
+    def __init__(self):
+        self.rows = 0
+        self.cols = 0
+        self.tables = {}
+
+    def update_index(self):
+        self.rows = max(row[0] for row in self.tables) + 1
+        self.cols = max(self.tables, key=lambda x: x[1])[1] + 1
+
+    def add_data(self, row, col, data):
+        self.tables[(row, col)] = data
+        self.update_index()
+
+    def remove_data(self, row, col):
+        try:
+            del self.tables[(row, col)]
+            self.update_index()
+        except KeyError:
+            raise IndexError('ячейка с указанными индексами не существует')
+
+    def __getitem__(self, item):
+        key = (item[0], item[1])
+        try:
+            return self.tables[key].value
+        except KeyError:
+            raise ValueError('данные по указанным индексам отсутствуют')
+
+    def __setitem__(self, item, value):
+        key = (item[0], item[1])
+        self.tables[key] = Cell(value)
+        self.update_index()
+
+
+class Cell:
+    def __init__(self, value):
+        self.value = value
+
+
+#######################################################################
+# _________3.9 Магические методы __iter__ и __next______Egorof_________
+
+class Marks:
+    def __init__(self, values):
+        self.values = values
+        self.index = 0
+
+    def __iter__(self):
+        print('call iter Mark')
+        return self
+
+    def __next__(self):
+        if self.index >= len(self.values):
+            self.index = 0
+            raise StopIteration
+        mark = self.values[self.index]
+        self.index += 1
+        return f'call next, mark = {mark}'
+
+
+class Student:
+    def __init__(self, name, surname, marks):
+        self.name = name
+        self.surname = surname
+        self.marks = marks
+
+    def __iter__(self):
+        print('call iter Student')
+        self.index = 0
+        return self.marks
+
+    # def __next__(self):
+    #     if self.index >= len(self.marks):
+    #         raise StopIteration
+    #     res = self.marks[self.index]
+    #     self.index += 1
+    #     return f'call next Student = {res}'
+
+
+misha_marks = Marks([3, 4, 5])
+misha = Student('Misha', 'Ivanov', misha_marks)
+for m in misha:
+    print(m)
+
+
+########################################################################
+# Ниже в коде представлена реализация карточной колоды при помощи классов Card и Deck.
+class Card:
+    def __init__(self, rank, suit):
+        self.rank = rank
+        self.suit = suit
+
+    def __str__(self):
+        return f'{self.rank} {self.suit}'
+
+
+class Deck:
+    ranks = [str(n) for n in range(2, 11)] + list('JQKA')
+    suits = ['Clubs', 'Diamonds', 'Hearts', 'Spades']
+
+    def __init__(self):
+        self.cards = [Card(rank, suit) for suit in self.suits for rank in self.ranks]
+
+    def __iter__(self):
+        self.index = 0
+        return self
+
+    def __next__(self):
+        if self.index >= len(self.cards):
+            raise StopIteration
+        res = self.cards[self.index]
+        self.index += 1
+        return res  # вызов Card(rank, suit)
+        # return f"{self.cards[self.index].rank} {self.cards[self.index].suit}"
+
+
+deck = Deck()
+for card in deck:
+    print(card)
+    # 2 Clubs 3 Clubs 4 Clubs5 Clubs6 Clubs7 Clubs8 Clubs9 Clubs10 ClubsJ ClubsQ Clubs
+    # K ClubsA Clubs.....
+
+
+###############################################################################################################################################
+class Card:
+    def __init__(self, rank, suit):
+        self.rank = rank
+        self.suit = suit
+
+    def __str__(self):
+        return f'{self.rank} {self.suit}'
+
+
+class Deck:
+    ranks = [str(n) for n in range(2, 11)] + list('JQKA')
+    suits = ['Clubs', 'Diamonds', 'Hearts', 'Spades']
+
+    def __init__(self):
+        self.cards = [Card(rank, suit) for suit in self.suits for rank in self.ranks]
+
+    def __iter__(self):
+        return iter(self.cards)
+
+
+########################################################################
+class Card:
+    def __init__(self, rank, suit):
+        self.rank = rank
+        self.suit = suit
+
+
+class Deck:
+    ranks = [str(n) for n in range(2, 11)] + list('JQKA')
+    suits = ['Clubs', 'Diamonds', 'Hearts', 'Spades']
+
+    def __init__(self):
+        self.cards = [Card(rank, suit) for suit in self.suits for rank in self.ranks]
+
+    def __getitem__(self, i):
+        return self.cards[i].rank, self.cards[i].suit
+
+
+deck = Deck()
+for card in deck:
+    print(*card)
+
+
+########################################################################
+# метод __iter__  возвращает генератор по шаблону ответа
+class Card:
+    def __init__(self, rank, suit):
+        self.rank = rank
+        self.suit = suit
+
+
+class Deck:
+    ranks = [str(n) for n in range(2, 11)] + list('JQKA')
+    suits = ['Clubs', 'Diamonds', 'Hearts', 'Spades']
+
+    def __init__(self):
+        self.cards = [Card(rank, suit) for suit in self.suits for rank in self.ranks]
+
+    def __iter__(self):
+        return (f'{i.rank} {i.suit}' for i in self.cards)
+
+
+########################################################################
+class Deck:
+    ranks = [str(n) for n in range(2, 11)] + list('JQKA')
+    suits = ['Clubs', 'Diamonds', 'Hearts', 'Spades']
+
+    def __init__(self):
+        self.cards = [Card(rank, suit) for suit in self.suits for rank in self.ranks]
+
+    def __iter__(self):
+        self.index = -1
+        return self
+
+    def __next__(self):
+        self.index += 1
+        if self.index >= len(self.cards):
+            raise StopIteration
+        return self.cards[self.index].rank, self.cards[self.index].suit
+
+
+deck = Deck()
+for card in deck:
+    print(*card)
+
+
+#######################################################################
+class Deck:
+    ranks = [*map(str, range(2, 11))] + list('JQKA')
+    suits = ['Clubs', 'Diamonds', 'Hearts', 'Spades']
+
+    def __init__(self):
+        self.cards = [Card(rank, suit) for suit in self.suits for rank in self.ranks]
+
+    def __iter__(self):
+        return map(lambda x: f'{x.rank} {x.suit}', self.cards)
+
+
+[print(card) for card in Deck()]
+
+
+########################################################################
+# Ниже в коде представлена реализация класса FileReader, который должен при итерирации считывать построчно содержимое
+# файлаВаша задача дописать метод __next__, чтобы он возвращал по порядку строки из файла, пока содержимое файла не
+# закончится. Строку нужно очистить слева и справа от символов пробелов и переносов на новую строку
+# text = 'Lorem ipsum dolor sit amet consectetur adipiscing elit Cras euismod ex a ante sollicitudin' \
+#        ' sollicitudin gravida massa bibendum Pellentesque quis mi ultricies gravida purus placerat   aliquam sapien
+#        'fringilla velit at lobortis interdum elit augue faucibus nuncet ullamcorper nisl lorem vitae risus Fusce magn
+
+class FileReader:
+    def __init__(self, filename):
+        self.file = open(filename)
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        return next(self.file).strip()
+
+
+for line in FileReader('lorem.txt'):
+    print(line)
+
+
+    #########################################################################
+    def __next__(self):
+        line = self.file.readline().strip()
+        if line:
+            return line
+        self.file.close()
+        raise StopIteration
+
+
+    #######################################################################
+    def __iter__(self):
+        return self.file
+        # return (line.strip() for line in self.file.readlines())
+
+
+    def __next__(self):
+        for line in self.file.readlines():
+            return line
+
+for line in FileReader('lorem.txt'):
+    print(line.strip())
+
+
+    ########################################################################
+    def __next__(self):
+        text_str = self.file.readline().strip()
+        if not text_str:
+            raise StopIteration
+        return text_str
+
+
+###############################################################################################################################################
+class FileReader:
+    def __init__(self, filename):
+        self.file = open(filename)
+        self.lines = self.file.readlines()
+
+    def __iter__(self):
+        self.value = - 1
+        return self
+
+    def __next__(self):
+        self.value += 1
+        if self.value < len(self.lines):
+            return self.lines[self.value].strip()
+        else:
+            raise StopIteration
+########################################################################
+
+########################################################################
+
+########################################################################
+
+#######################################################################
+
+########################################################################
+
+########################################################################
+
+#######################################################################
+
+########################################################################
+
+###############################################################################################################################################
+
+########################################################################
+
+########################################################################
+
+########################################################################
+
+#######################################################################
+
+########################################################################
+
+########################################################################
+
+#######################################################################
+
+########################################################################
+
+###############################################################################################################################################
+
+########################################################################
+
+########################################################################
+
+########################################################################
+
+#######################################################################
+
+
+########################################################################
+
+########################################################################
+
+#######################################################################
+
+########################################################################
+
+###############################################################################################################################################
+
+########################################################################
+
+########################################################################
+
+########################################################################
+
+#######################################################################
+
+########################################################################
+
+########################################################################
+
+#######################################################################
+
+########################################################################
+
+###############################################################################################################################################
+
+########################################################################
+
+########################################################################
+
+########################################################################
+
+#######################################################################
+
+########################################################################
+
+########################################################################
+
+#######################################################################
+
+########################################################################
+
+###############################################################################################################################################
+
+########################################################################
+
+########################################################################
+
+########################################################################
+
+#######################################################################
+
+########################################################################
+
+########################################################################
+
+#######################################################################
+
+########################################################################
+
+###############################################################################################################################################
+
+########################################################################
+
+########################################################################
+
+########################################################################
+
+#######################################################################
+
+########################################################################
+
+########################################################################
+
+#######################################################################
+
+########################################################################
+
+###############################################################################################################################################
+
+########################################################################
+
+########################################################################
+
+########################################################################
+
+#######################################################################
+
+########################################################################
+
+########################################################################
+
+#######################################################################
+
+########################################################################
+
+###############################################################################################################################################
+
+########################################################################
+
+########################################################################
+
+########################################################################
+
+#######################################################################
+
+########################################################################
+
+########################################################################
+
+#######################################################################
+
+########################################################################
+
+########################################################################

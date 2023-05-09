@@ -3481,45 +3481,572 @@ if fio == "Балакирев С.М.":
 if fio == "Гейтс Б.":
     assert len(v[0]) == 2 and len(v[1]) == 2 and len(v[2]) == 1 and len(
         v[3]) == 1, "неверно сформирован словарь dict_db"
+
+
 ########################################################################
+class DataBase:
+    def __init__(self, path):
+        self.path = path
+        self.dict_db = {}
+        self.__dict_pk = {}
+
+    def write(self, record):
+        self.dict_db[record] = self.dict_db.get(record, []) + [record]
+        self.__dict_pk[record.pk] = record
+
+    def read(self, pk):
+        return self.__dict_pk.get(pk, None)
+
 
 ###############################################################################################################################################
-##
+class Record:
+    __count = 0
+
+    def __new__(cls, *args, **kwargs):
+        cls.__count += 1
+        return super().__new__(cls)
+
+    def __init__(self, fio, descr, old):
+        self.fio = fio
+        self.descr = descr
+        self.old = int(old)
+        self.pk = self.__count
+
 
 ########################################################################
+import itertools
+from collections import defaultdict
+
+
+class Record:
+    id_iter = itertools.count(start=1)
+
+    # Функция count() модуля itertools создает бесконечный итератор, который возвращает равномерно распределенные значения,
+    # начиная с номера start с шагом step.
+    def __init__(self, fio: str, descr: str, old: int):
+        self.fio = fio
+        self.descr = descr
+        self.old = old
+        self.pk = next(self.id_iter)
+
+    def __eq__(self, other):
+        return self.fio.lower() == other.fio.lower() and self.old == other.old
+
+    def __hash__(self):
+        return hash((self.fio.lower(), self.old))
+
+
+class DataBase():
+
+    def __init__(self, path):
+        self.path = path
+        self.dict_db = defaultdict(list)
+
+    # defaultdict() модуля collections ничем не отличается от обычного словаря за исключением того,
+    # что по умолчанию всегда вызывается функция, которая возвращает значение по умолчанию для новых
+    # значений. Другими словами Класс defaultdict() представляет собой словарь со значениями по умолчанию.
+
+    def write(self, record):
+        self.dict_db[record].append(record)
+
+    def read(self, pk):
+        for i in self.dict_db:
+            print([i])
+        res = [*filter(lambda x: x.pk == pk, self.dict_db)]
+        return res[0] if res else None
+
+
+db = DataBase('path')
+
+for line in lst_in:
+    db.write(Record(*line.split('; ')))
+
 
 ########################################################################
+class DataBase:
+    def __init__(self, path: str):
+        self.path = path
+        self.dict_db = {}
 
+    def write(self, record):
+        if isinstance(record, Record):
+            self.dict_db[record] = self.dict_db.get(record, []) + [record]
+
+    def read(self, pk):
+        return next(obj for lst in self.dict_db.values() for obj in lst if obj.pk == pk)
+
+
+# Позволяет получить только первое значение. Остальные мне не нужны. Иногда очень удобно использовать вместе с
+# list comprehension.
+
+class Record:
+    COUNT = 0
+
+    def __init__(self, fio, descr, old):
+        if not all([type(fio) == str, type(descr) == str, type(old) == int]):
+            raise TypeError('Incorrect data')
+        self.fio, self.descr, self.old, self.pk = fio, descr, old, self.counter()
+
+    @classmethod
+    def counter(cls):
+        cls.COUNT += 1
+        return cls.COUNT
+
+    def __hash__(self):
+        return hash((self.fio.lower(), self.old))
+
+    def __eq__(self, other):
+        return hash(self) == hash(other)
+
+
+path = 'stepik.org'
+db = DataBase(path)
+for data in lst_in:
+    fio, descr, old = data.split('; ')
+    db.write(Record(fio, descr, int(old)))
 ########################################################################
+# Подвиг 8. Из входного потока необходимо прочитать список строк командой:
+# lst_in = list(map(str.strip, sys.stdin.readlines()))Каждая строка содержит информацию об учебном пособии в формате:
+# "Название; автор; год издания"Например:Python; Балакирев С.М.; 2020Python ООП; Балакирев С.М.; 2021
+# Python ООП; Балакирев С.М.; 2022Python; Балакирев С.М.; 2021
+# Необходимо каждую из этих строк представить объектом класса BookStudy, которые создаются командой:
+# bs = BookStudy(name, author, year)где name - название пособия (строка); author - автор пособия (строка);
+# year - год издания (целое число). Такие же публичные локальные атрибуты должны быть в объектах класса BookStudy.
+# Для каждого объекта реализовать вычисление хэша по двум атрибутам: name и author (без учета регистра).
+# Сформировать список lst_bs из объектов класса BookStudy на основе прочитанных строк (списка lst_in).
+# После этого определить число книг с уникальными хэшами. Это число сохранить через переменную unique_books (целое число
+lst_in = ['Python; Балакирев С.М.; 2020',
+          'Python ООП; Балакирев С.М.; 2021',
+          'Python ООП; Балакирев С.М.; 2022',
+          'Python; Балакирев С.М.; 2021', ]
+
+
+class BookStudy:
+    def __init__(self, name, author, year):
+        self.name = name
+        self.author = author
+        self.year = int(year)
+
+    def __hash__(self):
+        return hash((self.name.lower(), self.author.lower()))
+
+
+lst_bs = []
+for item in lst_in:
+    name, author, year = list(map(str.strip, item.split(';')))
+    lst_bs.append(BookStudy(name, author, year))
+# lst_bs = [BookStudy(*map(str.strip, item.split(';'))) for item in lst_in]
+
+unique_books = len(set(hash(item) for item in lst_bs))  # 2
 
 #######################################################################
+lst_bs = [BookStudy(*line.split('; ')) for line in lst_in]
+unique_books = len(set(map(hash, lst_bs)))
+
 
 ########################################################################
+class BookStudy:
+    def __init__(self, name, author, year):
+        self.name = name
+        self.author = author
+        self.year = year
 
+    def __hash__(self):
+        return hash((self.name.lower(), self.author.lower()))
+
+    def __eq__(self, other):
+        return hash(self) == hash(other)
+
+    @staticmethod
+    def book_study(elem):
+        el = elem.split('; ')
+        return BookStudy(el[0], el[1], int(el[2]))
+
+
+lst_bs = list(map(BookStudy.book_study, lst_in))
+unique_books = len(set(lst_bs))
+
+
+# set, видимо, для отсеивания одинаковых элементов обращается к сравнению (__eq__),  которое в свою очередь
+# реализуется через hash, которая в свою очередь обращается к __hash__
 ########################################################################
+class RestrictedTypeValue:
+    def __init__(self, *args):
+        self.__types = args
+
+    def __set_name__(self, owner, name):
+        self.name = f'_{owner.__name__}__{name}'
+
+    def __get__(self, instance, owner):
+        if not instance:
+            return property()
+        return instance.__dict__[self.name]
+
+    def __set__(self, instance, value):
+        if type(value) not in self.__types:
+            raise ValueError("Неверный тип данных.")
+        instance.__dict__[self.name] = value
+
+
+class BookStudy:
+    name = RestrictedTypeValue(str)
+    author = RestrictedTypeValue(str)
+    year = RestrictedTypeValue(int)
+
+    def __init__(self, name, author, year) -> None:
+        self.name = name
+        self.author = author
+        self.year = year
+
+    def __hash__(self) -> int:
+        return hash((self.name.lower(), self.author.lower()))
+
+    def __eq__(self, other):
+        if isinstance(other, type(self)):
+            return hash(self) == hash(other)
+        return False
+
+    def __str__(self):
+        return f'{self.name}; {self.author}; {self.year}'
+
+
+lst_bs = []
+for w in lst_in:
+    name, author, year = w.split('; ')
+    bs = BookStudy(name, author, int(year))
+    lst_bs.append(bs)
+unique_books = len(set(lst_bs))
+
 
 #######################################################################
+# Подвиг 9 (релакс). Объявите класс с именем Dimensions, объекты которого создаются командой:
+# d = Dimensions(a, b, c)где a, b, c - положительные числа (целые или вещественные), описывающие габариты некоторого
+# тела: высота, ширина и глубина.Каждый объект класса Dimensions должен иметь аналогичные публичные атрибуты
+# a, b, c (с соответствующими числовыми значениями). Также для каждого объекта должен вычисляться хэш на основе всех
+# трех габаритов: a, b, c.С помощью функции input() прочитайте из входного потока строку, записанную в формате:
+# "a1 b1 c1; a2 b2 c2; ... ;aN bN cN"Например:"1 2 3; 4 5 6.78; 1 2 3; 0 1 2.5"Если какой-либо габарит оказывается
+# отрицательным значением или равен нулю, то при создании объектов должна генерироваться ошибка командой:
+# raise ValueError("габаритные размеры должны быть положительными числами")Сформируйте на основе прочитанной строки
+# список lst_dims из объектов класса Dimensions. После этого отсортируйте этот список по возрастанию (неубыванию)
+# хэшей этих объектов так, чтобы объекты с равными хэшами стояли друг за другом.
+class Dimensions:
+    def __init__(self, a, b, c):
+        self.a = a
+        self.b = b
+        self.c = c
+
+    def __setattr__(self, key, value):
+        if value <= 0:
+            raise ValueError("габаритные размеры должны быть положительными числами")
+        else:
+            object.__setattr__(self, key, value)
+        # else:
+        #     super().__setattr__(key, value)
+
+    def __hash__(self):
+        return hash((self.a, self.b, self.c))
+
+    def __str__(self):
+        return f'{self.a} {self.b} {self.c}/ '
+
+
+s_inp = '1 2 3; 4 5 6.78; 1 2 3; 3 1 2.5'
+
+lst_dims = [Dimensions(*list(map(float, item.split()))) for item in s_inp.split(';')]
+lst_dims = sorted(lst_dims, key=hash)
+
+[print(*list(map(float, item.split()))) for item in s_inp.split(';')]
+print(lst_dims)  # [<__main__.Dimensions object at 0x000002606AA5FD90>, <__mai
+print([(i.a, i.b, i.c) for i in lst_dims])  # [(4.0, 5.0, 6.78), (1.0, 2.0, 3.0), (1.0, 2.0, 3.0), (3.0, 1.0, 2.5)]
+print(*[i.__str__() for i in lst_dims])  # 4.0 5.0 6.78/  1.0 2.0 3.0/  1.0 2.0 3.0/  3.0 1.0 2.5/
 
 ########################################################################
-
+lst_dims = sorted([Dimensions(*map(float, elem.split())) for elem in s_inp.split('; ')], key=hash)
 ###############################################################################################################################################
+from typing import TypeVar
+
+T = TypeVar("T", int, float)
+
+
+class Dimensions:
+    def __new__(cls, *args, **kwargs):
+        if not all(i > 0 for i in args):
+            raise ValueError("габаритные размеры должны быть положительными числами")
+        return super().__new__(cls)
+
+    def __init__(self, a: T, b: T, c: T):
+        self.c = c
+        self.b = b
+        self.a = a
+
+    def __hash__(self):
+        return hash((self.a, self.b, self.c))
+
+    def __repr__(self):
+        return str(hash(self))
+
+
+s_inp = input()
+lst_dims = [Dimensions(*map(float, i.split())) for i in s_inp.split("; ")]
+lst_dims.sort(key=hash)
+########################################################################
+# Подвиг 10 (на повторение). Объявите класс с именем Triangle, объекты которого создаются командой:
+# tr = Triangle(a, b, c)где a, b, c - длины сторон треугольника (числа: целые или вещественные).
+# В классе Triangle объявите следующие дескрипторы данных:a, b, c - для записи и считывания длин сторон треугольника.
+# При записи нового значения нужно проверять, что присваивается положительное число (целое или вещественное).
+# Иначе, генерируется исключение командой:raise ValueError("длины сторон треугольника должны быть положительными
+# числами")Также нужно проверять, что все три стороны a, b, c могут образовывать стороны треугольника.
+# То есть, должны выполняться условия:a < b+c; b < a+c; c < a+bИначе генерируется исключение командой:
+# raise ValueError("с указанными длинами нельзя образовать треугольник")Наконец, с объектами класса Triangle должны
+# выполняться функции:len(tr) - возвращает периметр треугольника, приведенный к целому значению с помощью функции int();
+# tr() - возвращает площадь треугольника (можно вычислить по формуле Герона: s = sqrt(p * (p-a) * (p-b) * (p-c)),
+# где p - полупериметр треугольника).
+from math import isclose
+
+
+class Desc:
+    def __set_name__(self, owner, name):
+        # self.name = f'_{owner.__name__}__{name}'
+        self.name = '__' + name
+
+    def __get__(self, instance, owner):
+        return getattr(instance, self.name, None)  # None if атрибута нет
+
+    def __set__(self, instance, value):
+        if type(value) not in (int, float) or value <= 0:
+            raise ValueError("длины сторон треугольника должны быть положительными числами")
+        setattr(instance, self.name, value)
+
+
+class Triangle:
+    a = Desc()
+    b = Desc()
+    c = Desc()
+
+    def __init__(self, a, b, c):
+        self.a = a
+        self.b = b
+        self.c = c
+        if not (self.a < self.b + self.c and self.b < self.a + self.c and self.c < self.a + self.b):
+            raise ValueError("с указанными длинами нельзя образовать треугольник")
+
+    def __len__(self):
+        return int(sum([self.a, self.b, self.c]))
+
+    def __call__(self):
+        p = sum([self.a, self.b, self.c]) / 2
+        return (p * (p - self.a) * (p - self.b) * (p - self.c)) ** 0.5
+
+
+tr = Triangle(5, 4, 3)
+assert tr.a == 5 and tr.b == 4 and tr.c == 3, "дескрипторы вернули неверные значения"
+
+try:
+    tr = Triangle(-5, 4, 3)
+except ValueError:
+    assert True
+else:
+    assert False, "не сгенерировалось исключение ValueError"
+
+try:
+    tr = Triangle(10, 1, 1)
+except ValueError:
+    assert True
+else:
+    assert False, "не сгенерировалось исключение ValueError"
+
+tr = Triangle(5, 4, 3)
+assert len(tr) == 12, "функция len вернула неверное значение"
+assert 5.9 < tr() < 6.1, "метод __call__ вернул неверное значение"
+
 
 ########################################################################
+# Теперь работает проверка для всех объектов, включая последующие изменения a, b, c
+# Хотя проверку на "треугольник"  в класс дескриптора лучше не "пихать"
+class Int_float:
+    cba = {}
+
+    @classmethod
+    def triangle_check(cls, instance, name, value):
+        # Int_float.cba[name] = value
+        cls.cba.setdefault(hash(instance), {})[name] = value
+        if len(cls.cba[hash(instance)]) == 3:
+            a1, b1, c1 = tuple(val for key, val in cls.cba[hash(instance)].items())
+            if not a1 < b1 + c1 or not b1 < a1 + c1 or not c1 < a1 + b1:
+                raise ValueError("с указанными длинами нельзя образовать треугольник")
+
+    def __set_name__(self, owner, name):
+        self.name = "_" + name
+
+    def __get__(self, instance, owner):
+        return getattr(instance, self.name)
+
+    def __set__(self, instance, value):
+        if not isinstance(value, (int, float)) or 0 > value:
+            raise ValueError("длины сторон треугольника должны быть положительными числами")
+        self.triangle_check(instance, self.name, value)
+        setattr(instance, self.name, value)
+
+
+class Triangle:
+    a = Int_float()
+    b = Int_float()
+    c = Int_float()
+
+    def __init__(self, a, b, c):
+        self.a = a
+        self.b = b
+        self.c = c
+
+    def __call__(self, *args, **kwargs):
+        p = (self.a + self.b + self.c) / 2
+        return (p * (p - self.a) * (p - self.b) * (p - self.c)) ** 0.5
+
+    def __len__(self):
+        return self.a + self.b + self.c
+
 
 ########################################################################
+class Descriptor:
 
-########################################################################
+    def __set_name__(self, owner, name):
+        self.name = '__' + name
+
+    def __get__(self, instance, owner):
+        return instance.__dict__[self.name]
+
+    def __set__(self, instance, value):
+        if type(value) not in (int, float) or value <= 0:
+            raise ValueError("длины сторон треугольника должны быть положительными числами")
+        instance.__dict__[self.name] = value
+        if len(instance.__dict__) == 3:
+            a, b, c = sorted(instance.__dict__.values())
+            if a + b <= c:
+                raise ValueError("с указанными длинами нельзя образовать треугольник")
+
+
+class Triangle:
+    a = Descriptor()
+    b = Descriptor()
+    c = Descriptor()
+
+    def __init__(self, a, b, c):
+        self.a = a
+        self.b = b
+        self.c = c
+
+    def __len__(self):
+        return int(self.a + self.b + self.c)
+
+    def __call__(self):
+        p = len(self) / 2
+        return (p * (p - self.a) * (p - self.b) * (p - self.c)) ** .5
+
+    def __setattr__(self, key, value):
+        if key in 'abc':
+            object.__setattr__(self, key, value)
+
 
 #######################################################################
+class SetGet:
+    def __set_name__(self, obj, name):
+        self.name = '_' + name
+
+    def __get__(self, obj, objtype=None):
+        return getattr(obj, self.name)
+
+    def __set__(self, obj, value):
+        if value < 0:
+            raise ValueError("длины сторон треугольника должны быть положительными числами")
+        setattr(obj, self.name, value)
+        lst = sorted(getattr(obj, v, False) for v in 'abc')
+        if all(type(v) is not bool for v in lst) and lst[2] >= lst[0] + lst[1]:
+            raise ValueError("с указанными длинами нельзя образовать треугольник")
+
 
 ########################################################################
+class Triangle:
+
+    def __init__(self, a, b, c):
+        self.__a = a
+        self.__b = b
+        self.__c = c
+
+    @staticmethod
+    def __check_value(value):
+        if not isinstance(value, (int, float)) or value <= 0:
+            raise ValueError("длины сторон треугольника должны быть положительными числами")
+
+    def __setattr__(self, key, value):
+        self.__check_value(value)
+        object.__setattr__(self, key, value)
+        if len(self.__dict__) == 3:
+            if self.a >= self.b + self.c or self.b >= self.a + self.c or self.c >= self.a + self.b:
+                raise ValueError("с указанными длинами нельзя образовать треугольник")
+
 
 ########################################################################
+# В python выражение 0.1 + 0.2 == 0.3 возвращает False,  а 0.8 - 0.1 > 0.7 возвращает True. Поэтому нельзя записывать
+# неравенства с вещественными числами вот так a < b+c; b < a+c; c < a+b Нужно использовать math.isclose. Подробней о
+# проблеме по ссылкам:https://www.youtube.com/watch?v=6kPbj5o5aqA
+# https://www.youtube.com/watch?v=c7tpUDT1Zmc
+# https://davidamos.dev/the-right-way-to-compare-floats-in-python/
+import math
+
+
+class Triangle:
+    a = Side()
+    b = Side()
+    c = Side()
+
+    def __init__(self, a, b, c):
+        if not self.is_triangle(a, b, c):
+            raise ValueError("с этими длинами нельзя образовать треугольник")
+        self.a = a
+        self.b = b
+        self.c = c
+
+    @staticmethod
+    def is_triangle(a, b, c):
+        if (not math.isclose(a, b + c, abs_tol=1e-9) and a < b + c) and (
+                not math.isclose(b, a + c, abs_tol=1e-9) and b < a + c) and \
+                (not math.isclose(c, a + b, abs_tol=1e-9) and c < a + b):
+            return True
+
+    def __len__(self):
+        return int(self.a + self.b + self.c)
+
+    def __call__(self, *args, **kwargs):
+        p = 0.5 * len(self)
+        return (p * (p - self.a) * (p - self.b) * (p - self.c)) ** 0.5
 
 #######################################################################
+    def __init__(self, a, b, c):
+        if self.__is_triangle(a, b, c):
+            self.a, self.b, self.c = a, b, c
+        else:
+            raise ValueError("с указанными длинами нельзя образовать треугольник")
 
+    @staticmethod
+    def __is_triangle(a, b, c):
+        # return a < b + c and b < a + c and c < a + b
+        return Decimal(f'{a}') < Decimal(f'{b}') + Decimal(f'{c}') and \
+            Decimal(f'{b}') < Decimal(f'{a}') + Decimal(f'{c}') and Decimal(f'{c}') < Decimal(f'{b}') + Decimal(f'{a}')
 ########################################################################
+class Triangle:
+    def __init__(self, a, b, c):
+        self.__check_values(a, b, c)
+        self.a = a
+        self.b = b
+        self.c = c
 
+    @staticmethod
+    def __check_values(a, b, c):
+        if not all(isinstance(i, (float, int)) and i > 0 for i in (a, b, c)):
+            raise ValueError("длины сторон треугольника должны быть положительными числами")
+        a, b, c = sorted((a, b, c))
+        if a + b <= c:
+            raise ValueError("с указанными длинами нельзя образовать треугольник")
 ###############################################################################################################################################
 
 ########################################################################
