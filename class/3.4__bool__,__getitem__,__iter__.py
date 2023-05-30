@@ -2666,6 +2666,151 @@ class Cell:
 
 
 #######################################################################
+# ___________________беседа с чат GPT________________________
+
+# yield - это ключевое слово в Python, которое используется для определения генераторов. Генераторы являются специальным
+# типом итераторов, которые позволяют последовательно вычислять значения их элементов по мере необходимости, т.е.
+# лениво (lazy) генерировать значения.Когда вызывается функция-генератор с yield, она не выполняется полностью, а
+# возвращает результат выполнения только до следующего оператора yield. Таким образом, каждый раз при вызове метода
+# next() у объекта генератора будет выполнено только одно следующее выражение после yield.  Это позволяет значительно
+# улучшить производительность программы, особенно если требуется обработка больших объемов данных.Вот пример
+# функции-генератора, которая возвращает квадраты натуральных чисел:
+def square_generator(n):
+    for i in range(1, n + 1):
+        yield i ** 2
+        # Эта функция может быть использована для создания объекта-итератора, который можно использовать для
+        # последовательного доступа к первым n квадратам натуральных чисел:
+
+
+squares = square_generator(5)
+print(next(squares))  # 1
+print(next(squares))  # 4
+print(next(squares))  # 9
+print(next(squares))  # 16
+print(next(squares))  # 25
+
+
+# Как видите, каждый раз при вызове next() на объекте squares будет выполняться только один шаг функции-генератора,
+# что позволяет сэкономить ресурсы и повысить эффективность работы программы.
+
+####################################################################
+# В Python, для того чтобы создать итератор, необходимо определить два метода: __iter__ и __next__.
+# Метод __iter__ возвращает сам объект-итератор, а метод __next__ возвращает следующий элемент последовательности
+# или выбрасывает исключение StopIteration, если достигнут конец последовательности.Если вы хотите сделать ваш класс
+# итерируемым, то вам нужно реализовать метод __iter__, который будет возвращать итератор. Обычно в таком случае
+# __iter__ просто возвращает self, потому что сам объект является своим собственным итератором. Таким образом,
+# если ваш класс представляет собой последовательность элементов, вы можете написать iter(self) в методе __iter__
+# для создания итератора.
+
+class MyIterator:
+    def __init__(self):
+        self.items = [1, 2, 3]
+        self.current = 0
+
+    def __iter__(self):
+        return iter(self.items)
+
+
+for item in MyIterator():
+    print(item)
+
+
+# Здесь метод __iter__ просто вызывает функцию iter() для списка self.items, чтобы создать итератор.
+
+# аналог analogue
+class Iterator:
+    def __init__(self):
+        self.items = [1, 2, 3]
+        self.count = 0
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        while self.count < len(self.items):
+            res = self.count
+            self.count += 1
+            return self.items[res]
+        raise StopIteration
+
+
+###################################################
+# В этой версии метод __iter__ возвращает генератор, который последовательно генерирует каждый элемент списка self.items
+# при каждом вызове функции next(). Ключевое слово yield используется для возврата элемента и для приостановки
+# выполнения функции до следующего вызова.Обратите внимание, что теперь мы используем for i in it:,
+# а не for i in Iterator(10):, потому что мы хотим итерироваться по объекту it, который является экземпляром класса
+# Iterator.Этот код создает класс Iterator, который является итерируемым объектом. В конструкторе класса определяется
+# список self.items со значениями [1,2,3]. Метод __iter__ возвращает объект-итератор, который может проходить
+# по списку self.items. В данном случае метод __iter__ определен в виде генератора, который использует оператор
+# yield для последовательного возврата значений списка.
+
+class Iterator:
+    def __init__(self):
+        self.items = [1, 2, 3]
+
+    def __iter__(self):
+        for i in self.items:
+            yield i
+        # yield from self.items
+
+
+it = Iterator()
+for i in it:
+    print(i)
+
+
+##################################
+# Пример итератора
+# Метод __iter__ возвращает сам итератор объекта, что позволяет этому объекту быть итерируемым. В приведенном примере
+# метод __iter__ возвращает сам объект-итератор, что позволяет его использовать в цикле for.Когда вы используете
+# выражение for i in my_object, Python вызывает метод __iter__ вашего объекта-итератора, чтобы получить итератор.
+# Затем он использует этот итератор для последовательного извлечения элементов из объекта в цикле.Таким образом, когда
+# мы определяем класс итератора, мы должны определить метод __iter__, который возвращает сам итератор объекта, а также
+# метод __next__, который возвращает следующий элемент объекта и генерирует исключение StopIteration, когда элементы
+# закончились.
+class Iterator:
+    def __init__(self, limit):
+        self.limit = limit
+        self.count = 0
+
+    def __iter__(self):
+        return self  # чтобы экз мог быть итерируемым ч/з for/next
+
+    def __next__(self):
+        while self.count < self.limit:
+            res = self.count
+            self.count += 1
+            return res
+        raise StopIteration
+
+
+it = Iterator(10)
+for i in it:
+    print(i)
+
+
+##################################
+# Аналог class Iterator:
+# В Python протокол итерации требует определения методов __iter__ и __next__ в классе, чтобы объекты этого класса могли
+# быть использованы в качестве итераторов.Однако, когда мы определяем __iter__ метод с ключевым словом yield, то он
+# автоматически делает объект итерируемым и создает итератор для него. Каждый вызов метода __next__ на этом итераторе
+# будет продвигать выполнение функции до следующего оператора yield и возвращать соответствующее значение.Таким образом,
+# при использовании генераторов в Python, мы можем избежать необходимости явно определять метод __next__ для наших
+# итераторов. Вместо этого мы определяем метод __iter__ c использованием ключевого слова yield, который автоматически
+# создает итератор и возвращает его для последующего использования.
+
+class Iterator:
+    def __init__(self, limit):
+        self.limit = limit
+        self.count = 0
+
+    def __iter__(self):
+        while self.count < self.limit:
+            yield self.count
+            self.count += 1
+
+
+#################
 # _________3.9 Магические методы __iter__ и __next______Egorof_________
 
 class Marks:
@@ -2921,77 +3066,832 @@ class FileReader:
             return self.lines[self.value].strip()
         else:
             raise StopIteration
-########################################################################
+
 
 ########################################################################
+# Создайте класс Countdown, который должен принимать начальное значение и вести обратный отсчет до нуля,
+# возвращая каждое значение в последовательности каждый раз, когда вызывается __next__. Когда обратный отсчет
+# достигает нуля, итератор должен вызвать исключение StopIteration. Для этого вам понадобиться реализовать:
+# метод __init__. Он должен принимать одно положительное число - начало отсчета
+# методы __iter__ и __next__ для итерирования по значениям класса Countdown.
+class Countdown:
+    def __init__(self, value):
+        self.length = list(range(value + 1))
+
+    def __iter__(self):
+        self.index = -1
+        return self
+
+    def __next__(self):
+        while self.index > -len(self.length) - 1:
+            res = self.length[self.index]
+            self.index -= 1
+            return res
+        raise StopIteration
+
 
 ########################################################################
+class Countdown:
+    def __init__(self, value):
+        self.length = sorted(list(range(value + 1)), reverse=True)
+
+    def __iter__(self):
+        self.index = 0
+        return self
+
+    def __next__(self):
+        if self.index == len(self.length):
+            raise StopIteration
+        res = self.length[self.index]
+        self.index += 1
+        return res
+
+
+########################################################################
+class Countdown:
+    def __init__(self, value):
+        self.length = sorted(list(range(value + 1)), reverse=True)
+
+    def __iter__(self):
+        return iter(self.length)
+
+    def __next__(self):
+        while self.length:
+            return next(self.length)
+        raise StopIteration
+
 
 #######################################################################
+class Countdown:
+    def __init__(self, value):
+        self.length = sorted(list(range(value + 1)), reverse=True)
+
+    def __iter__(self):
+        return iter(self.length)
+
+    def __next__(self):
+        return self.length
+
 
 ########################################################################
+# Создайте класс PowerTwo, который возвращает следующую степень двойки, начиная с нулевой степени (20=1). Внутри класса
+# реализуйте:метод __init__. Он должен принимать одно положительное число - степень двойки, до которой нужно
+# итеририроваться включительно (см пример ниже)методы __iter__ и __next__ для итерирования по степеням двойки
+
+
+class PowerTwo:
+    def __init__(self, value):
+        self.value = list(range(value + 1))
+        self.index = 0
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        while self.index < len(self.value):
+            res = pow(2, self.value[self.index])
+            self.index += 1
+            return res
+        raise StopIteration
+
+
+for i in PowerTwo(4):  # итерируемся до 4й степени двойки
+    print(i)
+
+numbers = PowerTwo(2)
+
+iterator = iter(numbers)
+
+print(next(iterator))  # печатает 1
+print(next(iterator))  # печатает 2
+print(next(iterator))  # печатает 4
+print(next(iterator))  # исключение StopIteration
+
 
 ########################################################################
+class PowerTwo:
+    def __init__(self, value):
+        self.value = value
+        self.index = 0
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        while self.index <= self.value:
+            res = pow(2, self.index)
+            self.index += 1
+            return res
+        raise StopIteration
+
 
 #######################################################################
+# получается, что вычисление всех значений и запись в память идет при инициализации.
+class PowerTwo:
+    def __init__(self, power):
+        self.pow_gen = (2 ** p for p in range(power + 1))
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        return next(self.pow_gen)
+
 
 ########################################################################
+# С помощью yield  мы запрашиваем следующий элемент в числовой последовательности. А next просто возвращает iter(self)
+class PowerTwo:
+    def __init__(self, num=0):
+        self.num = num
+
+    def __iter__(self):
+        # return self
+        for i in range(self.num + 1):
+            m = 2 ** i
+            yield m
+
+    # def __next__(self):
+    #     return iter(self)
+
+
+#############################################################################################
+# Создайте класс InfinityIterator, который реализует бесконечный итератор, который будет при каждой новой итерации или
+# вызовы функции next будет возвращать число, увеличенное на 10 от предыдущего значения. Начинать нужно с нуля.
+
+class InfinityIterator:
+    def __init__(self, value=0):
+        self.value = value
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        result = self.value
+        self.value += 10
+        return result
+
+
+a = iter(InfinityIterator())
+next(a)
+next(a)
+next(a)
+next(a)
+
+
+########################################################################
+class InfinityIterator:
+    def __iter__(self):
+        self.index = -10
+        return self
+
+    def __next__(self):
+        self.index += 10
+        return self.index
+
+
+########################################################################
+class InfinityIterator:
+    def __init__(self, value=0):
+        self.value = value
+
+    def __iter__(self):
+        while True:
+            yield self.value
+            self.value += 10
+
+
+########################################################################
+# ____________iter____Balakiref___________________________________________
+# Подвиг 3. Пусть в программе объявлен класс для реализации геометрической прогрессии:
+class GeomRange:
+    def __init__(self, start, step, stop):
+        self.start = start
+        self.step = step
+        self.stop = stop
+        self.__value = self.start
+
+    def __next__(self):
+        if self.__value < self.stop:
+            ret_value = self.__value
+            self.__value *= self.step
+            return ret_value
+        else:
+            raise StopIteration
+
+
+g = GeomRange(1, 1.2, 2)
+res = next(g)
+res = next(g)
+
+
+#######################################################################
+class GeomRange:
+    def __init__(self, start, step, stop):
+        self.start = start
+        self.step = step
+        self.stop = stop
+        self.__value = self.start
+
+    def __next__(self):
+        if self.__value < self.stop:
+            ret_value = self.__value
+            self.__value *= self.step
+            return ret_value
+        else:
+            raise StopIteration
+
+    def __iter__(self):
+        self.__value = self.start
+        return self
+
+
+g = GeomRange(1, 1.2, 2)
+res = next(g)
+
+it = iter(g)
+res = next(g)
+# Если строку с неправильным синтаксисом разбить на две, то она работает при обоих запусках:
+for x in g: print(x)
+for x in g: print(x)
+
+# Это свидетельствует о том, что объект 'g' не является Итератором в классическом понимании. То есть он не опустошается
+# после первого цикла for. Однако его размер 48 байт, как у обычного ('ленивого') итератора. Просто в этой реализации
+# оператор 'for' создает итератор с обновленным значением self.value каждый раз, когда мы его запускаем. Для сравнения:
+r = iter(range(5))
+for x in r: print()
+for x in r: print()
+
+
+# Оператор 'for' сработает только один раз, потому что первый 'for' опустошает итератор.
+#
+# многоразовый range:
+
+class ReusableRange:
+    def __init__(self, start=0, stop=None, step=1):
+        if stop is None:
+            stop, start = start, 0
+        self._range = range(start, stop, step)
+        self._iter = iter(self._range)
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        try:
+            return next(self._iter)
+        except StopIteration:
+            self._iter = iter(self._range)
+            raise
+
+
+# создание нового итератора (self._iter = iter(self._range)) после опустошения текущего дает возможность опустошать его
+# сколь угодно раз:
+numbers = ReusableRange(10)
+list(numbers)
+# [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+list(numbers)
+
+
+# [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+########################################################################
+# Подвиг 5. Объявите в программе класс Person, объекты которого создаются командой:
+# p = Person(fio, job, old, salary, year_job)где fio - ФИО сотрудника (строка); job - наименование должности
+# (строка); old - возраст (целое число); salary - зарплата (число: целое или вещественное); year_job - непрерывный стаж
+# на указанном месте работы (целое число).В каждом объекте класса Person автоматически должны создаваться локальные
+# атрибуты с такими же именами: fio, job, old, salary, year_job и соответствующими значениями.Также с объектами класса
+# Person должны поддерживаться следующие команды:data = p[indx] # получение данных по порядковому номеру (indx)
+# атрибута (порядок: fio, job, old, salary, year_job и начинается с нуля)p[indx] = value # запись в поле с указанным
+# индексом (indx) нового значения valuefor v in p: # перебор всех атрибутов объекта в порядке: fio, job, old, salary,
+# year_job    print(v)При работе с индексами, проверить корректность значения indx. Оно должно быть целым числом в
+# диапазоне [0; 4]. Иначе, генерировать исключение командой:raise IndexError('неверный индекс')
+class Person:
+    def __init__(self, fio, job, old, salary, year_job):
+        self.fio = fio
+        self.job = job
+        self.old = old
+        self.salary = salary
+        self.year_job = year_job
+        self.lst = [self.fio, self.job, self.old, self.salary, self.year_job]
+        self.index = -1
+
+    def __check_index(self, index):
+        if index not in range(0, len(self.lst)):
+            raise IndexError('неверный индекс')
+
+    def __getitem__(self, index):
+        self.__check_index(index)
+        return self.lst[index]
+
+    def __setitem__(self, index, value):
+        self.__check_index(index)
+        self.lst[index] = value
+
+    # def __iter__(self):
+    #     return self
+
+    def __next__(self):
+        self.index += 1
+        while self.index < len(self.lst):
+            return self.lst[self.index]
+        raise StopIteration
+
+
+pers = Person('Гейтс Б.', 'бизнесмен', 61, 1000000, 46)
+pers[0] = 'Балакирев С.М.'
+for v in pers:
+    print(v)
+
+
+########################################################################
+# генерацию ошибок через декоратор
+def error(func):
+    def wrapper(*args):
+        try:
+            assert args[1] in range(0, 5)
+            return func(*args)
+        except:
+            raise IndexError('неверный индекс')
+
+    return wrapper
+
+
+class Person:
+    def __init__(self, fio, job, old, salary, year_job):
+        self.fio = fio
+        self.job = job
+        self.old = old
+        self.salary = salary
+        self.year_job = year_job
+
+    @error
+    def __getitem__(self, item):
+        return self.__dict__[list(self.__dict__.keys())[item]]
+
+    @error
+    def __setitem__(self, item, value):
+        self.__dict__[list(self.__dict__.keys())[item]] = value
+
+    def __iter__(self):
+        return iter(self.__dict__.values())
+
+
+#######################################################################
+class Person:
+    def __init__(self, fio, job, old, salary, year_job):
+        self.fio = fio
+        self.job = job
+        self.old = old
+        self.salary = salary
+        self.year_job = year_job
+        self.lst = self.__dict__
+
+    def __getitem__(self, item):
+        if item < 0 or item > 4:
+            raise IndexError('неверный индекс')
+        return self.__dict__[list(self.lst.keys())[item]]
+
+    def __setitem__(self, key, value):
+        if key < 0 or key > 4:
+            raise IndexError('неверный индекс')
+        self.__dict__[list(self.lst.keys())[key]] = value
+
+    def __iter__(self):
+        self.value = -1
+        return self
+
+    def __next__(self):
+        if self.value < 4:
+            self.value += 1
+            return self.__dict__[list(self.lst.keys())[self.value]]
+        else:
+            raise StopIteration
+
+
+########################################################################
+class Person:
+    def __init__(self, fio, job, old, salary, year_job):
+        self.fio = fio
+        self.job = job
+        self.old = old
+        self.salary = salary
+        self.year_job = year_job
+        self.__keys = tuple(self.__dict__.keys())
+
+    def __getitem__(self, key):
+        self.__validate_key(key)
+        return getattr(self, self.__keys[key])
+
+    def __setitem__(self, key, value):
+        self.__validate_key(key)
+        setattr(self, self.__keys[key], value)
+
+    def __next__(self):
+        if self.value >= 4:
+            raise StopIteration
+        self.value += 1
+        return self[self.value]
+
+    def __iter__(self):
+        self.value = -1
+        return self
+
+    @staticmethod
+    def __validate_key(key):
+        if not isinstance(key, int) or key not in range(5):
+            raise IndexError('неверный индекс')
+
 
 ###############################################################################################################################################
+class Person:
+    def __init__(self, fio, job, old, salary, year_job):
+        self.fio = fio
+        self.job = job
+        self.old = old
+        self.salary = salary
+        self.year_job = year_job
+        self.order = list(self.__dict__.keys())
+
+    def __getitem__(self, indx):
+        try:
+            return getattr(self, self.order[indx])
+        except IndexError:
+            raise IndexError('неверный индекс')
+
+    def __setitem__(self, indx, value):
+        try:
+            setattr(self, self.order[indx], value)
+        except IndexError:
+            raise IndexError('неверный индекс')
+
+    def __iter__(self):
+        self.index = -1
+        return self
+
+    def __next__(self):
+        self.index += 1
+        if self.index >= len(self.order):
+            raise StopIteration
+        return self[self.index]
+
 
 ########################################################################
 
-########################################################################
+# при отсутствии метода __iter__ итератор формируется из правильно настроенного метода __getitem__.
+class Person:
+    def __init__(self, fio, job, old, salary, year_job):
+        self.fio = fio
+        self.job = job
+        self.old = old
+        self.salary = salary
+        self.year_job = year_job
+
+    def __raise(self):
+        raise IndexError('неверный индекс')
+
+    def __getitem__(self, idx):
+        try:
+            return list(self.__dict__.items())[idx][1]
+        except IndexError:
+            self.__raise()
+
+    def __setitem__(self, idx, value):
+        try:
+            key = list(self.__dict__.keys())[idx]
+            self.__dict__[key] = value
+        except IndexError:
+            self.__raise()
+
 
 ########################################################################
+class Person:
+    def __init__(self, fio, job, old, salary, year_job):
+        self.fio = fio
+        self.job = job
+        self.old = old
+        self.salary = salary
+        self.year_job = year_job
+        self.attr = [self.fio, self.job, self.old, self.salary, self.year_job]
+
+    def __getitem__(self, item):
+        self.__check_indx(item)
+        return self.attr[item]
+
+    def __setitem__(self, item, value):
+        self.__check_indx(item)
+        self.attr[item] = value
+
+    def __check_indx(self, indx):
+        if type(indx) != int or not 0 <= indx <= 4:
+            raise IndexError('неверный индекс')
+
+
+########################################################################
+self.card = [self.fio, self.job, self.old, self.salary, self.year_job]
+
+
+@staticmethod
+def check_indx(indx):
+    if 0 <= indx <= 4 and type(indx) == int:
+        return True
+    else:
+        raise IndexError('неверный индекс')
+
+
+def __getitem__(self, item):
+    if self.check_indx(item):
+        return self.card[item]
+
+
+def __setitem__(self, key, value):
+    if self.check_indx(key):
+        self.card[key] = value
+
+
+def __iter__(self):
+    return iter(self.card)
+
 
 #######################################################################
+@staticmethod
+def __check_indx(indx):
+    if not isinstance(indx, int) or indx not in range(0, 5):
+        raise IndexError('неверный индекс')
+    return True
+
+
+def __getitem__(self, item):
+    self.__check_indx(item)
+    key = tuple(self.__dict__)[item]
+    return getattr(self, key)
+
+
+def __setitem__(self, key, value):
+    self.__check_indx(key)
+    key = tuple(self.__dict__)[key]
+    setattr(self, key, value)
+
+
+def __iter__(self):
+    self.value = -1
+    return self
+
+
+def __next__(self):
+    if self.value < 4:
+        self.value += 1
+        return self[self.value]
+    else:
+        raise StopIteration
+
+
+########################################################################
+# Подвиг 6. Вам дают задание разработать итератор для последовательного перебора элементов вложенных (двумерных) списков
+# следующей структуры:lst = [[x00],       [x10, x11],       [x20, x21, x22],       [x30, x31, x32, x33],       ... ]
+# Для этого необходимо в программе объявить класс с именем TriangleListIterator, объекты которого создаются командой:
+# it = TriangleListIterator(lst)где lst - ссылка на перебираемый список.Затем, с объектами класса TriangleListIterator
+# должны быть доступны следующие операции:for x in it:  # последовательный перебор всех элементов списка:
+# x00, x10, x11, x20, ...    print(x)it_iter = iter(it)x = next(it_iter)Итератор должен перебирать элементы
+# списка по указанной треугольной форме. Даже если итератору на вход будет передан прямоугольная таблица
+# (вложенный список), то ее перебор все равно должен осуществляться по треугольнику. Если же это невозможно
+# (из-за структуры списка), то естественным образом должна возникать ошибка IndexError: index out of range (выход
+# индекса за допустимый диапазон)
+
+class TriangleListIterator:
+    def __init__(self, lst):
+        self.lst = lst
+
+    def __iter__(self):
+        for i in range(len(self.lst)):
+            for j in range(i + 1):
+                yield self.lst[i][j]  # вернёт генератор, а for ч/з next будет перебирать
+
+
+######################################################################################
+def __iter__(self):
+    return iter(self.lst[i][j] for i in range(len(self.lst)) for j in range(i + 1))
+
+
+#########################################################################################
+def __iter__(self):
+    return iter(j for i in range(len(self.lst)) for j in self.lst[i][:i + 1])
+
 
 ########################################################################
 
-########################################################################
+
+def __iter__(self):
+    self.ind = 1
+    for i in range(len(self.lst)):
+        for j in self.lst[i][:self.ind]:
+            yield j
+        self.ind += 1
+
+    ########################################################################
+
+
+def __iter__(self):
+    self.ind = 1
+    for i in self.lst:
+        for j in i[:self.ind]:
+            yield j
+        self.ind += 1
+
 
 #######################################################################
+class TriangleListIterator:
+    def __init__(self, lst):
+        self.__lst = lst
+
+    def __iter__(self):
+        self.__col = self.__row = -1
+        return self
+
+    def __next__(self):
+        if self.__row == self.__col:
+            self.__row += 1
+            self.__col = 0
+        else:
+            self.__col += 1
+
+        if self.__row == len(self.__lst):
+            raise StopIteration
+
+        return self.__lst[self.__row][self.__col]
+
+
+#######################################################################
+class TriangleListIterator:
+    def __init__(self, lst):
+        self.lst = lst
+
+    def __iter__(self):
+        self.idx = [0, 0]
+        return self
+
+    def __next__(self):
+        r, c = self.idx
+        if r > len(self.lst) - 1:
+            raise StopIteration
+        self.idx = (r, c + 1) if c < r else (r + 1, 0)
+        return self.lst[r][c]
+
 
 ########################################################################
+class TriangleListIterator:
+    def __init__(self, lst):
+        self.lst = lst  # ссылка на перебираемый список
+
+    def __iter__(self):
+        self.length = len(self.lst)  # длина (количество "строк") двумерного списка
+        self.i = 0  # начальное значения для перебора "строк" двумерного списка
+        self.j = -1  # начальное значения для перебора элементов в "строке"
+        return self
+
+    def __next__(self):
+        if self.j + 1 < len(self.lst[self.i]):
+            self.j += 1
+            return self.lst[self.i][self.j]
+        else:
+            self.i += 1
+            self.j = 0
+            if self.i >= self.length:
+                raise StopIteration
+            return self.lst[self.i][self.j]
+
 
 ###############################################################################################################################################
+class TriangleListIterator:
+    def __init__(self, lst):
+        self.lst = lst
+        self.gener = ((i, j) for i in range(len(self.lst)) for j in range(i + 1))
+
+    def __next__(self):
+        i, j = next(self.gener)
+        return self.lst[i][j]
+
+    def __iter__(self):
+        self.gener = ((i, j) for i in range(len(self.lst)) for j in range(i + 1))
+        return self
+
 
 ########################################################################
+class TriangleListIterator:
+    def __init__(self, lst):
+        self._lst = lst
+        self.row = self.col = -1
+
+    def __iter__(self):
+        self.row = self.col = -1
+        return self
+
+    def __next__(self):
+        if self.row == self.col:
+            self.row += 1
+            self.col = -1
+        self.col += 1
+        if self.row > len(self._lst) - 1:
+            raise StopIteration
+        if self.col > len(self._lst[self.row]) - 1:
+            raise IndexError
+        return self._lst[self.row][self.col]
+
 
 ########################################################################
+class TriangleListIterator:
+    def __init__(self, lst=[]):
+        self.lst = lst
+
+    def __iter__(self):
+        l = []
+        for i in self.lst:
+            for j in i:
+                l.append(j)
+        return iter(l)
+
 
 ########################################################################
+# Подвиг 7. Теперь, вам необходимо разработать итератор, который бы перебирал указанные столбцы двумерного списка.
+# Список представляет собой двумерную таблицу из данных:lst Для этого в программе необходимо объявить класс с
+# именем IterColumn, объекты которого создаются командой:it = IterColumn(lst, column)где lst - ссылка на двумерный
+# список; column - индекс перебираемого столбца (отсчитывается от 0).
+class IterColumn:
+    def __init__(self, lst, column):
+        self.lst = lst
+        self.column = column
+
+    def __iter__(self):
+        for i in range(len(self.lst)):
+            yield lst[i][self.column]
+
+
+lst = [['x00', 'x01', 'x02'],
+       ['x10', 'x11', 'x12'],
+       ['x20', 'x21', 'x22'],
+       ['x30', 'x31', 'x32']]
+
+it = IterColumn(lst, 1)
+for x in it:  # последовательный перебор всех элементов столбца списка: x12, x22, ..., xM2
+    print(x)
+
+it_iter = iter(it)
+x = next(it_iter)
+
 
 #######################################################################
+class IterColumn:
+    def __init__(self, lst, column):
+        self.lst = lst
+        self.column = column
+
+    def __iter__(self):
+        for row in self.lst:
+            yield row[self.column]
 
 
 ########################################################################
+class IterColumn:
+    def __init__(self, lst, column):
+        self.lst = lst
+        self.column = column
 
-########################################################################
+    def __iter__(self):
+        g = (row[self.column] for row in self.lst)  # создаём генератор
+        return iter(g)  # перебираем генератор
+
+    ########################################################################
+    def __iter__(self):
+        g = (row[self.column] for row in self.lst)
+        yield from g
+        # аналог :
+        for i in g:
+            yield i
+
 
 #######################################################################
+class IterColumn:
+    def __init__(self, lst, column):
+        self.__lst = lst
+        self.__col = column
+
+    def __iter__(self):
+        self.rows = -1
+        return self
+
+    def __next__(self):
+        self.rows += 1
+        if self.rows == len(self.__lst):
+            raise StopIteration
+        return self.__lst[self.rows][self.__col]
+
 
 ########################################################################
+class IterColumn:
+    def __init__(self, lst, col):
+        self.lst = lst
+        self.col = col
 
-###############################################################################################################################################
-
-########################################################################
-
-########################################################################
-
-########################################################################
-
-#######################################################################
-
-########################################################################
-
-########################################################################
-
-#######################################################################
-
-########################################################################
-
+    def __iter__(self):
+        return iter([*zip(*self.lst)][self.col])
 ###############################################################################################################################################
 
 ########################################################################
