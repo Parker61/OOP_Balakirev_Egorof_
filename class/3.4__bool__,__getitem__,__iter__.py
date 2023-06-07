@@ -1382,6 +1382,10 @@ class Track:
         self.points.append(((x, y), speed))
 
 
+# Он нужен, чтобы можно было завернуть в декоратор. @staticmethod не вызываемый объект (если убрать __get__(0),
+# напишешь "TypeError: 'staticmethod' object is not callable"). Однако с версией Python 3.10 разработчики добавили
+# __call__ в staticmethod, так что на новых версия этого не требуется.
+
 ###############################################################################################################################################
 class Track:
     def __init__(self, *args):
@@ -2694,6 +2698,8 @@ print(next(squares))  # 25
 # что позволяет сэкономить ресурсы и повысить эффективность работы программы.
 
 ####################################################################
+##################################
+################################################################################################
 # В Python, для того чтобы создать итератор, необходимо определить два метода: __iter__ и __next__.
 # Метод __iter__ возвращает сам объект-итератор, а метод __next__ возвращает следующий элемент последовательности
 # или выбрасывает исключение StopIteration, если достигнут конец последовательности.Если вы хотите сделать ваш класс
@@ -2716,7 +2722,6 @@ for item in MyIterator():
 
 
 # Здесь метод __iter__ просто вызывает функцию iter() для списка self.items, чтобы создать итератор.
-
 # аналог analogue
 class Iterator:
     def __init__(self):
@@ -2739,8 +2744,8 @@ class Iterator:
 # при каждом вызове функции next(). Ключевое слово yield используется для возврата элемента и для приостановки
 # выполнения функции до следующего вызова.Обратите внимание, что теперь мы используем for i in it:,
 # а не for i in Iterator(10):, потому что мы хотим итерироваться по объекту it, который является экземпляром класса
-# Iterator.Этот код создает класс Iterator, который является итерируемым объектом. В конструкторе класса определяется
-# список self.items со значениями [1,2,3]. Метод __iter__ возвращает объект-итератор, который может проходить
+# Iterator.Этот код создает класс Iterator, который является итерируемым объектом.# В конструкторе класса определяется
+# список self.items со значениями [1,2,3].# Метод __iter__ возвращает объект-итератор, который может проходить
 # по списку self.items. В данном случае метод __iter__ определен в виде генератора, который использует оператор
 # yield для последовательного возврата значений списка.
 
@@ -2808,6 +2813,117 @@ class Iterator:
         while self.count < self.limit:
             yield self.count
             self.count += 1
+
+
+#################
+# yield - это ключевое слово в Python, которое используется для определения генераторов. Генераторы являются специальны
+# м типом итераторов, которые позволяют последовательно вычислять значения их элементов по мере необходимости, т.е.
+# лениво (lazy) генерировать значения.Когда вызывается функция-генератор с yield, она не выполняется полностью,
+# а возвращает результат выполнения только до следующего оператора yield. Таким образом, каждый раз при вызове метода
+# next() у объекта генератора будет выполнено только одно следующее выражение после yield.  Это позволяет значительно
+# улучшить производительность программы, особенно если требуется обработка больших объемов данных.Вот пример
+# функции-генератора, которая возвращает квадраты натуральных чисел:
+
+def square_generator(n):
+    for i in range(1, n + 1):
+        yield i ** 2
+
+
+################################################################
+def echo(value=None):
+    try:
+        while True:
+            try:
+                value = (yield value)
+            except Exception as e:
+                value = e
+    finally:
+        print('finally echo')
+
+
+gen = echo(3)
+print(next(gen))
+print(gen.send(2))
+################################################################
+string = 'afwgherigg'
+
+
+def stop_iteration(iteration, stop_items):
+    for k, v in enumerate(iteration, 1):
+        yield v
+        if v == stop_items:
+            break
+
+
+res = stop_iteration(string, 7)
+print(next(res))
+for i in res:
+    print(i, end='')
+
+
+################################################################
+def counter(max):
+    i = 0
+    while i < max:
+        yield i
+        # if value is not None:
+        #     i = value
+        # else:
+        i += 1
+
+
+it = counter(5)
+print(next(it))  # 0
+print(next(it))  # 1
+
+for i in it:  # 2,3,4
+    print(i)
+
+
+################################################################
+# Оператор yield используется внутри генераторных функций для создания объектов-итераторов. Он приостанавливает
+# выполнение функции и возвращает значение, которое будет использоваться как следующий элемент последовательности,
+# генерируемой генераторной функцией. После этого выполнение функции продолжается с того же самого места, где оно
+# было остановлено.
+# Выражение yield может использоваться в любом выражении, где ожидается значение, и представляет
+# собой генераторное выражение. Оно также создает объект-итератор и возвращает каждый элемент последовательности по
+# запросу. Однако, в отличие от оператора yield, выражение yield не останавливает выполнение функции, а просто
+# возвращает значение итератора.Таким образом, оператор yield используется для создания генераторных функций, а
+# выражение yield - для создания генераторных выражений.
+
+# Пример использования оператора yield для создания генератора:
+
+def countdown(n):
+    while n > 0:
+        yield n
+        n -= 1
+
+
+for i in countdown(5):
+    print(i)
+
+l = [1, 2, 3, 4, 5, 6, 7, 8]
+for i in countdown(l):
+    print(i)
+
+
+# В этом примере функция countdown является генераторной функцией, которая производит последовательность чисел
+# от n до 1. Каждый вызов оператора yield приостанавливает выполнение функции и возвращает очередное значение из
+# последовательности.
+
+# Пример использования выражения yield для создания генераторного выражения:
+def countdown(n):
+    yield from n
+
+
+squares = (x ** 2 for x in range(10))
+for square in squares:
+    print(square)
+
+
+# В этом примере выражение (x**2 for x in range(10)) является генераторным выражением, которое производит
+# последовательность квадратов чисел от 0 до 9. Значение каждого выражения x**2 возвращается по запросу, когда оно
+# запрашивается в цикле for.
 
 
 #################
@@ -3892,22 +4008,423 @@ class IterColumn:
 
     def __iter__(self):
         return iter([*zip(*self.lst)][self.col])
+
+
 ###############################################################################################################################################
+# Подвиг 8. Вы несколько раз уже делали стек-подобную структуру, когда объекты последовательно связаны между собой:
+# Доведем ее функционал до конца. Для этого, по прежнему, нужно объявить классы:Stack - для представления стека в целом;
+# StackObj - для представления отдельных объектов стека.В классе Stack должны быть методы:
+# push_back(obj) - для добавления нового объекта obj в конец стека;push_front(obj) - для добавления нового объекта
+# obj в начало стека.В каждом объекте класса Stack должен быть публичный атрибут:top - ссылка на первый объект стека
+# (при пустом стеке top = None).Объекты класса StackObj создаются командой:obj = StackObj(data)где data - данные,
+# хранящиеся в объекте стека (строка).Также в каждом объекте класса StackObj должны быть публичные атрибуты:
+# data - ссылка на данные объекта;next - ссылка на следующий объект стека (если его нет, то next = None).
+# Наконец, с объектами класса Stack должны выполняться следующие команды:st = Stack()st[indx] = value # замена прежних
+# данных на новые по порядковому индексу (indx); отсчет начинается с нуляdata = st[indx]  # получение данных из
+# объекта стека по индексу n = len(st) # получение общего числа объектов стека for obj in st: # перебор объектов стека
+# (с начала и до конца)    print(obj.data)  # отображение данных в консольПри работе с индексами (indx),
+# нужно проверять их корректность. Должно быть целое число от 0 до N-1, где N - число объектов в стеке. Иначе,
+# генерировать исключение командой:raise IndexError('неверный индекс')
+class Stack:
+    def __init__(self):
+        self.top = None
+        self.last = None
+
+    def push_back(self, obj):
+        if self.top is None:
+            self.top = obj
+        else:
+            self.last.next = obj  # для связки
+        self.last = obj
+
+    def push_front(self, obj):
+        if self.top is None:
+            self.last = self.top = obj
+        else:
+            obj.next = self.top
+            self.top = obj
+
+    def __len__(self):
+        # return sum(1 for _ in self.__dict__.keys())
+        return sum(1 for _ in self)
+
+    def __iter__(self):
+        h = self.top
+        while h:
+            yield h
+            h = h.next
+
+    def __get_obj_index(self, item):  # взятие объекта по индексу
+        if type(item) != int or not (0 <= item < len(self.__dict__)):
+            raise IndexError('неверный индекс')
+
+    def __getitem__(self, item):
+        self.__get_obj_index(item)
+        for i, obj in enumerate(self):  # self является итератором
+            # for i, obj in enumerate(self.__dict__.values()):
+            if i == item:
+                return obj.data
+
+    def __setitem__(self, key, value):
+        self.__get_obj_index(key)
+        for i, obj in enumerate(self):  # self является итератором
+            if i == key:
+                obj.data = value
+
+
+class StackObj:
+    def __init__(self, data):
+        self.data = data
+        self.next = None
+
+    def __repr__(self):
+        return str(self.data)
+
+
+st = Stack()
+
+st[0] = 'value'  # замена прежних данных на новые по порядковому индексу (indx); отсчет начинается с нуля
+data = st[0]  # получение данных из объекта стека по индексу
+n = len(st)  # получение общего числа объектов стека
+
+for obj in st:  # перебор объектов стека (с начала и до конца)
+    print(obj.data)  # отображение данных в консоль
+
 
 ########################################################################
+class Stack:
+    def __init__(self):
+        self.top = None
+        self.last = None
+
+    def push_back(self, obj):
+        if self.top is None:
+            self.top = obj
+        else:
+            self.last.next = obj  # для связки
+        self.last = obj
+
+    def push_front(self, obj):
+        if self.top is None:
+            self.last = self.top = obj
+        else:
+            obj.next = self.top
+            self.top = obj
+
+    def __len__(self):
+        # return sum(1 for _ in self.__dict__.keys())
+        return sum(1 for _ in self)
+
+    def __iter__(self):
+        self.h = self.top
+        return self
+        # метод __iter__ должен возвращать объект-итератор, а не просто устанавливать какое-то состояние. При вызове
+        # метода __iter__ он инициализирует начальное состояние объекта-итератора и возвращает его. Затем этот объект
+        # используется для последующего перебора элементов в цикле for.В данном коде, при создании объекта-итератора
+        # в методе __iter__, переменная self.current устанавливается в self.top, то есть на первый элемент стека,
+        # таким образом гарантируя, что итерация начнется с начала стека при использовании for obj in st:. Если бы
+        # мы установили self.current = self.top в методе __next__ вместо метода __iter__, то каждый раз при переборе
+        # элементов стека циклом for, итератор бы начинался с самого начала, что может привести к непредсказуемому
+        # поведению в случае измененhа внутри цикла.
+
+    def __next__(self):
+        # Метод __next__ теперь использует цикл for, используя переменную self.h как начальное состояние. Цикл
+        # выполняется, пока self.h не станет None, и при каждой итерации он возвращает следующий элемент из стека.
+        # if self.h:
+        #     next = self.h
+        #     self.h = self.h.next
+        #     return next
+        # else:
+        #     raise StopIteration()
+        while self.h is not None:
+            next = self.h
+            self.h = self.h.next
+            return next
+        raise StopIteration()
+
+    def __get_obj_index(self, item):  # взятие объекта по индексу
+        if type(item) != int or not (0 <= item < len(self.__dict__)):
+            raise IndexError('неверный индекс')
+
+    def __getitem__(self, item):
+        self.__get_obj_index(item)
+        for i, obj in enumerate(self):  # self является итератором
+            if i == item:
+                return obj.data
+
+    def __setitem__(self, key, value):
+        self.__get_obj_index(key)
+        for i, obj in enumerate(self):  # self является итератором
+            if i == key:
+                if i == 0:
+                    obj.data = value
+
+    ########################################################################
+    def __iter__(self):
+        self.h = self.top
+        while self.h is not None:
+            yield self.h
+            self.h = self.h.next
+
 
 ########################################################################
+class StackObj:
 
-########################################################################
+    def __init__(self, data):
+        self.__next = None
+        self.data = data
+
+    @property
+    def next(self):
+        return self.__next
+
+    @next.setter
+    def next(self, obj):
+        if isinstance(obj, StackObj) or obj is None:
+            self.__next = obj
+
+
+class Stack:
+    # Метод __getitem__ в данном классе используется для получения значения элемента стека по его индексу. При вызове
+    # метода с аргументом get_data=True, он возвращает значение (атрибут data) элемента стека, соответствующего данному
+    # индексу. А при передаче аргумента False, метод возвращает сам элемент стека (StackObj), а не его значение.
+    # В строке root = self.__getitem__(self.__count - 1, False), метод __getitem__ вызывается с параметрами
+    # self.__count - 1 и False. Это означает, что будет получен последний элемент стека (так как индекс последнего
+    # элемента равен self.__count - 1), но не его значение. Полученный объект будет присвоен переменной root.
+    def __init__(self):
+        self.top = None
+        self.__count = 0
+
+    @staticmethod
+    def check_index(idx, count):
+        if not (isinstance(idx, int) and 0 <= idx < count):
+            raise IndexError('неверный индекс')
+
+    def __len__(self):
+        return self.__count
+
+    def push_back(self, obj):
+        if not isinstance(obj, StackObj):
+            return
+        if self.__count == 0:
+            self.top = obj
+        else:
+            root = self.__getitem__(self.__count - 1, False)
+            root.next = obj
+        self.__count += 1
+
+    def push_front(self, obj):
+        if not isinstance(obj, StackObj):
+            return
+        if self.__count == 0:
+            self.top = obj
+        else:
+            obj.next = self.top
+            self.top = obj
+        self.__count += 1
+
+    def pop(self):
+        if self.__count == 1:
+            obj = self.top
+            self.top = None
+        elif self.__count > 1:
+            obj = self.__getitem__(self.__count - 1)
+            prev = self.__getitem__(self.__count - 2)
+            prev.next = None
+        self.__count -= 1
+        return obj
+
+    def __getitem__(self, idx, get_data=True):
+        self.check_index(idx, self.__count)
+        if idx == 0:
+            return self.top.data if get_data else self.top
+        count, root = 0, self.top
+        while count < idx:
+            count += 1
+            root = root.next
+        return root.data if get_data else root
+
+    def __setitem__(self, idx, value):
+        self.check_index(idx, self.__count)
+        if idx == 0:
+            next = self.top.next
+            self.top.data = value
+            self.next = next
+        else:
+            root = self.__getitem__(idx, False)
+            prev = self.__getitem__(idx - 1, False)
+            next = root.next
+            root.data = value
+            root.next, prev.next = next, root
+
+    def __iter__(self):
+        for i in range(len(self)):
+            yield self.__getitem__(i, False)
+
 
 #######################################################################
+# Подвиг 9. В программе необходимо реализовать таблицу TableValues по следующей схеме:Каждая ячейка таблицы должна быть
+# представлена классом Cell. Объекты этого класса создаются командой:Cell = Cell(data)где data - данные в ячейке. В
+# каждом объекте класса Cell должен формироваться локальный приватный атрибут __data с соответствующим значением.
+# Для работы с ним в классе Cell должно быть объект-свойство (property):data - для записи и считывания информации из
+# атрибута __data.Сам класс TableValues представляет таблицу в целом, объекты которого создаются командой:
+# table = TableValues(rows, cols, type_data)где rows, cols - число строк и столбцов таблицы; type_data - тип данных
+# ячейки (int - по умолчанию, float, list, str и т.п.). Начальные значения в ячейках таблицы равны 0 (целое число).
+# С объектами класса TableValues должны выполняться следующие команды:table[row, col] = value# запись нового значения
+# в ячейку с индексами row, col (индексы отсчитываются с нуля)value = table[row, col] # считывание значения из ячейки
+# с индексами row, colfor При попытке записать по индексам table[row, col] данные другого типа (не совпадающего с
+# атрибутом type_data объекта класса TableValues), должно генерироваться исключение командой:
+# raise TypeError('неверный тип присваиваемых данных')При работе с индексами row, col, необходимо проверять их
+# корректность. Если индексы не целое число или они выходят за диапазон размера таблицы, то генерировать исключение
+# командой:raise IndexError('неверный индекс')
+class Cell:
+    def __init__(self, data=0):
+        self.__data = data
 
-########################################################################
+    @property
+    def data(self):
+        return self.__data
 
-########################################################################
+    @data.setter
+    def data(self, value):
+        self.__data = value
 
-#######################################################################
 
+class TableValues:
+    def __init__(self, rows, cols, type_data=int):
+        self.rows = rows
+        self.cols = cols
+        self.type_data = type_data
+        self.cells = tuple(tuple(Cell() for _ in range(cols)) for _ in range(rows))
+        # self.cells = tuple(tuple(cell() for _ in range(cols)) for _ in range(rows))
+
+    def __check_index(self, index):
+        r, c = index
+        if not (0 <= r < self.rows) or not (0 <= c < self.cols):
+            raise IndexError('неверный индекс')
+
+    def __getitem__(self, index):
+        self.__check_index(index)
+        r, c = index
+        # return self.cells[index[0]][index[1]].data
+        return self.cells[r][c].data
+
+    def __setitem__(self, key, value):
+        self.__check_index(key)
+        if type(value) != self.type_data:
+            raise TypeError('неверный тип присваиваемых данных')
+        self.cells[key[0]][key[1]].data = value
+
+    def __iter__(self):
+        for row in self.cells:
+            yield (i.data for i in row)
+
+
+cell = Cell(0)
+table = TableValues(2, 2, int)
+table[0, 0] = 12  # запись нового значения в ячейку с индексами row, col (индексы отсчитываются с нуля)
+value = table[0, 0]  # считывание значения из ячейки с индексами row, col
+
+for row in table:  # перебор по строкам
+    for value in row:  # перебор по столбцам
+        print(value, end=' ')  # вывод значений ячеек в консоль
+    print()
+
+
+    ########################################################################
+    def __iter__(self):
+        # for row in self.cells:
+        #     for key in row:
+        #         yield [key.data]
+        # for row in self.cells:
+        #     yield tuple(i.data for i in row)
+        #     # yield [i.data for i in row]
+        for row in self.cells:
+            for key in row:
+                yield (key.data,)
+
+# так не работает
+# for row in self.cells:
+#     for key in row:
+#         yield tuple(key.data)
+# потому что:
+#  Проблема в методе __iter__(self). В текущей реализации он возвращает только  значения ячеек (key.data) из каждой
+# строки, а не целые строки. И когда вы выполняете цикл for row in table, каждый элемент row - это число (значение
+# одной ячейки), и при попытке перебрать его циклом for value in row возникает ошибка 'int' object is not iterable.
+# вы используете tuple() для создания кортежа из единственного элемента key.data. Однако, переменная key не является
+# отдельным элементом, а является словарем, содержащим data в качестве ключа. Поэтому использование tuple() для
+# создания кортежа из одного элемента не является правильным способом создания кортежа.
+
+
+# но вот так всё работает и итерируется
+# for row in self.cells:
+#     for key in row:
+#         yield [key.data]
+# Во втором коде вы используете [key.data] для создания списка с одним элементом key.data. Это работает, потому что вам
+# нужно создать список, а не кортеж, и вы непосредственно добавляете элемент key.data в список.
+# Если вы хотите создать кортеж из одного элемента, то можно использовать следующий синтаксис: (key.data,). Обратите
+# внимание на запятую после key.data, которая говорит Python, что это кортеж, а не просто выражение в скобках.
+#         for row in self.cells:
+#             for key in row:
+#                 yield (key.data,)
+
+
+cell = Cell(0)
+table = TableValues(2, 2, int)
+table[0, 0] = 12  # запись нового значения в ячейку с индексами row, col (индексы отсчитываются с нуля)
+value = table[0, 0]  # считывание значения из ячейки с индексами row, col
+
+for row in table:  # перебор по строкам
+    for value in row:  # перебор по столбцам
+        print(value, end=' ')  # вывод значений ячеек в консоль
+    print()
+
+
+    ############################################################################
+    def __iter__(self):
+        self.indx = -1
+        return self
+
+
+    def __next__(self):
+        if self.indx + 1 < len(self.__cells):
+            self.indx += 1
+            return (i.data for i in self.__cells[self.indx])
+            #
+            for i in self.__cells[self.indx]:
+                return [i.data]
+            #
+            return map(lambda x: x.data, self.__cells[self.indx])
+            return iter(map(lambda x: x.data, self.__cells[self.indx]))
+        else:
+            raise StopIteration
+
+
+    #######################################################################
+
+
+    ########################################################################
+    def __iter__(self):
+        return (iter(j.data for j in i) for i in self.cells)
+
+    #######################################################################
+    def __iter__(self):
+        self.__n_row = -1
+        return self
+
+
+    @staticmethod
+    def row_iter(row):
+        for el in row:
+            yield el.data
+
+
+    def __next__(self):
+        if self.__n_row + 1 < len(self.__cells):
+            self.__n_row += 1
+            return self.row_iter(self.__cells[self.__n_row])
+        else:
+            raise StopIteration
 ########################################################################
 
 ###############################################################################################################################################
