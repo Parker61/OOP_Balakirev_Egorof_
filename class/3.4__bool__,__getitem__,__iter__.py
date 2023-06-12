@@ -4402,10 +4402,10 @@ for row in table:  # перебор по строкам
 
     #######################################################################
 
-
     ########################################################################
     def __iter__(self):
         return (iter(j.data for j in i) for i in self.cells)
+
 
     #######################################################################
     def __iter__(self):
@@ -4425,16 +4425,559 @@ for row in table:  # перебор по строкам
             return self.row_iter(self.__cells[self.__n_row])
         else:
             raise StopIteration
+
+
 ########################################################################
+# Подвиг 10 (на повторение). Объявите класс Matrix (матрица) для операций с матрицами. Объекты этого класса должны
+# создаваться командой:m1 = Matrix(rows, cols, fill_value)где rows, cols - число строк и столбцов матрицы;
+# fill_value - заполняемое начальное значение элементов матрицы (должно быть число: целое или вещественное).
+# Если в качестве аргументов передаются не числа, то генерировать исключение:raise TypeError('аргументы rows, cols -
+# целые числа; fill_value - произвольное число')Также объекты можно создавать командой:m2 = Matrix(list2D)
+# де list2D - двумерный список (прямоугольный), состоящий из чисел (целых или вещественных). Если список list2D не
+# прямоугольный, или хотя бы один из его элементов не число, то генерировать исключение командой:
+# raise TypeError('список должен быть прямоугольным, состоящим из чисел')Для объектов класса Matrix должны выполняться
+# следующие команды:matrix = Matrix(4, 5, 0)res = matrix[0, 0] # возвращается первый элемент матрицы
+# matrix[indx1, indx2] = value # элементу матрицы с индексами (indx1, indx2) присваивается новое значение
+# Если в результате присвоения тип данных не соответствует числу, то генерировать исключение командой:
+# raise TypeError('значения матрицы должны быть числами')Если указываются недопустимые индексы матрицы (должны быть
+# целыми числами от 0 и до размеров матрицы), то генерировать исключение:raise IndexError('недопустимые значения
+# индексов')Также с объектами класса Matrix должны выполняться операторы:
+# matrix = m1 + m2 # сложение соответствующих значений элементов матриц m1 и m2
+# matrix = m1 + 10 # прибавление числа ко всем элементам матрицы m1
+# matrix = m1 - m2 # вычитание соответствующих значений элементов матриц m1 и m2
+# matrix = m1 - 10 # вычитание числа из всех элементов матрицы m1
+# Во всех этих операция должна формироваться новая матрица с соответствующими значениями. Если размеры матриц не
+# совпадают (разные хотя бы по одной оси), то генерировать исключение командой:
+# raise ValueError('операции возможны только с матрицами равных размеров')
+
+
+class Matrix:
+    def __init__(self, rows, cols=None, fill_value=None):
+        if type(rows) == list:  # rows в виде list
+            self.rows = len(rows)
+            self.cols = len(rows[0])
+            if not all(len(r) == self.cols for r in rows) or not all(self.__is_digit(x) for row in rows for x in row):
+                # if not self.__check_rows_int(rows) or not self.__check_rows(rows):  # or not self.__check_rows(rows)
+                raise TypeError('список должен быть прямоугольным, состоящим из чисел')
+            self.lst = rows  # ссылается на переданный список
+        else:
+            if type(rows) != int or type(cols) != int or type(fill_value) not in [int, float]:
+                raise TypeError('аргументы rows, cols - целые числа; fill_value - произвольное число')
+            self.rows = rows
+            self.cols = cols
+            self.fill_value = fill_value
+            self.lst = [[fill_value for _ in range(cols)] for _ in range(rows)]
+
+    def __is_digit(self, x):
+        return type(x) in (int, float)
+
+    @staticmethod
+    def __check_index(other):
+        if type(other) not in (int, float):
+            raise IndexError('недопустимые значения индексов')
+
+    def __check_ind_(self, item):
+        r, c = item
+        if not (0 <= r < self.rows) or not (0 <= c < self.cols):
+            raise IndexError('недопустимые значения индексов')
+
+    def __getitem__(self, item):
+        self.__check_ind_(item)
+        r, c = item[0], item[1]  # item
+        return self.lst[r][c]
+
+    def __setitem__(self, item, value):
+        self.__check_ind_(item)
+        # if type(value) not in [int, float]:
+        #     raise TypeError('значения матрицы должны быть числами')
+        if not self.__is_digit(value):
+            raise TypeError('значения матрицы должны быть числами')
+        r, c = item[0], item[1]
+        self.lst[r][c] = value
+
+    def __check_matrix(self, other):
+        rows, cols = other.rows, other.cols
+        if self.rows != rows or cols != other.cols:
+            # if len(other.lst) != len(self.lst):
+            raise ValueError('операции возможны только с матрицами равных размеров')
+
+    def __add__(self, other):
+        # if isinstance(other, Matrix):
+        if type(other) == type(self):
+            self.__check_matrix(other)
+            # self.lst = [list(zip(self.lst[i], other.lst[i])) for i in range(len(self.lst))]
+            return Matrix([[self[i, j] + other[i, j] for j in range(self.cols)] for i in range(self.rows)])
+            # Matrix([[self.lst[i][j] + other.lst[i][j] for j in self.cols] for i in range(self.rows)])
+            # Matrix([[self.lst[i][j] + other.lst[i][j] for j in range(len(self.lst[i]))] for i in range(len(self.lst))])
+        else:
+            self.__is_digit(other)
+            return Matrix([[self[i, j] + other for j in range(self.cols)] for i in range(self.rows)])
+
+    def __sub__(self, other):
+        if type(other) == type(self):
+            self.__check_matrix(other)
+            return Matrix(
+                [[self.lst[i][j] - other.lst[i][j] for j in range(len(self.lst[i]))] for i in range(len(self.lst))])
+        else:
+            return Matrix(
+                [[self.lst[i][j] - other for j in range(len(self.lst[i]))] for i in range(len(self.lst))])
+
 
 ###############################################################################################################################################
+class Matrix:
+    def __init__(self, rows, cols=None, fill_value=None):
+        if type(rows) == list:  # rows в виде list
+            self.rows = len(rows)
+            self.cols = len(rows[0])
+            if not self.__check_rows_int(rows) or not self.__check_rows(rows):
+                raise TypeError('список должен быть прямоугольным, состоящим из чисел')
+            self.lst = rows  # ссылается на переданный список
+        else:
+            if type(rows) != int or type(cols) != int or type(fill_value) not in [int, float]:
+                raise TypeError('аргументы rows, cols - целые числа; fill_value - произвольное число')
+            self.rows = rows
+            self.cols = cols
+            self.fill_value = fill_value
+            self.lst = [[fill_value for _ in range(cols)] for _ in range(rows)]
+
+    @staticmethod
+    def __check_rows(rows):
+        for row in rows:
+            if len(row) != len(rows[0]):
+                return False
+        return True  # список должен быть прямоугольным
+
+    def __is_digit(self, x):
+        return type(x) in (int, float)
+
+    @staticmethod
+    def __check_rows_int(rows):
+        for row in rows:
+            for i in row:
+                if type(i) != int:
+                    return False
+        return True  # состоящим из чисел
+        # return all(type(i) == int for row in rows for i in row)
+
+    @staticmethod
+    def __check_index(other):
+        if type(other) not in (int, float):
+            raise IndexError('недопустимые значения индексов')
+
+    def __check_ind_(self, item):
+        r, c = item
+        if not (0 <= r < self.rows) or not (0 <= c < self.cols):
+            raise IndexError('недопустимые значения индексов')
+
+    def __getitem__(self, item):
+        self.__check_ind_(item)
+        r, c = item[0], item[1]  # item
+        return self.lst[r][c]
+
+    def __setitem__(self, item, value):
+        self.__check_ind_(item)
+        if not self.__is_digit(value):
+            raise TypeError('значения матрицы должны быть числами')
+        r, c = item[0], item[1]
+        self.lst[r][c] = value
+
+    def __check_matrix(self, other):
+        rows, cols = other.rows, other.cols
+        if self.rows != rows or cols != other.cols:
+            # if len(other.lst) != len(self.lst):
+            raise ValueError('операции возможны только с матрицами равных размеров')
+
+    def __add__(self, other):
+        if isinstance(other, Matrix):
+            self.__check_matrix(other)
+            return Matrix(
+                [[self.lst[i][j] + other.lst[i][j] for j in range(len(self.lst[i]))] for i in range(len(self.lst))])
+        else:
+            self.__is_digit(other)
+            return Matrix([[self[i, j] + other for j in range(self.cols)] for i in range(self.rows)])
+
+    def __sub__(self, other):
+        if type(other) == type(self):
+            self.__check_matrix(other)
+            return Matrix(
+                [[self.lst[i][j] - other.lst[i][j] for j in range(len(self.lst[i]))] for i in range(len(self.lst))])
+        else:
+            return Matrix(
+                [[self.lst[i][j] - other for j in range(len(self.lst[i]))] for i in range(len(self.lst))])
+
 
 ########################################################################
+from operator import add, sub
+
+
+class Matrix:
+    def __init__(self, *args):
+        if len(args) == 3:
+            if not all(map(isinstance, args, [int, int, (int, float)])):
+                raise TypeError('аргументы rows, cols - целые числа; fill_value - произвольное число')
+            self.rows, self.cols, fill_value = args
+            self.table = [[fill_value] * self.cols for _ in range(self.rows)]
+        elif len(args) == 1:
+            lst, = args
+            self.rows = len(lst)
+            self.cols = len(lst[0])
+            check_length = lambda x: len(x) == self.cols
+            if all(map(check_length, lst)) and all(isinstance(x, (int, float)) for row in lst for x in row):
+                self.table = lst
+            else:
+                raise TypeError('список должен быть прямоугольным, состоящим из чисел')
+
+    def check_indx(self, i, j):
+        if not (0 <= i < self.rows and 0 <= j < self.cols):
+            raise IndexError('недопустимые значения индексов')
+
+    def check_equal(self, other):
+        if not (self.rows == other.rows and self.cols == other.cols):
+            raise ValueError('операции возможны только с матрицами равных размеров')
+
+    def __getitem__(self, item):
+        i, j = item
+        self.check_indx(i, j)
+        return self.table[i][j]
+
+    def __setitem__(self, key, value):
+        if not isinstance(value, (int, float)):
+            raise TypeError('значения матрицы должны быть числами')
+        i, j = key
+        self.check_indx(i, j)
+        self.table[i][j] = value
+
+    def __iter__(self):
+        return (col for row in self.table for col in row)
+
+    def calculate(self, op, it2):
+        temp = Matrix(self.rows, self.cols, 0)
+        it1 = iter(self)
+        for i in range(self.rows):
+            for j in range(self.cols):
+                temp.table[i][j] = op(next(it1), next(it2))
+        return temp
+
+    def operation(self, op, other):
+        if isinstance(other, Matrix):
+            self.check_equal(other)
+            return self.calculate(op, iter(other))
+        elif isinstance(other, (float, int)):
+            return self.calculate(op, iter([other] * self.rows * self.cols))
+
+    def __add__(self, other):
+        return self.operation(add, other)
+
+    def __sub__(self, other):
+        return self.operation(sub, other)
+
+
+#######################################################################################################
+class Matrix:
+    def __init__(self, rows_or_list2D, cols=None, fill_value=None):
+        if cols is not None and fill_value is not None:
+            self.rows = rows_or_list2D
+            self.cols = cols
+            self.matrix = [[fill_value for j in range(cols)] for i in range(rows_or_list2D)]
+        else:
+            list2D = rows_or_list2D
+            rows = len(list2D)
+            if rows == 0:
+                raise TypeError('список должен быть прямоугольным, состоящим из чисел')
+            cols = len(list2D[0])
+            for row in list2D:
+                if len(row) != cols:
+                    raise TypeError('список должен быть прямоугольным, состоящим из чисел')
+                for elem in row:
+                    if not isinstance(elem, (int, float)):
+                        raise TypeError('список должен быть прямоугольным, состоящим из чисел')
+            self.rows = rows
+            self.cols = cols
+            self.matrix = list2D
+
+    def __getitem__(self, indexes):
+        i, j = indexes
+        return self.matrix[i][j]
+
+    def __setitem__(self, indexes, value):
+        i, j = indexes
+        if not isinstance(value, (int, float)):
+            raise TypeError('значения матрицы должны быть числами')
+        if i < 0 or i >= self.rows or j < 0 or j >= self.cols:
+            raise IndexError('недопустимые значения индексов')
+        self.matrix[i][j] = value
+
+    def __add__(self, other):
+        if not isinstance(other, Matrix):
+            other = Matrix(self.rows, self.cols, other)
+        if self.rows != other.rows or self.cols != other.cols:
+            raise ValueError('операции возможны только с матрицами равных размеров')
+        result = Matrix(self.rows, self.cols, 0)
+        for i in range(self.rows):
+            for j in range(self.cols):
+                result[i, j] = self[i, j] + other[i, j]
+        return result
+
+    def __radd__(self, other):
+        return self.__add__(other)
+
+    def __sub__(self, other):
+        if not isinstance(other, Matrix):
+            other = Matrix(self.rows, self.cols, other)
+        if self.rows != other.rows or self.cols != other.cols:
+            raise ValueError('операции возможны только с матрицами равных размеров')
+        result = Matrix(self.rows, self.cols, 0)
+        for i in range(self.rows):
+            for j in range(self.cols):
+                result[i, j] = self[i, j] - other[i, j]
+        return result
+
+    def __rsub__(self, other):
+        return self.__sub__(other)
+
 
 ########################################################################
-
+# Техническое задание Необходимо объявить класс с именем TicTacToe (крестики-нолики) для управления игровым процессом.
+# Объекты этого класса будут создаваться командой:game = TicTacToe()В каждом объекте этого класса должен быть
+# публичный атрибут:pole - двумерный кортеж, размером 3x3.Каждый элемент кортежа pole является объектом класса Cell:
+# cell = Cell()В объектах этого класса должно автоматически формироваться локальное свойство:value - текущее значение
+# в ячейке: 0 - клетка свободна; 1 - стоит крестик; 2 - стоит нолик.Также с объектами класса Cell должна выполняться
+# функция:bool(cell) - возвращает True, если клетка свободна (value = 0) и False - в противном случае.
+# К каждой клетке игрового поля должен быть доступ через операторы:res = game[i, j] # получение значения из клетки с
+# индексами i, jgame[i, j] = value # запись нового значения в клетку с индексами i, jЕсли индексы указаны неверно
+# (не целые числа или числа, выходящие за диапазон [0; 2]), то следует генерировать исключение командой:
+# raise IndexError('некорректно указанные индексы')Чтобы в программе не оперировать величинами: 0 - свободная
+# клетка; 1 - крестики и 2 - нолики, в классе TicTacToe должны быть три публичных атрибута (атрибуты класса):
+# FREE_CELL = 0      # свободная клеткаHUMAN_X = 1        # крестик (игрок - человек)COMPUTER_O = 2     # нолик (игрок
+# - компьютер)В самом классе TicTacToe должны быть объявлены следующие методы (как минимум):
+# init() - инициализация игры (очистка игрового поля, возможно, еще какие-либо действия);
+# show() - отображение текущего состояния игрового поля (как именно - на свое усмотрение);
+# human_go() - реализация хода игрока (запрашивает координаты свободной клетки и ставит туда крестик);
+# computer_go() - реализация хода компьютера (ставит случайным образом нолик в свободную клетку).
+# Также в классе TicTacToe должны быть следующие объекты-свойства (property):
+# is_human_win - возвращает True, если победил человек, иначе - False;
+# is_computer_win - возвращает True, если победил компьютер, иначе - False;
+# is_draw - возвращает True, если ничья, иначе - False.Наконец, с объектами класса TicTacToe должна выполняться функция:
+# bool(game) - возвращает True, если игра не окончена (никто не победил и есть свободные клетки) и False - в
+# противном случае.Все эти функции и свойства предполагается использовать следующим образом (эти строчки в программе
 ########################################################################
+from random import choice, randint, randrange
 
+
+class Cell:
+    def __init__(self):
+        self.value = 0  # 0 - клетка свободна; 1 - стоит крестик; 2 - стоит нолик.
+
+    def __bool__(self):
+        return not self.value
+        # return self.value == 0  # True, если клетка свободна (value = 0)
+
+
+class TicTacToe:
+    FREE_CELL = 0  # свободная клетка
+    HUMAN_X = 1  # крестик (игрок - человек)
+    COMPUTER_O = 2  # нолик (игрок - компьютер)
+
+    def __init__(self):
+        self.size = 3
+        self.pole = tuple(tuple(Cell() for _ in range(self.size)) for _ in range(self.size))
+        self.lst_human = []
+        self.lst_computer = []
+
+    def init(self):
+        for row in self.pole:
+            for cell in row:
+                cell.value = self.FREE_CELL
+        self.lst_human = []
+        self.lst_computer = []
+        self.is_human_win
+        self.is_computer_win
+        self.is_draw
+
+    def show(self):
+        for row in self.pole:
+            print()
+            for cell in row:
+                print(cell.value, end=' ')
+        print()
+
+    def human_go(self):
+        # key_row = int(input("Enter index: "))
+        # key_col = int(input("Enter index: "))
+        # key = key_row, key_col,
+        key = tuple(map(int, input('Enter index: ').split()))
+        while self.__getitem__(key) != self.FREE_CELL:  # while key != 0
+            print("Error, Enter index yet")
+            key = tuple(map(int, input('Enter index: ').split()))
+        self.__setitem__(key, self.HUMAN_X)
+
+    def computer_go(self):
+        key_row = randrange(len(self.pole))
+        key_col = randrange(len(self.pole))
+        key = key = key_row, key_col,
+        # key = choice(choice(self.pole)).value
+        # while key == self.FREE_CELL:
+        while self.__getitem__(key) != self.FREE_CELL:  # FREE_CELL = 0 - свободная клетка
+            key_row = randrange(len(self.pole))
+            key_col = randrange(len(self.pole))
+            key = key = key_row, key_col,
+            # key = choice(choice(self.pole)).value
+            # if self.FREE_CELL else choice(choice(self.pole)
+        self.__setitem__(key, self.COMPUTER_O)
+
+    def __check_index(self, index):
+        if type(index) not in (tuple, list) or len(index) != 2:
+            raise IndexError('некорректно указанные индексы')
+        r, c = index
+        if not 0 <= r < self.size or c not in range(self.size):
+            raise IndexError('некорректно указанные индексы')
+
+    def __getitem__(self, item):
+        self.__check_index(item)
+        r, c = item
+        return self.pole[r][c].value
+
+    def __setitem__(self, key, value):
+        self.__check_index(key)
+        r, c = key
+        self.pole[r][c].value = value
+        self.is_human_win
+        self.is_computer_win
+        self.is_draw
+
+    @property
+    def is_human_win(self):
+        for i in range(len(self.pole)):  # сумма по строкам
+            v = 0
+            for j in range(len(self.pole)):
+                if self.pole[i][j].value == self.HUMAN_X:
+                    v += 1
+            # return True if v == 3 else False
+            self.lst_human.append(v)
+
+        for i in range(len(self.pole)):  # сумма по столбцам
+            x = -1
+            v = 0
+            for j in range(len(self.pole)):
+                if self.pole[i][x + 1].value == self.HUMAN_X:
+                    v += 1
+                x += 1
+            # return True if v == 3 else False
+            self.lst_human.append(v)
+
+        for i in range(1):  # сумма по диагонали с (0,0) по (2,2)
+            v = 0
+            x = 0
+            for j in range(len(self.pole)):
+                if self.pole[j][x].value == self.HUMAN_X:
+                    v += 1
+                x += 1
+            # return True if v == 3 else False
+            self.lst_human.append(v)
+
+        for i in range(1):  # сумма по диагонали с (0,2) по (2,0)
+            v = 0
+            x = 2
+            for j in range(len(self.pole)):
+                if self.pole[j][x].value == self.HUMAN_X:
+                    v += 1
+                x -= 1
+            # return True if v == 3 else False
+            self.lst_human.append(v)
+
+        if 3 in self.lst_human:
+            # print(self.lst_human)
+            return True
+        elif len(self.lst_human) == 0:
+            return False
+        else:
+            return False
+
+    @property
+    def is_computer_win(self):
+        for i in range(len(self.pole)):  # сумма по строкам
+            v = 0
+            for j in range(len(self.pole)):
+                if self.pole[i][j].value == self.COMPUTER_O:
+                    v += 1
+            # return True if v == 3 else False
+            self.lst_computer.append(v)
+
+        for i in range(len(self.pole)):  # сумма по столбцам
+            x = -1
+            v = 0
+            for j in range(len(self.pole)):
+                if self.pole[i][x + 1].value == self.COMPUTER_O:
+                    v += 1
+                x += 1
+            # return True if v == 3 else False
+            self.lst_computer.append(v)
+
+        for i in range(1):  # сумма по диагонали с (0,0) по (2,2)
+            v = 0
+            x = 0
+            for j in range(len(self.pole)):
+                if self.pole[j][x].value == self.COMPUTER_O:
+                    v += 1
+                x += 1
+            # return True if v == 3 else False
+            self.lst_computer.append(v)
+
+        for i in range(1):  # сумма по диагонали с (0,2) по (2,0)
+            v = 0
+            x = 2
+            for j in range(len(self.pole)):
+                if self.pole[j][x].value == self.COMPUTER_O:
+                    v += 1
+                x -= 1
+            # return True if v == 3 else False
+            self.lst_computer.append(v)
+
+        if 3 in self.lst_computer:
+            # print(self.lst_computer)
+            return True  # победа
+        elif len(self.lst_computer) == 0:
+            return False
+        else:
+            return False
+
+    @property
+    def is_draw(self):  # возвращает True, если ничья,  - иначе - False.
+        if not self.__bool__() and not self.is_human_win and not self.is_computer_win:
+            return True  # ничья
+        else:
+            return False
+
+    def __bool__(self):
+        # возвращает True, если игра не окончена (никто не победил и есть свободные клетки) и False - в противном случае.
+        if not self.is_human_win and self.is_computer_win == False and any(
+                cell.value == self.FREE_CELL for row in self.pole for cell in row):
+            return True  # игра не окончена
+        else:
+            return False
+
+
+game = TicTacToe()
+game.init()
+step_game = 0
+while game:
+    game.show()
+    if step_game % 2 == 0:
+        game.human_go()
+    else:
+        game.computer_go()
+    step_game += 1
+
+print("Stop________________")
+game.show()
+
+if game.is_human_win:
+    print("Поздравляем! Вы победили!")
+elif game.is_computer_win:
+    print("Все получится, со временем")
+elif game.is_draw:
+    # else:
+    print("Ничья.")
 #######################################################################
 
 ########################################################################
