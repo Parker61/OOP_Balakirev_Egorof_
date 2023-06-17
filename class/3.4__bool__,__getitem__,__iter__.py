@@ -4981,7 +4981,121 @@ elif game.is_draw:
 
 #
 #######################################################################
+from random import choice, randint, randrange
 
+
+class Cell:
+    def __init__(self):
+        self.value = 0  # 0 - клетка свободна; 1 - стоит крестик; 2 - стоит нолик.
+
+    def __bool__(self):
+        return self.value == 0  # True, если клетка свободна (value = 0)
+
+
+class TicTacToe:
+    FREE_CELL = 0  # свободная клетка
+    HUMAN_X = 1  # крестик (игрок - человек)
+    COMPUTER_O = 2  # нолик (игрок - компьютер)
+
+    def __init__(self):
+        self.size = 3
+        self.win = 0  # 0 - игра , 1 - победа человека, 2 - победа компьютера, 3 - ничья
+        self.pole = tuple(tuple(Cell() for _ in range(self.size)) for _ in range(self.size))
+
+    def init(self):
+        for i in range(self.size):
+            for j in range(self.size):
+                self.pole[i][j].value = 0
+        self.win = 0  # 0 - игра
+
+    def show(self):
+        for row in self.pole:
+            print(*map(lambda x: x.value, row))
+        print('________________________________________________________________')
+
+    def human_go(self):
+        # if not self.__bool__():
+        if not self:
+            return
+        while True:
+            i, j = map(int, input('Enter index: '))
+            if not (0 <= i < self.size) or not (0 <= j < self.size):
+                continue
+            if self[i, j] == self.FREE_CELL:  # отправляет в setitem
+                self[i, j] = self.HUMAN_X
+                break
+
+    def computer_go(self):
+        if not self:
+            return
+        while True:
+            i = randint(0, self.size - 1)
+            j = randint(0, self.size - 1)
+            if self[i, j] != self.FREE_CELL:
+                continue
+            self[i, j] = self.COMPUTER_O
+
+    def __check_index(self, index):
+        if type(index) not in (tuple, list) or len(index) != 2:
+            raise IndexError('некорректно указанные индексы')
+        r, c = index
+        if not 0 <= r < self.size or c not in range(self.size):
+            raise IndexError('некорректно указанные индексы')
+
+    def __update_win_status(self):
+        for row in self.pole:
+            if all(i.value == self.HUMAN_X for i in row):  # проверка на выигрыш по строкам человека
+                self.win = 1
+                return
+            if all(i.value == self.COMPUTER_O for i in row):
+                self.win = 2
+                return
+        for i in range(self.size):  # проверка на выигрыш по столбцам человека
+            if all(col.value == self.HUMAN_X for col in (row[i] for row in self.pole)):
+                self.win = 1
+                return
+            if all(col.value == self.COMPUTER_O for col in (row[i] for row in self.pole)):
+                self.win = 2
+                return
+        # проверка на выигрыш по диагоналям человека
+        if all(self.pole[i][i].value == self.HUMAN_X for i in range(self.size)) \
+                or all(self.pole[i][-1-i].value == self.HUMAN_X for i in range(self.size)):
+            self.win = 1
+            return
+        if all(self.pole[i][i].value == self.COMPUTER_O for i in range(self.size)) \
+                or all(self.pole[i][-1-i].value == self.COMPUTER_O for i in range(self.size)):
+            self.win = 2
+            return
+        # проверка на ничью
+        if all(col.value != self.FREE_CELL for row in self.pole for col in row):
+            self.win = 3
+            return
+
+    def __getitem__(self, item):
+        self.__check_index(item)
+        r, c = item
+        return self.pole[r][c].value
+
+    def __setitem__(self, key, value):
+        self.__check_index(key)
+        r, c = key
+        self.pole[r][c].value = value
+        self.__update_win_status()  # пересчёт статуса победителя
+
+    @property
+    def is_human_win(self):
+        return self.win == 1
+
+    @property
+    def is_computer_win(self):
+        return self.win == 2
+
+    @property
+    def is_draw(self):  # возвращает True, если ничья,  - иначе - False.
+        return self.win == 3
+
+    def __bool__(self):
+        return self.win == 0 and self.win not in (1, 2, 3)
 ########################################################################
 
 ########################################################################
