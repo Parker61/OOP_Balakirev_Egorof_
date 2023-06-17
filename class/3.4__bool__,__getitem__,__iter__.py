@@ -5018,7 +5018,7 @@ class TicTacToe:
         if not self:
             return
         while True:
-            i, j = map(int, input('Enter index: '))
+            i, j = map(int, input('Enter index: ').split())
             if not (0 <= i < self.size) or not (0 <= j < self.size):
                 continue
             if self[i, j] == self.FREE_CELL:  # отправляет в setitem
@@ -5034,6 +5034,7 @@ class TicTacToe:
             if self[i, j] != self.FREE_CELL:
                 continue
             self[i, j] = self.COMPUTER_O
+            break
 
     def __check_index(self, index):
         if type(index) not in (tuple, list) or len(index) != 2:
