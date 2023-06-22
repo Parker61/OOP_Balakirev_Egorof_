@@ -4783,6 +4783,8 @@ class TicTacToe:
         self.pole = tuple(tuple(Cell() for _ in range(self.size)) for _ in range(self.size))
         self.lst_human = []
         self.lst_computer = []
+        # self.is_human, self.is_computer, self._is_draw = False, False, False
+        self.init()
 
     def init(self):
         for row in self.pole:
@@ -4790,9 +4792,11 @@ class TicTacToe:
                 cell.value = self.FREE_CELL
         self.lst_human = []
         self.lst_computer = []
-        self.is_human_win
-        self.is_computer_win
-        self.is_draw
+        self.is_human, self.is_computer, self._is_draw = False, False, False
+        # self.lst_human = []
+        # self.lst_computer = []
+        # self.is_computer_win
+        # self.is_draw
 
     def show(self):
         for row in self.pole:
@@ -4841,32 +4845,33 @@ class TicTacToe:
         self.__check_index(key)
         r, c = key
         self.pole[r][c].value = value
-        self.is_human_win
-        self.is_computer_win
-        self.is_draw
+        # self.is_human_win
+        # self.is_computer_win
+        # self.is_draw
 
     @property
     def is_human_win(self):
+        v = 0
         for i in range(len(self.pole)):  # сумма по строкам
-            v = 0
+            # v = 0
             for j in range(len(self.pole)):
                 if self.pole[i][j].value == self.HUMAN_X:
                     v += 1
             # return True if v == 3 else False
             self.lst_human.append(v)
-
+        v = 0
         for i in range(len(self.pole)):  # сумма по столбцам
             x = -1
-            v = 0
+            # v = 0
             for j in range(len(self.pole)):
                 if self.pole[i][x + 1].value == self.HUMAN_X:
                     v += 1
                 x += 1
             # return True if v == 3 else False
             self.lst_human.append(v)
-
+        v = 0
         for i in range(1):  # сумма по диагонали с (0,0) по (2,2)
-            v = 0
+            # v = 0
             x = 0
             for j in range(len(self.pole)):
                 if self.pole[j][x].value == self.HUMAN_X:
@@ -4874,9 +4879,9 @@ class TicTacToe:
                 x += 1
             # return True if v == 3 else False
             self.lst_human.append(v)
-
+        v = 0
         for i in range(1):  # сумма по диагонали с (0,2) по (2,0)
-            v = 0
+            # v = 0
             x = 2
             for j in range(len(self.pole)):
                 if self.pole[j][x].value == self.HUMAN_X:
@@ -4886,35 +4891,39 @@ class TicTacToe:
             self.lst_human.append(v)
 
         if 3 in self.lst_human:
-            # print(self.lst_human)
-            return True
+            self.is_human = True
+            return self.is_human
         elif len(self.lst_human) == 0:
-            return False
+            self.is_human = False
+            return self.is_human
         else:
-            return False
+            self.is_human = False
+            return self.is_human
 
     @property
     def is_computer_win(self):
+        v = 0
         for i in range(len(self.pole)):  # сумма по строкам
-            v = 0
+            # v = 0
             for j in range(len(self.pole)):
                 if self.pole[i][j].value == self.COMPUTER_O:
                     v += 1
             # return True if v == 3 else False
             self.lst_computer.append(v)
 
+        v = 0
         for i in range(len(self.pole)):  # сумма по столбцам
             x = -1
-            v = 0
+            # v = 0
             for j in range(len(self.pole)):
                 if self.pole[i][x + 1].value == self.COMPUTER_O:
                     v += 1
                 x += 1
             # return True if v == 3 else False
-            self.lst_computer.append(v)
-
+        self.lst_computer.append(v)
+        v = 0
         for i in range(1):  # сумма по диагонали с (0,0) по (2,2)
-            v = 0
+            #v = 0
             x = 0
             for j in range(len(self.pole)):
                 if self.pole[j][x].value == self.COMPUTER_O:
@@ -4922,9 +4931,9 @@ class TicTacToe:
                 x += 1
             # return True if v == 3 else False
             self.lst_computer.append(v)
-
+        v = 0
         for i in range(1):  # сумма по диагонали с (0,2) по (2,0)
-            v = 0
+            # v = 0
             x = 2
             for j in range(len(self.pole)):
                 if self.pole[j][x].value == self.COMPUTER_O:
@@ -4935,18 +4944,23 @@ class TicTacToe:
 
         if 3 in self.lst_computer:
             # print(self.lst_computer)
-            return True  # победа
+            self.is_computer = True
+            return self.is_computer  # победа
         elif len(self.lst_computer) == 0:
-            return False
+            self.is_computer = False
+            return self.is_computer
         else:
-            return False
+            self.is_computer = False
+            return self.is_computer
 
     @property
     def is_draw(self):  # возвращает True, если ничья,  - иначе - False.
         if not self.__bool__() and not self.is_human_win and not self.is_computer_win:
-            return True  # ничья
+            self._is_draw = True
+            return self._is_draw  # ничья
         else:
-            return False
+            self._is_draw = False
+            return self._is_draw
 
     def __bool__(self):
         # возвращает True, если игра не окончена (никто не победил и есть свободные клетки) и False - в противном случае.
@@ -4955,30 +4969,6 @@ class TicTacToe:
             return True  # игра не окончена
         else:
             return False
-
-
-game = TicTacToe()
-game.init()
-step_game = 0
-while game:
-    game.show()
-    if step_game % 2 == 0:
-        game.human_go()
-    else:
-        game.computer_go()
-    step_game += 1
-
-print("Stop________________")
-game.show()
-
-if game.is_human_win:
-    print("Поздравляем! Вы победили!")
-elif game.is_computer_win:
-    print("Все получится, со временем")
-elif game.is_draw:
-    # else:
-    print("Ничья.")
-
 #
 #######################################################################
 from random import choice, randint, randrange
