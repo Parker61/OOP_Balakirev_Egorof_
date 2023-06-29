@@ -1,4 +1,4 @@
-from random import choice, randint, randrange
+from random import randint, randrange, choice
 
 
 class Cell:
@@ -7,7 +7,10 @@ class Cell:
 
     def __bool__(self):
         return not self.value
-        # return self.value == 0  # True, если клетка свободна (value = 0)
+
+    def __str__(self):
+        self.str = {0: u'\u2b1c', 1: u'\u274c', 2: u'\u2b55'}
+        return self.str[self.value]
 
 
 class TicTacToe:
@@ -18,70 +21,44 @@ class TicTacToe:
     def __init__(self):
         self.size = 3
         self.pole = tuple(tuple(Cell() for _ in range(self.size)) for _ in range(self.size))
-        self.lst_human = []
-        self.lst_computer = []
         self.init()
 
     def init(self):
         for row in self.pole:
             for cell in row:
                 cell.value = self.FREE_CELL
-        self.lst_human = []
-        self.lst_computer = []
-        self.is_human, self.is_computer, self._is_draw = False, False, False
 
     def show(self):
         for row in self.pole:
+            for i in row:
+                if i.value == self.FREE_CELL:
+                    print("⬜", end=' ')
+                else:
+                    if i.value == self.HUMAN_X:
+                        print('❌', end=' ')
+                    else:
+                        print('⭕', end=' ')
             print()
-            for cell in row:
-                print(cell.value, end=' ')
+            # print(*['⬜' if i.value == self.FREE_CELL else '❌' if i.value == self.HUMAN_X else '⭕' for i in row])
         print()
 
     def human_go(self):
         while True:
             try:
                 key = tuple(map(int, input('Enter index: ').split()))
-                if self.__check_index(key):
-                    continue
-                if self.__check_range(key):
-                    continue
                 if self.__getitem__(key) != self.FREE_CELL:
                     print("Error, Enter index yet")
                     continue
-                self.__setitem__(key, self.HUMAN_X)
+                self[key] = self.HUMAN_X  # in __setitem__
                 break
             except ValueError:
                 print('Введённые данные не являются координатами.')
-                continue
+            except IndexError:
+                print('некорректно указанные индексы')
 
     def computer_go(self):
-        while True:
-            try:
-                key_row = randrange(len(self.pole))
-                key_col = randrange(len(self.pole))
-                key = key_row, key_col,
-                if self.__getitem__(key) != self.FREE_CELL:
-                    continue
-                self.__setitem__(key, self.COMPUTER_O)
-                break
-            except ValueError:
-                print('Введённые данные не являются координатами.')
-                continue
-
-    def __check_index(self, index):
-        if type(index) not in (tuple, list) or len(index) != 2:
-            # raise IndexError('некорректно указанные индексы')
-            print('некорректно указанные индексы')
-            return True
-        # return False
-
-    def __check_range(self, index):
-        r, c = index
-        if not 0 <= r < self.size or c not in range(self.size):
-            # raise IndexError('некорректно указанные индексы')
-            print('некорректно указанные диапазоны')
-            return True
-        # return False
+        free_cells = [i for row in self.pole for i in row if i.value == self.FREE_CELL]
+        choice(free_cells).value = self.COMPUTER_O
 
     def __getitem__(self, item):
         r, c = item
@@ -91,140 +68,41 @@ class TicTacToe:
         r, c = key
         self.pole[r][c].value = value
 
+    def __check_func(self, who):  # 1 - human, 2 - computer
+        rows = any(all(self[row, i] == who for i in [0, 1, 2]) for row in [0, 1, 2])
+        cols = any(all(self[i, col] == who for i in [0, 1, 2]) for col in [0, 1, 2])
+        diag1 = all(self[i, i] == who for i in [0, 1, 2])
+        diag2 = all(self[2 - i, i] == who for i in [0, 1, 2])
+        return any([rows, cols, diag1, diag2])
+
     @property
     def is_human_win(self):
-        v = 0
-        for i in range(len(self.pole)):  # сумма по строкам
-            for j in range(len(self.pole)):
-                if self.pole[i][j].value == self.HUMAN_X:
-                    v += 1
-            #return True if v == 3 else False
-            self.lst_human.append(v)
-        v = 0
-        for i in range(len(self.pole)):  # сумма по столбцам
-            x = -1
-            for j in range(len(self.pole)):
-                if self.pole[i][x + 1].value == self.HUMAN_X:
-                    v += 1
-                x += 1
-            # return True if v == 3 else False
-            self.lst_human.append(v)
-        v = 0
-        for i in range(1):  # сумма по диагонали с (0,0) по (2,2)
-            x = 0
-            for j in range(len(self.pole)):
-                if self.pole[j][x].value == self.HUMAN_X:
-                    v += 1
-                x += 1
-            # return True if v == 3 else False
-            self.lst_human.append(v)
-        v = 0
-        for i in range(1):  # сумма по диагонали с (0,2) по (2,0)
-            x = 2
-            for j in range(len(self.pole)):
-                if self.pole[j][x].value == self.HUMAN_X:
-                    v += 1
-                x -= 1
-            # return True if v == 3 else False
-            self.lst_human.append(v)
-
-        if 3 in self.lst_human:
-            self.is_human = True
-            return self.is_human
-        elif len(self.lst_human) == 0:
-            self.is_human = False
-            return self.is_human
-        else:
-            self.is_human = False
-            return self.is_human
+        return self.__check_func(self.HUMAN_X)
 
     @property
     def is_computer_win(self):
-        v = 0
-        for i in range(len(self.pole)):  # сумма по строкам
-            for j in range(len(self.pole)):
-                if self.pole[i][j].value == self.COMPUTER_O:
-                    v += 1
-            # return True if v == 3 else False
-            self.lst_computer.append(v)
-
-        v = 0
-        for i in range(len(self.pole)):  # сумма по столбцам
-            x = -1
-            for j in range(len(self.pole)):
-                if self.pole[i][x + 1].value == self.COMPUTER_O:
-                    v += 1
-                x += 1
-            # return True if v == 3 else False
-        self.lst_computer.append(v)
-        v = 0
-        for i in range(1):  # сумма по диагонали с (0,0) по (2,2)
-            x = 0
-            for j in range(len(self.pole)):
-                if self.pole[j][x].value == self.COMPUTER_O:
-                    v += 1
-                x += 1
-            # return True if v == 3 else False
-            self.lst_computer.append(v)
-        v = 0
-        for i in range(1):  # сумма по диагонали с (0,2) по (2,0)
-            x = 2
-            for j in range(len(self.pole)):
-                if self.pole[j][x].value == self.COMPUTER_O:
-                    v += 1
-                x -= 1
-            # return True if v == 3 else False
-            self.lst_computer.append(v)
-
-        if 3 in self.lst_computer:
-            # print(self.lst_computer)
-            self.is_computer = True
-            return self.is_computer  # победа
-        elif len(self.lst_computer) == 0:
-            self.is_computer = False
-            return self.is_computer
-        else:
-            self.is_computer = False
-            return self.is_computer
+        return self.__check_func(self.COMPUTER_O)
 
     @property
-    def is_draw(self):  # возвращает True, если ничья,  - иначе - False.
-        if not self.__bool__() and not self.is_human_win and not self.is_computer_win:
-            self._is_draw = True
-            return self._is_draw  # ничья
-        else:
-            self._is_draw = False
-            return self._is_draw
+    def is_nobody_win(self):
+        return not (self.is_human_win or self.is_computer_win)
+
+    @property
+    def any_free_space(self):
+        for i in [0, 1, 2]:
+            for j in [0, 1, 2]:
+                if not self[i, j]:  # call __getitem__ and after call to __bool__ from class Cell()
+                    # self.pole[i][j].value
+                    return True  # есть ещё свободные клетки self[i, j] = self.value = 0
+        return False
+
+    @property
+    def is_draw(self):
+        return not self.any_free_space and self.is_nobody_win
 
     def __bool__(self):
-        if not self.is_human_win and self.is_computer_win == False and any(
-                cell.value == self.FREE_CELL for row in self.pole for cell in row):
-            return True  # игра не окончена
-        else:
-            return False
+        return self.any_free_space and self.is_nobody_win
 
-
-game = TicTacToe()
-game.init()
-step_game = 0
-while game:
-    game.show()
-    if step_game % 2 == 0:
-        game.human_go()
-    else:
-        game.computer_go()
-    step_game += 1
-
-print("Stop____________________________________")
-game.show()
-
-if game.is_human_win:
-    print("Поздравляем! Вы победили!")
-elif game.is_computer_win:
-    print("Все получится, со временем")
-    # elif game.is_draw:
-else:
-    print("Ничья.")
 
 cell = Cell()
 assert cell.value == 0, "начальное значение атрибута value объекта класса Cell должно быть равно 0"
@@ -262,10 +140,35 @@ assert game.is_human_win == False and game.is_computer_win == False and game.is_
 game[0, 0] = TicTacToe.HUMAN_X
 game[1, 1] = TicTacToe.HUMAN_X
 game[2, 2] = TicTacToe.HUMAN_X
-assert game.is_human_win and game.is_computer_win == False and game.is_draw == False, "некорректно пересчитываются атрибуты is_human_win, is_computer_win, is_draw. Возможно не пересчитывается статус игры в момент присвоения новых значения по индексам: game[i, j] = value"
+assert game.is_human_win and game.is_computer_win == False and game.is_draw == False, "некорректно пересчитываются атрибуты is_human_win, " \
+                                                                                      "is_computer_win, is_draw. Возможно не пересчитывается " \
+                                                                                      "статус игры в момент присвоения новых значения по" \
+                                                                                      "индексам: game[i, j] = value"
 
-# game.init()
-# game[0, 0] = TicTacToe.COMPUTER_O
-# game[1, 0] = TicTacToe.COMPUTER_O
-# game[2, 0] = TicTacToe.COMPUTER_O
-# assert game.is_human_win == False and game.is_computer_win and game.is_draw == False, "некорректно пересчитываются атрибуты is_human_win, is_computer_win, is_draw. Возможно не пересчитывается статус игры в момент присвоения новых значения по индексам: game[i, j] = value"
+game.init()
+game[0, 0] = TicTacToe.COMPUTER_O
+game[1, 0] = TicTacToe.COMPUTER_O
+game[2, 0] = TicTacToe.COMPUTER_O
+assert game.is_human_win == False and game.is_computer_win and game.is_draw == False, "некорректно пересчитываются атрибуты is_human_win, is_computer_win, is_draw. Возможно не пересчитывается статус игры в момент присвоения новых значения по индексам: game[i, j] = value"
+
+game = TicTacToe()
+game.init()
+step_game = 0
+while game:
+    game.show()
+    if step_game % 2 == 0:
+        game.human_go()
+    else:
+        game.computer_go()
+    step_game += 1
+
+print("Stop____________________________________")
+game.show()
+
+if game.is_human_win:
+    print("Поздравляем! Вы победили!")
+elif game.is_computer_win:
+    print("Все получится, со временем")
+    # elif game.is_draw:
+else:
+    print("Ничья.")
