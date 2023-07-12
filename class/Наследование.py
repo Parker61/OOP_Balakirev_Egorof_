@@ -220,7 +220,9 @@ class SweetTooth(Initialization):
 
 ################################################################
 # _________Balakiref________________________________Наследование________________________
-# 4.3 Наследование. Функция super() и делегирование
+#
+# ______________4.3 Наследование. Функция super() и делегирование
+#
 # Подвиг 4. Создается программа по учету склада. Каждый предмет на складе должен описываться базовым классом Thing.
 # Объекты этого класса создаются командой:th1 = Thing(name, weight)где name - наименование предмета (строка);
 # weight - вес предмета (вещественное число).Для описания каждого конкретного вида предметов, создаются дочерние
@@ -903,6 +905,8 @@ class ItemAttrs(list):
 
 
 class Point(ItemAttrs): pass
+
+
 ################################################################
 class ItemAttrs:
 
@@ -918,6 +922,8 @@ class Point(ItemAttrs):
     def __init__(self, x, y):
         self.x = x
         self.y = y
+
+
 ################################################################
 class ItemAttrs:
     def __getitem__(self, item):
@@ -930,6 +936,8 @@ class ItemAttrs:
 class Point(ItemAttrs):
     def __init__(self, x, y):
         self.list = [x, y]
+
+
 ################################################################
 class ItemAttrs:
     def __getitem__(self, k):
@@ -940,92 +948,1453 @@ class ItemAttrs:
         d = list(self.__dict__.keys())
         d[k] = v
         # setattr(self, d[k], v)
-################################################################
+
 
 ################################################################
+# _____4.1 Наследование в объектно-ориентированном программировании________________________
+# Подвиг 4. Наследование часто используют, чтобы вынести общий код дочерних классов в базовый класс. Сделаем такой
+# пример. Объявите в программе базовый класс Animal (животное), объекты которого можно создать командой:
+# an = Animal(name, old)где name - название животного (строка); old - возраст животного (целое число). Такие же
+# локальные атрибуты (name и old) должны создаваться в объектах класса.Далее, объявите дочерний класс
+# (от базового Animal) с именем Cat (кошки), объекты которого создаются командой:cat = Cat(name, old, color, weight)
+# где name, old - те же самые параметры, что и в базовом классе; color - цвет кошки (строка); weight - вес кошки
+# (любое положительное число).В объектах класса Cat должны автоматически формироваться локальные атрибуты: name,
+# old, color, weight. Формирование атрибутов name, old должен выполнять инициализатор базового класса.
+# По аналогии объявите еще один дочерний класс Dog (собака), объекты которого создаются командой:
+# dog = Dog(name, old, breed, size)здесь name, old - те же самые параметры, что и в базовом классе;
+# breed - порода собаки (строка); size - кортеж в формате (height, length) высота и длина - числа.
+# В объектах класса Dog по аналогии должны формироваться локальные атрибуты: name, old, breed, size.
+# За формирование атрибутов name, old отвечает инициализатор базового класса. Наконец, в классах Cat и Dog
+# объявите метод:get_info() - для получения информации о животном.Этот метод должен возвращать строку в формате:
+# "name: old, <остальные параметры через запятую>"
+class Animal:
+    def __init__(self, name, old):
+        self.name = name
+        self.old = old
+
+    def get_info(self):
+        print(self.__dict__.values())  # dict_values(['кот', 4, 'black', 2.25])
+        # Объявлять в родительском классе методы для работы с дочерними - очень плохая практика !! в родительском
+        # классе нельзя объявлять методы, которых в нем нет или которые будут ссылаться на атрибуты которых в нем нет.
+        print(*self.__dict__.values())  # кот 4 black 2.25
+        return f"{self.name}: {', '.join(map(str, list(self.__dict__.values())[1:]))}"
+
+
+class Cat(Animal):
+    def __init__(self, name, old, color, weight):
+        super().__init__(name, old)
+        self.color = color
+        self.weight = weight
+
+    # def get_info(self):
+    #     return f'{self.name}: {self.old}, {self.color}, {self.weight}'
+
+
+class Dog(Animal):
+    def __init__(self, name, old, breed, size):
+        super().__init__(name, old)
+        self.breed = breed
+        self.size = size
+
+    # def get_info(self):
+    #     return f'{self.name}: {self.old}, {self.breed}, {self.size}'
+
+
+c = Cat('кот', 4, 'black', 2.25)
+print(c.get_info())
+
 
 ################################################################
+class Animal:
+    def __init__(self, name, old):
+        self.name = name
+        self.old = old
+        self.info = f'{self.name}: {self.old}, '
+
+    def get_info(self):
+        return self.info
+
+
+class Cat(Animal):
+    def __init__(self, name, old, color, weight):
+        super().__init__(name, old)
+        self.color = color
+        self.weight = weight
+        self.info += f'{self.color}, {self.weight}'
+
+
+class Dog(Animal):
+    def __init__(self, name, old, breed, size):
+        super().__init__(name, old)
+        self.breed = breed
+        self.size = size
+        self.info += f'{self.breed}, {self.size}'
+
+
+c = Cat('кот', 4, 'black', 2.25)
+print(c.get_info())
+
 
 ################################################################
+def get_info(self):
+    return '{}: {}, {}, {}'.format(*self.__dict__.values())
+
+    ################################################################
+    def get_info(self):
+        name, old, param_3, param_4 = self.__dict__.values()
+        return f"{name}: {old}, {param_3}, {param_4}"
+
 
 ################################################################
+from typing import Any
+
+
+class Animal:
+
+    def __init__(self, name, old):
+
+        self.name = name
+        self.old = old
+
+    def __setattr__(self, __name: str, __value: Any) -> None:
+        if __name == 'name' and self.check_string(__value):
+            raise AttributeError('name should be a atring')
+
+        if __name == 'old' and type(__value) is not int:
+            raise AttributeError('old should be an int')
+
+        super().__setattr__(__name, __value)
+
+    @classmethod
+    def check_string(self, value):
+        if type(value) is not str:
+            raise ValueError('value should be a string')
+
+    @classmethod
+    def check_positive_value(self, value):
+        if type(value) not in (int, float) or value <= 0:
+            raise ValueError('value should be positive int or float')
+
+    @classmethod
+    def check_tuple(self, value):
+        if type(value) is not tuple or len(value) != 2:
+            raise ValueError('value should be a tuple with two items')
+        h, l = value
+        if type(h) not in (int, float) or type(l) not in (int, float):
+            raise ValueError('values in tuple should be in (int, float)')
+
+    @staticmethod
+    def dec(func):
+        def wrapper(self):
+            res = f'{self.name}: {self.old}, '
+            cur = func(self)
+            return res + cur
+
+        return wrapper
+
+
+class Cat(Animal):
+
+    def __init__(self, name, old, color, weight):
+        super().__init__(name, old)
+        self.check_string(color)
+        self.color = color
+        self.check_positive_value(weight)
+        self.weight = weight
+
+    @Animal.dec
+    def get_info(self):
+        return f'{self.color}, {self.weight}'
+
+
+class Dog(Animal):
+
+    def __init__(self, name, old, breed, size):
+        super().__init__(name, old)
+        self.check_string(breed)
+        self.breed = breed
+        self.check_tuple(size)
+        self.size = size
+
+    @Animal.dec
+    def get_info(self):
+        return f'{self.breed}, {self.size}'
+
+
+c = Cat('кот', 4, 'black', 2.25)
+print(c.get_info())
+
 
 ################################################################
+# Подвиг 5. Иногда наследование используют, чтобы наделить объекты дочерних классов определенным набором атрибутов.
+# Сделаем такой пример.Предположим, вы разрабатываете программу для интернет-магазина. В этом магазине могут быть как
+# реальные (физические) товары, так и электронные. Для этих двух групп, очевидно, нужен разный набор атрибутов:
+# - для реальных физических товаров: id, name, price, weight, dimsгде id - идентификатор товара (целое число);
+# name - наименование товара (строка); price - цена товара (вещественное число); weight - вес товара (вещественное
+# число); dims = (lenght, width, depth) - длина, ширина, глубина - габариты товара (вещественные числа);
+# - для электронных товаров: id, name, price, memory, frmгде id - идентификатор товара (целое число); name -
+# наименование товара (строка); price - цена товара (вещественное число); memory - занимаемый размер
+# (в байтах - целое число); frm - формат данных (строка: pdf, docx и т.п.)Так как все товары могут идти вперемешку,
+# то мы хотим, чтобы в каждом объекте (для товара) присутствовали все атрибуты:id, name, price, weight, dims, memory,
+# frmс начальными значениями None. А уже, затем, нужным из них будут присвоены конкретные данные.Для реализации этой
+# логики объявите в программе базовый класс с именем Thing (вещь, предмет), объекты которого могут создаваться командой
+# th = Thing(name, price)А атрибут id должен формироваться автоматически и быть уникальным для каждого товара
+# (например, можно для каждого нового объекта увеличивать на единицу).В объектах класса Thing должен формироваться
+# полный набор локальных атрибутов (id, name, price, weight, dims, memory, frm) со значением None, кроме атрибутов:
+# id, name, price.Далее, нужно объявить два дочерних класса:Table - для столов;ElBook - для электронных книг.
+# Объекты этих классов должны создаваться командами:table = Table(name, price, weight, dims)book = ElBook(name, price,
+# memory, frm)Причем, атрибуты name, price (а также id) следует инициализировать в базовом классе, т.к. они общие для
+# всех товаров. Остальные атрибуты должны либо принимать значение None, если не используются, либо инициализироваться
+# конкретными значениями уже в дочерних классах.Наконец, в базовом классе Thing объявите метод:get_data() -
+# для получения кортежа в формате (id, name, price, weight, dims, memory, frm)
+class Thing:
+    id = 0
+
+    def __new__(cls, *args, **kwargs):
+        cls.id += 1
+        return super().__new__(cls)
+
+    def __init__(self, name, price, weight=None, dims=None, memory=None, frm=None):
+        self.name = name
+        self.price = price
+        self.weight = self.dims = self.memory = self.frm = None
+        Thing.id += 1
+        # self.id = id(self)
+
+    def get_data(self):
+        return tuple(
+            [i for i in [self.id, self.name, self.price, self.weight, self.dims, self.memory, self.frm] if i])
+
+
+class Table(Thing):
+    def __init__(self, name, price, weight, dims):
+        super().__init__(name, price)
+        self.weight = weight
+        self.dims = dims
+
+
+class ElBook(Thing):
+    def __init__(self, name, price, memory, frm):
+        super().__init__(name, price)
+        self.memory = memory
+        self.frm = frm
+
+
+table = Table("Круглый", 1024, 812.55, (700, 750, 700))
+book = ElBook("Python ООП", 2000, 2048, 'pdf')
+print(*table.get_data())
+print(*book.get_data())
+
 
 ################################################################
+class Thing:
+    id = 0
+
+    def __init__(self, name, price):
+        __class__.id += 1
+        self.name = name
+        self.price = price
+        self.weight = self.dims = self.memory = self.frm = None
+
+    def get_data(self):
+        return tuple(
+            [i for i in [self.id, self.name, self.price, self.weight, self.dims, self.memory, self.frm] if i])
+
+
+class Table(Thing):
+    def __init__(self, name, price, weight, dims):
+        super().__init__(name, price)
+        self.weight = weight
+        self.dims = dims
+        self.id = super().id
+
 
 ################################################################
+class Thing:
+    id = 0
+    __attribute = ('id', 'name', 'price', 'weight', 'dims', 'memory', 'frm')
+
+    def __init__(self, name, price):
+        self.name = name
+        self.price = price
+        self.weight = self.dims = self.memory = self.frm = None
+        # self.id = id(self)
+        self.id = self.get_id()
+
+    @classmethod
+    def get_id(cls):
+        Thing.id += 1
+        return Thing.id
+
+    # Когда self находится в пространстве имен базового класса (метод get_data внутри Thing), то он
+    # имеет доступ ко всем приватным атрибутам этого класса (так сделали Python и это разумно). А вот если метод
+    # get_data скопировать в дочерний класс, то уже будет ошибка, т.к. меняется пространство имен и доступ к приватному
+    # атрибуту напрямую будет закрыт.
+    def get_data(self):
+        return tuple(getattr(self, name) for name in self.__attribute)
+
+
+class Table(Thing):
+    def __init__(self, name, price, weight, dims):
+        super().__init__(name, price)
+        self.weight = weight
+        self.dims = dims
+
+
+class ElBook(Thing):
+    def __init__(self, name, price, memory, frm):
+        super().__init__(name, price)
+        self.memory = memory
+        self.frm = frm
+
 
 ################################################################
+# так уже нет доступа к __attribute из Table.get_data
+# AttributeError: 'Table' object has no attribute '_Table__attribute'. Did you mean: '_Thing__attribute'?
+class Thing:
+    id = 0
+    __attribute = ('id', 'name', 'price', 'weight', 'dims', 'memory', 'frm')
+
+    def __init__(self, name, price):
+        self.name = name
+        self.price = price
+        self.weight = self.dims = self.memory = self.frm = None
+        # self.id = id(self)
+        self.id = self.get_id()
+        self.__attribute = ('id', 'name', 'price', 'weight', 'dims', 'memory', 'frm')
+
+    @classmethod
+    def get_id(cls):
+        Thing.id += 1
+        return Thing.id
+
+
+class Table(Thing):
+    def __init__(self, name, price, weight, dims):
+        super().__init__(name, price)
+        self.weight = weight
+        self.dims = dims
+
+    def get_data(self):
+        return tuple(getattr(self, name) for name in self.__attribute)
+
 
 ################################################################
+# или так тоже нет доступа private attribute
+class Thing:
+    id = 0
+    __attribute = ('id', 'name', 'price', 'weight', 'dims', 'memory', 'frm')
+
 
 ################################################################
+import sys
+
+
+class Thing:
+    SEQ_ID = (i for i in range(1, sys.maxsize))
+
+    def __init__(self, name, price):
+        self.id = self.get_id()
+        self.name = name
+        self.price = price
+        self.weight = self.dims = self.memory = self.frm = None
+
+    @classmethod
+    def get_id(cls):
+        return next(cls.SEQ_ID)
+
 
 ################################################################
+class Thing:
+    id = 1
+
+    def __init__(self, *args):
+        self.id = Thing.id
+        self.name, self.price, self.weight, self.dims, self.memory, self.frm = args
+        Thing.id += 1
+
+    def get_data(self):
+        return tuple(self.__dict__.values())
+
+
+class Table(Thing):
+
+    def __init__(self, name, price, weight, dims, memory=None, frm=None):
+        super().__init__(name, price, weight, dims, memory, frm)
+
+
+class ElBook(Thing):
+
+    def __init__(self, name, price, memory, frm, weight=None, dims=None):
+        super().__init__(name, price, weight, dims, memory, frm)
+
 
 ################################################################
+class Thing:
+    def __init__(self, name, price):
+        self.id = hash(self)
+        self.name = name
+        self.price = price
+        self.weight = self.dims = self.memory = self.frm = None
+        # на самом деле у разных объектов хэш может совпадать. У разных объектов теоретически возможен одинаковый хэш,
+        # но у одинаковых объектов разного хэша не может быть.
+
 
 ################################################################
+class Thing:
+    __ids = iter(range(1_000_000))
+
+    def __init__(self, name, price, *, weight=None, dims=None, memory=None, frm=None):
+        self.name = name
+        self.price = price
+        self.id = next(self.__ids)
+
 
 ################################################################
+import itertools
+
+
+class Thing:
+    goods_id = itertools.count(1)
+
+    def __init__(self, name, price):
+        self.id = next(self.goods_id)
+
 
 ################################################################
+class Thing:
+    id = 0
+
+    def __init__(self, name, price):
+        __class__.id += 1
+        # if self.id+=1 -> 0
+        self.name = name
+        self.price = price
+        self.weight = self.dims = self.memory = self.frm = None
+
+    def get_data(self):
+        return tuple(
+            [i for i in [self.id, self.name, self.price, self.weight, self.dims, self.memory, self.frm] if i])
+
+
+class Table(Thing):
+    def __init__(self, name, price, weight, dims):
+        super().__init__(name, price)
+        self.weight = weight
+        self.dims = dims
+        self.id = super().id
+
 
 ################################################################
+class Thing:
+    ID = 0
+
+    def __init__(self, name: str, price: float):
+        Thing.ID += 1
+        self.id = Thing.ID
+
 
 ################################################################
+class Thing:
+    id = 0
+
+    def __init__(self, name: str, price: float):
+        __class__.id += 1
+        self.id = __class__.id
+
 
 ################################################################
+# Подвиг 6. Еще один пример, когда в базовом классе прописывается необходимый начальный функционал для дочерних классов.
+# Известно, что браузер (и не только) может отправлять на сервер различные типы запросов: GET, POST, PUT, DELETE и др.
+# Каждый из этих типов запросов обрабатывается в программе на сервере своим отдельным методом. Чтобы каждый раз не
+# прописывать все необходимые методы в классах при обработке входящих запросов, они выносятся в базовый класс и
+# вызываются из дочерних. Выполним такой пример.Пусть в программе объявлен следующий базовый класс с именем GenericView:
+# Здесь каждый метод отвечает за обработку своего типа запроса. Параметр methods - это кортеж или список, состоящий
+# из набора разрешенных запросов: строк с именами соответствующих методов (как правило, пишут заглавными буквами).
+# Вам необходимо объявить дочерний класс с именем DetailView, объекты которого можно создавать командами:
+# dv = DetailView()  # по умолчанию methods=('GET',)dv = DetailView(methods=('PUT', 'POST'))Для инициализации атрибута
+# methods следует вызывать инициализатор базового класса GenericView.Далее, в классе DetailView нужно определить метод:
+# def render_request(self, request, method): ...который бы имитировал выполнение поступившего на сервер запроса.
+# Здесь request - словарь с набором данных запроса; method - тип запроса (строка: 'get' или 'post' и т.д.).
+# Например:html = dv.render_request({'url': 'https://site.ru/home'}, 'GET')должен быть обработан запрос как GET-запрос
+# с параметром url и значением 'https://site.ru/home'. Параметр url является обязательным в словаре request для каждого
+# запроса.В методе render_request() необходимо выполнить проверку: является ли указанный метод (method) разрешенным
+# (присутствует в коллекции methods). Если это не так, то генерировать исключение командой:raise TypeError('данный
+# запрос не может быть выполнен')Если проверка проходит, то выполнить соответствующий метод (или get(), или post(),
+# или put() и т.д. с возвращением результата их работы). Подсказка: для получения ссылки на нужный метод можно
+# воспользоваться магическим методом __getattribute__() или аналогичной функцией getattr()).Наконец, в дочернем классе
+# DetailView следует переопределить метод get() для нужной нам обработки GET-запросов. В этом методе нужно выполнить
+# проверку, что параметр request является словарем. Если это не так, то генерировать исключение:
+# raise TypeError('request не является словарем')Сделать проверку, что в словаре request присутствует ключ url.
+# Если его нет, то генерировать исключение:raise TypeError('request не содержит обязательного ключа url')
+# Если же все проверки проходят, то вернуть строку в формате:"url: <request['url']>"
+class GenericView:
+    def __init__(self, methods=('GET',)):
+        self.methods = methods
+
+    def get(self, request):
+        return ""
+
+    def post(self, request):
+        pass
+
+    def put(self, request):
+        pass
+
+    def delete(self, request):
+        pass
+
+
+class DetailView(GenericView):
+    def __init__(self, methods=('GET',)):
+        super().__init__(methods)
+
+    def get(self, request):
+        if type(request) != dict:
+            raise TypeError('request не является словарем')
+        if 'url' not in request:
+            raise TypeError('request не содержит обязательного ключа url')
+        return f"url: {request['url']}"
+
+    def render_request(self, request, method):
+        if method.upper() not in self.methods:
+            raise TypeError('данный запрос не может быть выполнен')
+        return getattr(self, method.lower(), False)(request)
+        return self.__getattribute__(method.lower())(request)
+
+
+dv = DetailView()
+html = dv.render_request({'url': 'https://site.ru/home'}, 'GET')  # url: https://site.ru/home
+print(html)
+
 
 ################################################################
+class DetailView(GenericView):  # def __init__(self, methods=('GET',)):
+    def render_request(self, request, method):
+        dic = {'GET': self.get, 'POST': self.post, 'PUT': self.put, 'DELETE': self.delete}
+        if method not in self.methods:
+            raise TypeError('данный запрос не может быть выполнен')
+        return dic[method](request)
+
 
 ################################################################
+# Подвиг 7. С помощью наследования можно как бы "наполнять" дочерние классы нужными качествами (свойствами). Как пример,
+# объявите в программе класс с именем:Singletonкоторый бы позволял создавать только один экземпляр (все последующие
+# экземпляры должны ссылаться на первый). Как это делать, вы должны уже знать из этого курса.Затем, объявите еще один
+# класс с именем:Gameкоторый бы наследовался от класса Singleton. Объекты класса Game должны создаваться командой:
+# game = Game(name)где name - название игры (строка). В каждом объекте класса Game должен создаваться атрибут name с
+# соответствующим содержимым.Убедитесь, что атрибут name принимает значение первого созданного объекта (если это не
+# так, то поправьте инициализатор дочернего класса, чтобы это условие выполнялось).
+class Singleton:
+    instance = None
+    instance_basic = None
+
+    def __new__(cls, *args, **kwargs):
+        # если создать экз Singleton то дочерний класс будет ссылать на него и не создастся экз дочерненго класса, тогда
+        if cls == Singleton:
+            if cls.instance_basic is None:
+                cls.instance_basic = super().__new__(cls)  # обращение к базовому классу
+            return cls.instance_basic
+
+        if not cls.instance:
+            cls.instance = super().__new__(cls)  # обращение к базовому классу
+            # cls.instance_basic = object.__new__(cls)
+        return cls.instance
+
+
+class Game(Singleton):
+    def __init__(self, name):
+        if 'name' not in self.__dict__:
+            # для того чтобы name принимал только первое значение и не перезаписывать каждый раз новое name, а Singleton
+            # не будет давать создать новый объект
+            self.name = name
+
 
 ################################################################
+class Singleton:
+    _instance = None
+
+    def __new__(cls, *args, **kwargs):
+        if not isinstance(cls._instance, cls):
+            cls._instance = object.__new__(cls)
+        return cls._instance
+
+
+class Game(Singleton):
+    def __init__(self, name):
+        if 'name' not in self.__dict__:
+            self.name = name
+
 
 ################################################################
+class Singleton:
+    def __new__(cls, *args, **kwargs):
+        if not hasattr(cls, "instance"):
+            cls.instance = super().__new__(cls)
+        return cls.instance
+
+
+class Game(Singleton):
+    def __init__(self, name):
+        if not hasattr(self, "name"):
+            self.name = name
+
 
 ################################################################
+class Singleton:
+    _instance = None
+
+    def __new__(cls, *args, **kwargs):
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+        return cls._instance
+
+
+class Game(Singleton):
+    _instance = None
+
+    def __init__(self, name):
+        if not hasattr(self, 'name'):
+            self.name = name
+
 
 ################################################################
+class Singleton:
+    obj = None
+
+    def __new__(cls, *args, **kwargs):
+        cls.obj = cls.obj or super().__new__(cls)
+        return cls.obj
+
+
+class Game(Singleton):
+    def __init__(self, name):
+        if not hasattr(self, 'name'):
+            self.name = name
+
 
 ################################################################
+class Singleton:
+    _instance = None
+
+    def __new__(cls, *args, **kwargs):
+        if cls._instance is None:
+            cls._instance = object.__new__(cls)
+
+        return cls._instance
+
+
+class Game(Singleton):
+    def __init__(self, name):
+        if not hasattr(self, 'name'):
+            self.name = name
+
 
 ################################################################
+class Singleton:
+    ''' странно вообще, что классу гейм приходится наследоваться от синглтона
+        но даже если пришлось это делать, то в чем суть держать в атрибутах синглота ссылки на
+        экзепляры других классов, при этом в решении Сергея каждрый раз надо добавлять в класс синглотан новую
+                 ссылку на поддержку другого класса.'''
+
+    def __new__(cls, *args, **kwargs):
+        if not hasattr(cls, 'obj'):
+            cls.obj = object.__new__(cls)  # решение с нормальной реализации данного патерна
+        return cls.obj
+
+
+class Game(Singleton):
+
+    def __init__(self, name):
+        self.name = getattr(self, 'name', name)
+
+
+'''class Singleton:
+    """решение с использования делегирования, а не наследования, понятнее и логичнее"""
+
+    def __new__(cls, *args, **kwargs):
+        if not hasattr(cls, 'obj'):
+            cls.obj = object.__new__(cls)
+        return cls.obj
+
+class Game:
+    __new__ = Singleton.__new__
+
+    def __init__(self, name):
+        self.name = getattr(self, 'name', name)'''
+
 
 ################################################################
+# Подвиг 8. Вам необходимо создать множество классов для валидации (проверки) корректности данных. Для этого ваш
+# непосредственный начальник (Senior) предлагает вам объявить в программе базовый класс с именем:Validator
+# обеспечивающий базовый функционал для проверки корректности данных. В частности, в этом классе нужно объявить
+# следующий метод:def _is_valid(self, data): ...По задумке этот метод должен возвращать булево значение True, если
+# данные (data) корректны и False - в противном случае.Так как базовый класс Validator - это общий класс для всех
+# видов проверок, то метод _is_valid() будет просто возвращать True.Кроме того, объекты класса Validator:
+# v = Validator()   # инициализатор в классе Validator прописывать не нужнодолжны вызываться подобно функциям:
+# v(data)и если данные (data) некорректны, то генерировать исключение:raise ValueError('данные не прошли валидацию')
+# Проверка корректности выполняется с помощью метода _is_valid(). После этого, в программе нужно объявить два дочерних
+# класса:IntegerValidator - для проверки, что data - целое число в заданном диапазоне;FloatValidator - для проверки,
+# что data - вещественное число в заданном диапазоне.Объекты этих классов предполагается создавать командами:
+# integer_validator = IntegerValidator(min_value, max_value)float_validator = IntegerValidator(min_value, max_value)
+# где min_value, max_value - допустимый диапазон чисел [min_value; max_value]Также в этих классах нужно переопределить
+# метод:def _is_valid(self, data): ...который бы возвращал True, если data является числом верного типа (либо int, либо
+# float в зависимости от валидатора) и находится в заданном диапазоне [min_value; max_value]. Иначе, возвращается False.
+
+class Validator:
+    def _is_valid(self, data):
+        return True
+
+    def __call__(self, data):
+        if not self._is_valid(data):
+            raise ValueError('данные не прошли валидацию')
+
+
+class IntegerValidator(Validator):
+    def __init__(self, min_value, max_value):
+        self.min_value = min_value
+        self.max_value = max_value
+
+    def _is_valid(self, data):
+        if type(data) == int and data in range(self.min_value, self.max_value + 1):
+            return True
+        else:
+            return False
+
+
+class FloatValidator(Validator):
+    def __init__(self, min_value, max_value):
+        self.min_value = min_value
+        self.max_value = max_value
+
+    def _is_valid(self, data):
+        if type(data) == float and data in range(self.min_value, self.max_value + 1):
+            return True
+        else:
+            return False
+
+    ################################################################
+    def _is_valid(self, data):
+        return isinstance(data, int) and self.min_value <= data <= self.max_value
+
 
 ################################################################
+class Validator:
+    def __init__(self, min_value, max_value):
+        self.min_value = min_value
+        self.max_value = max_value
+
+    def _is_valid(self, data):
+        return True if type(data) == self.type and self.min_value <= data <= self.max_value else False
+
+    def __call__(self, data):
+        if not self._is_valid(data):
+            raise ValueError('данные не прошли валидацию')
+
+
+class IntegerValidator(Validator):
+    def __init__(self, min_value, max_value):
+        super().__init__(min_value, max_value)
+        self.type = int
+
+
+class FloatValidator(Validator):
+    def __init__(self, min_value, max_value):
+        super().__init__(min_value, max_value)
+        self.type = float
+
 
 ################################################################
+# Большой подвиг 9. Используя механизм наследования, вам поручено разработать функционал по построению моделей нейронных
+# сетей. Общая схема модели очень простая:Базовый класс Layer имеет локальный атрибут next_layer, который ссылается
+# на следующий объект слоя нейронной сети (объект класса Layer или любого объекта дочерних классов). У последнего слоя
+# значение next_layer = None.Создавать последовательность слоев предполагается командами:
+# first_layer = Layer()next_layer = first_layer(Layer())next_layer = next_layer(Layer())То есть, сначала создается
+# объект first_layer класса Layer, а затем он вызывается как функция для образования связки со следующим слоем. При
+# этом возвращается ссылка на следующий слой и переменная next_layer ссылается уже на этот следующий слой нейронной
+# сети. И так можно создавать столько слоев, сколько необходимо.В каждом объекте класса Layer также должен
+# формироваться локальный атрибут:name = 'Layer'Но сам по себе класс Layer образует только связи между слоями.
+# Никакой другой функциональности он не несет. Чтобы это исправить, в программе нужно объявить еще два дочерних класса:
+# Input - формирование входного слоя нейронной сети;Dense - формирование полносвязного слоя нейронной сети.
+# Конечно, создавать нейронную сеть мы не будем. Поэтому, в классе Input нужно лишь прописать инициализатор так,
+# чтобы его объекты создавались следующим образом:inp = Input(inputs)где inputs - общее число входов (целое число).
+# Также в объектах класса Input должен автоматически формироваться атрибут:name = 'Input'(Не забывайте при этом,
+# вызывать инициализатор базового класса Layer).Объекты второго дочернего класса Dense предполагается создавать
+# командой:dense = Dense(inputs, outputs, activation)где inputs - число входов в слой; outputs - число выходов слоя
+# (целые числа); activation - функция активации (строка, например: 'linear', 'relu', 'sigmoid'). И в каждом объекте
+# класса Dense также должен автоматически формироваться атрибут:name = 'Dense'Все эти классы совместно можно
+# использовать следующим образом (эти строчки пример, писать не нужно):network = Input(128)
+# layer = network(Dense(network.inputs, 1024, 'linear'))layer = layer(Dense(layer.inputs, 10, 'softmax'))
+# Здесь создается три слоя нейронной сети. Наконец, для перебора всех слоев с помощью цикла for, необходимо объявить
+# отдельный класс NetworkIterator для итерирования (перебора) слоев нейронной сети следующим образом:
+# for x in NetworkIterator(network):    print(x.name)Здесь создается объект класса NetworkIterator. На вход
+# передается первый объект (слой) нейронной сети. Объект этого класса является итератором, который в цикле for
+# последовательно возвращает объекты (слои) нейронной сети.
+
+class Layer:
+    def __init__(self, name='Layer'):
+        self.name = name
+        self.next_layer = None
+
+    def __call__(self, layer, *args, **kwargs):
+        self.next_layer = layer
+        return layer
+
+
+class Input(Layer):
+    def __init__(self, inputs, name='Input'):
+        self.inputs = inputs
+        super().__init__('Input')
+
+
+class Dense(Layer):
+    def __init__(self, inputs, outputs, activation, name='Dense'):
+        self.inputs = inputs
+        self.outputs = outputs
+        self.activation = activation
+        super().__init__(name)
+
+
+class NetworkIterator:
+    def __init__(self, network):
+        self.network = network
+
+    def __iter__(self):
+        while self.network:
+            yield self.network
+            self.network = self.network.next_layer
+
+
+nt = Input(12)
+layer = nt(Dense(nt.inputs, 1024, 'relu'))
+layer = layer(Dense(layer.inputs, 2048, 'relu'))
+layer = layer(Dense(layer.inputs, 10, 'softmax'))
+
 
 ################################################################
+class NetworkIterator:
+    def __init__(self, network):
+        self.network = network
+
+    def __iter__(self):
+        self.start = self.network
+        return self
+
+    def __next__(self):
+        if not self.start:
+            raise StopIteration
+        self.network, self.start = self.start, self.start.next_layer
+        return self.network
+
+    ################################################################
+    class NetworkIterator:
+        def __init__(self, network):
+            self.network = network
+
+        def __iter__(self):
+            self.start = self.network
+            return self
+
+        def __next__(self):
+            if not self.start:
+                raise StopIteration
+            out = self.start
+            self.start = self.start.next_layer
+            return out
+
 
 ################################################################
+class NetworkIterator:
+    def __init__(self, network):
+        self.network = network
+
+    def __iter__(self):
+        self.start = self.network
+        return self
+
+    def __next__(self):
+        out = self.start
+        while self.start:
+            self.start = self.start.next_layer
+            return out
+        raise StopIteration
+
+    ################################################################
+
+    def __iter__(self):
+        self.start = self.network
+        return self
+
+    def __next__(self):
+        out = self.start
+        if out:
+            self.start = self.start.next_layer
+            return out
+        else:
+            raise StopIteration
+
+    ################################################################
+    # __good_____
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        out = self.network
+        if out:
+            self.network = self.network.next_layer
+            return out
+        raise StopIteration
+
+    ##############################################################
+
 
 ################################################################
+class Layer:
+    def __init__(self):
+        self.name = 'Layer'
+        self.next_layer = None
+
+    def __call__(self, next_layer):
+        return self.__add_layer(next_layer)
+
+    def __add_layer(self, next_layer):
+        if self.next_layer is None:
+            self.next_layer = next_layer
+            return self.next_layer
+        else:
+            return self.next_layer(next_layer)
+
+
+class Input(Layer):
+    def __init__(self, inputs):
+        super().__init__()
+        self.name = 'Input'
+        self.inputs = inputs
+
+
+class Dense(Layer):
+    def __init__(self, inputs, outputs, activation):
+        super().__init__()
+        self.name = 'Dense'
+        self.inputs = inputs
+        self.outputs = outputs
+        self.activation = activation
+
+
+class NetworkIterator:
+    def __init__(self, network):
+        self.network = network
+
+    def __iter__(self):
+        self.it = self.network
+        return self
+
+    def __next__(self):
+        if self.it is None:
+            raise StopIteration
+        out = self.it
+        self.it = self.it.next_layer
+        return out
+
 
 ################################################################
+class NetworkIterator:
+    def __init__(self, network):
+        self.network = network
+
+    def __iter__(self):
+        while self.network:
+            yield self.network
+            self.network = self.network.next_layer
+
 
 ################################################################
+################################################
+# Подвиг 10 (на повторение). Объявите в программе класс Vector, объекты которого создаются командой:
+# v = Vector(x1, x2, ..., xN)где x1, x2, ..., xN - координаты радиус-вектора (числа: целые или вещественные).
+# С объектами этого класса должны выполняться команды:v1 = Vector(1, 2, 3)v2 = Vector(3, 4, 5)
+# v = v1 + v2 # формируется новый вектор (объект класса Vector) с соответствующими координатами
+# v = v1 - v2 # формируется новый вектор (объект класса Vector) с соответствующими координатами
+# Если размерности векторов v1 и v2 не совпадают, то генерировать исключение:raise TypeError('размерности векторов
+# не совпадают')В самом классе Vector объявите метод с именем get_coords, который возвращает кортеж из текущих
+# координат вектора.На основе класса Vector объявите дочерний класс VectorInt для работы с целочисленными координатами:
+# v = VectorInt(1, 2, 3, 4)v = VectorInt(1, 0.2, 3, 4) # ошибка: генерируется исключение raise ValueError('координаты
+# должны быть целыми числами')При операциях сложения и вычитания с объектом класса VectorInt:v = v1 + v2  # v1 -
+# объект класса VectorIntv = v1 - v2  # v1 - объект класса VectorIntдолжен формироваться объект v как объект класса
+# Vector, если хотя бы одна координата является вещественной. Иначе, v должен быть объектом класса VectorInt.
+
+class Vector:
+    def __init__(self, *args, **kwargs):
+        self.coords = args
+
+    def __check_args(self, other):
+        if len(self.coords) != len(other.get_coords()):
+            raise TypeError('размерности векторов не совпадают')
+
+    def __add__(self, other):
+        self.__check_args(other)
+        return Vector(*[i + j for i, j in zip(self.coords, other.get_coords())])
+        # return Vector(*[val + other.coords[i] for i, val in enumerate(self.coords)])
+
+    def __sub__(self, other):
+        self.__check_args(other)
+        return Vector(*[val - other.coords[i] for i, val in enumerate(self.coords)])
+
+    def get_coords(self):
+        return self.coords
+
+
+class VectorInt(Vector):
+    def __init__(self, *args):
+        if any(map(lambda x: type(x) != int, args)):
+            raise ValueError('координаты должны быть целыми числами')
+        super().__init__(*args)
+
+    def __add__(self, other):
+        if any(map(lambda x: type(x) == float, other.coords)):
+            return super().__add__(other)
+        self.__check_args(other)
+        if len(self.coords) != len(other.coords):
+            raise TypeError('размерности векторов не совпадают')
+        return VectorInt(*[val + other.coords[i] for i, val in enumerate(self.coords)])
+
+
+v1 = Vector(1, 2, 3)
+v2 = Vector(3, 4, 5)
+
 
 ################################################################
+class Vector:
+    _allowed_types = (int, float)
+
+    def __init__(self, *args, **kwargs):
+        self.__check_allowed_types(args)
+        self.coords = args
+
+    def __check_allowed_types(self, args):
+        if not all(type(i) in self._allowed_types for i in args):
+            raise ValueError('неверный тип координат')
+
+    def __check_args(self, other):
+        if len(self.coords) != len(other.get_coords()):
+            raise TypeError('размерности векторов не совпадают')
+
+    def __is_vector(self, other):
+        if not isinstance(other, Vector):
+            raise TypeError('операнд должен быть obj Vector или дочернего класса')
+
+    def __add__(self, other):
+        self.__is_vector(other)
+        self.__check_args(other)
+        coords = tuple(i + j for i, j in zip(self.coords, other.get_coords()))
+        # coords = tuple(map(sum, zip(self.coords, other.coords)))
+        return self.__make_coords(coords)
+
+    def __make_coords(self, coords):
+        try:
+            return self.__class__(*coords)  # запись в дочерний класс/текущий, * - распаковываем кортеж
+        except ValueError:
+            return Vector(*coords)  # запись в класс Vector т.к. не пропускает _check_allowed_types при создании
+            # дочернего класса с координатами типа float
+        # принцип SOLID не используются атрибуты дочернего класса
+
+    def __sub__(self, other):
+        self.__is_vector(other)
+        self.__check_args(other)
+        coords = tuple(i - j for i, j in zip(self.coords, other.get_coords()))
+        return self.__make_coords(coords)
+
+    def get_coords(self):
+        return self.coords
+
+
+class VectorInt(Vector):
+    _allowed_types = (int,)
+
 
 ################################################################
+from operator import add, sub
+
+
+class Vector:
+    type_coords = (int, float)
+    error_message = 'числами'
+
+    def __init__(self, *args):
+        self.__check_data(args)
+        self.coords = [*args]
+
+    def get_coords(self):
+        return tuple(self.coords)
+
+    def __check_data(self, lst):
+        if not all(type(x) in self.type_coords for x in lst):
+            raise ValueError(f'координаты должны быть {self.error_message}')
+
+    def __len__(self):
+        return len(self.coords)
+
+    def __check_vector(self, other):
+        if len(self) != len(other):
+            raise TypeError('размерности векторов не совпадают')
+
+    def __make_calc(self, other, op) -> list:
+        self.__check_vector(other)
+        return [op(*el) for el in zip(self.coords, other.coords)]
+
+    # Здесь op является оператором, переданным в метод __make_calc, который может быть либо функцией add (сложение) либо
+    # функцией sub (вычитание) из модуля operator.op(*el) для выполнения операции поэлементного сложения или вычитания.
+    @staticmethod
+    def make_vector(lst):
+        try:
+            return VectorInt(*lst)
+        except ValueError:
+            return Vector(*lst)
+
+    def __add__(self, other):
+        res = self.__make_calc(other, add)
+        return self.make_vector(res)
+
+    def __sub__(self, other):
+        res = self.__make_calc(other, sub)
+        return self.make_vector(res)
+
+
+class VectorInt(Vector):
+    type_coords = (int,)
+    error_message = 'целыми числами'
+
 
 ################################################################
+class Vector:
+    def __init__(self, *args):
+        self.coords = args
+
+    def __make_vector(self, coords):
+        try:
+            return self.__class__(*coords)
+        except ValueError:
+            return Vector(*coords)
+
+    def __add__(self, other):
+        if len(self.coords) != len(other.coords):
+            raise TypeError('размерности векторов не совпадают')
+        coords = tuple(map(sum, zip(self.coords, other.coords)))
+        return self.__make_vector(coords)
+
+    def __sub__(self, other):
+        if len(self.coords) != len(other.coords):
+            raise TypeError('размерности векторов не совпадают')
+        coords = tuple(x - y for (x, y) in zip(self.coords, other.coords))
+        return self.__make_vector(coords)
+
+    def get_coords(self):
+        return self.coords
+
+
+class VectorInt(Vector):
+    def __init__(self, *args):
+        super().__init__(*args)
+        if not all(type(i) is int for i in args):
+            raise ValueError('координаты должны быть целыми числами')
+
 
 ################################################################
+class Vector:
+    def __init__(self, *args):
+        self.coord = list(args)
+
+    def __add__(self, other):
+        self._is_valid(other)
+        return Vector(*[self.coord[i] + other.coord[i] for i in range(len(self.coord))])
+
+    def __sub__(self, other):
+        self._is_valid(other)
+        return Vector(*[self.coord[i] - other.coord[i] for i in range(len(self.coord))])
+
+    def _is_valid(self, other):
+        if len(self.coord) != len(other.coord):
+            raise TypeError('размерности векторов не совпадают')
+
+    def get_coords(self):
+        return tuple(self.coord)
+
+
+class VectorInt(Vector):
+    def __init__(self, *args):
+        if not self.int_valid(args):
+            raise ValueError('координаты должны быть целыми числами')
+        self.coord = list(args)
+
+    def __add__(self, other):
+        self._is_valid(other)
+        if self.int_valid(other.coord):
+            return VectorInt(*[self.coord[i] + other.coord[i] for i in range(len(self.coord))])
+        return super().__add__(other)
+
+    def __sub__(self, other):
+        self._is_valid(other)
+        if self.int_valid(other.coord):
+            return VectorInt(*[self.coord[i] - other.coord[i] for i in range(len(self.coord))])
+        return super().__sub__(other)
+
+    def int_valid(self, args):
+        return all([type(i) == int for i in args])
+
 
 ################################################################
+class Vector:
+
+    def __init__(self, *args):
+        self.coords = list(args)
+
+    def get_coords(self):
+        return tuple(self.coords)
+
+    def validate(func):
+        def wrapper(instance, other, *args):
+            if len(instance) != len(other):
+                raise TypeErro('размерности векторов не совпадают')
+            elif type(instance) == VectorInt:  # случай, когда второй параметр принадлежит к типу VectorInt
+                instance, other = other, instance  # для первого парам. (если он VectorInt) замена не требуется,
+                return func(instance, other)  # т.к. type(self) = Vector в методах add и sub
+            else:
+                return func(instance, other)
+
+        return wrapper
+
+    def __len__(self):
+        return len(self.coords)
+
+    @validate
+    def __add__(self, other):
+        return type(self)(*map(sum, zip(self.coords, other.coords)))
+
+    @validate
+    def __sub__(self, other):
+        return type(self)(*map(lambda x, y: x - y, self.coords, other.coords))  # type(self) будет оцениваться
+        # как Vector или VectorInt Цель использования type(self) состоит в обработке случая, когда второй параметр
+        # (other) принадлежит классу VectorInt. В этом случае декоратор меняет местами позиции instance и other перед
+        # вызовом фактического метода оператора. Это позволяет правильно выполнять сложение или вычитание, независимо
+        # от того, является ли экземпляр типом VectorInt или другого класса.
+
+
+class VectorInt(Vector):
+
+    def __init__(self, *args):
+        if list(map(int, list(args))) == list(args):
+            super().__init__()
+            self.coords = list(args)
+        else:
+            raise ValueError('координаты должны быть целыми числами')
+
 
 ################################################################
+# 4.2 Функция issubclass(). Наследование от встроенных типов
+class List(list):
+    def __str__(self):
+        return ' '.join(map(str, self))
+
+
+# self  наследуется от list, а в листе есть iter
+
+l = List([1, 2, 3])
+print(l)  # 1 2 3
+
 
 ################################################################
+# Подвиг 3. Создается проект, в котором предполагается использовать списки из целых чисел. Для этого вам ставится
+# задача создать класс с именем ListInteger с базовым классом list и переопределить три метода:__init__()__setitem__()
+# append()так, чтобы список ListInteger содержал только целые числа. При попытке присвоить любой другой тип данных,
+# генерировать исключение командой:raise TypeError('можно передавать только целочисленные значения')
+class ListInteger(list):
+    def __init__(self, values):
+        for i in values:
+            self._check_int(i)
+        super().__init__(values)
+
+    def __setitem__(self, key, value):
+        self._check_int(value)
+        super().__setitem__(key, value)
+
+    def append(self, value):
+        self._check_int(value)
+        super().append(value)
+
+    @staticmethod
+    def _check_int(value):
+        if not isinstance(value, int):
+            raise TypeError('можно передавать только целочисленные значения')
+
+
+s = ListInteger((1, 2, 3))
+s[1] = 10
+s.append(11)
+print(s)
+s[0] = 10.4  # TypeError
+
 
 ################################################################
+class ListInteger(list):
+    def __init__(self, iterable):
+        super().__init__(map(self._check_int, iterable))
 
+    def __setitem__(self, key, value):
+        super().__setitem__(key, self._check_int(value))
+
+    def append(self, value):
+        super().append(self._check_int(value))
+
+    @staticmethod
+    def _check_int(value):
+        if not isinstance(value, int):
+            raise TypeError('можно передавать только целочисленные значения')
+        return value
+
+
+################################################################
+# при проверке типа в __init__ создаю копию входного iterable на случай, если это итератор (чтобы при проверке он
+# попросту не закончился)
+from copy import copy
+from typing import Iterable, Any
+
+
+class ListInteger(list):
+    def __init__(self, iterable: Iterable[int]):
+        self._validate_iterable(iterable)
+        super().__init__(iterable)
+
+    def __setitem__(self, key: int, value: int):
+        self._validate_type(value)
+        super().__setitem__(key, value)
+
+    def append(self, __object: int) -> None:
+        self._validate_type(__object)
+        super().append(__object)
+
+    def _validate_iterable(self, iterable: Iterable[int]):
+        for value in copy(iterable):
+            self._validate_type(value)
+
+    @staticmethod
+    def _validate_type(value: Any, type_=int):
+        if type(value) is not type_:
+            raise TypeError('можно передавать только целочисленные значения')
+
+
+################################################################
+class ListInteger(list):
+    def __init__(self, *args):
+        [self.check_type(i) for i in list(*args)]
+        super().__init__(*args)
+
+    def __setitem__(self, key, value):
+        self.check_type(value)
+        super().__setitem__(key, value)
+
+    def append(self, value) -> None:
+        self.check_type(value)
+        super().append(value)
+
+    @staticmethod
+    def check_type(i):
+        if type(i) is not int:
+            raise TypeError('можно передавать только целочисленные значения')
+
+
+################################################################
+# Подвиг 4. Разрабатывается интернет-магазин. Каждый товар предполагается представлять классом Thing, объекты которого
+# создаются командой:thing = Thing(name, price, weight)где name - наименование товара (строка); price - цена
+# (вещественное число); weight - вес товара (вещественное число). В каждом объекте этого класса создаются аналогичные
+# атрибуты: name, price, weight.Класс Thing необходимо определить так, чтобы его объекты можно было использовать в
+# качестве ключей словаря, например:d = {}d[thing] = thingИ для каждого уникального набора данных name, price, weight
+# должны формироваться свои уникальные ключи.Затем, вам необходимо объявить класс словаря DictShop, унаследованный от
+# базового класса dict. В этом новом словаре ключами могут выступать только объекты класса Thing. При попытке указать
+# любой другой тип, генерировать исключение командой:raise TypeError('ключами могут быть только объекты класса Thing')
+# Объекты класса DictShop должны создаваться командами:dict_things = DictShop() # пустой словарь
+# dict_things = DictShop(things) # словарь с набором словаря thingsгде things - некоторый словарь. В инициализаторе
+# следует проверять, чтобы аргумент thing был словарем, если не так, то выбрасывать исключение:
+# raise TypeError('аргумент должен быть словарем')И проверять, чтобы все ключи являлись объектами класса Thing. Если
+# это не так, то генерировать исключение:raise TypeError('ключами могут быть только объекты класса Thing')
+# Дополнительно в классе DictShop переопределить метод:__setitem__()с проверкой, что создаваемый ключ является
+# объектом класса Thing. Иначе, генерировать исключение:raise TypeError('ключами могут быть только объекты класса
+# Thing')
+class Thing:
+    def __init__(self, name, price, weight):
+        self.name = name
+        self.price = price
+        self.weight = weight
+        self.weight = weight
+
+    def __hash__(self):
+        return hash((self.name, self.price, self.weight))
+
+    def __eq__(self, other):
+        if isinstance(other, Thing):
+            return (self.name == other.name and self.price == other.price and self.weight == other.weight)
+        return False
+
+
+# Если все три условия выполняются (имя, цена и вес равны), то возвращается значение True, указывая на то, что объекты
+# self и other равны(указание что это один и тот же объект с одним и тем же ключём у словаря).В противном случае, если
+# other не является экземпляром класса Thing, возвращается значение False,
+# указывая на то, что объекты различны или несравнимы по заданным критериям.
+# ни к чему не приводит без метода __eq__, именно этот метод сравнивает объекты при одинаковых атрибутах и записывает в
+# словарь только уникальные товары
+class DictShop(dict):
+    def __init__(self, dictions=None):
+        if dictions is None:
+            super().__init__()
+        else:
+            if not isinstance(dictions, dict):
+                raise TypeError('аргумент должен быть словарем')
+            if not all(map(lambda x: isinstance(x, Thing), dictions)):
+                # for key in dictions:
+                #     if not isinstance(key, Thing):
+                raise TypeError('ключами могут быть только объекты класса Thing')
+            super().__init__(dictions)
+
+    def __setitem__(self, key, value):
+        if not isinstance(key, Thing):
+            raise TypeError('ключами могут быть только объекты класса Thing')
+        super().__setitem__(key, value)
+
+
+th_1 = Thing('Лыжи', 11000, 1978.55)
+th_2 = Thing('Книга', 1500, 256)
+dict_things = DictShop()
+dict_things[th_1] = th_1
+dict_things[th_2] = th_2
+
+for x in dict_things:
+    print(x.name)
+################################################################
+class Thing:
+    def __init__(self, name, price, weight):
+        self.name, self.price, self.weight = name, price, weight
+
+    def __hash__(self):
+        return hash((self.name, self.price, self.weight))
+
+    def __eq__(self, other):
+        return hash(self) == hash(other)
+
+
+class DictShop(dict):
+    def __init__(self, dictionaries=None):
+        if dictionaries:
+            if not isinstance(dictionaries, dict):
+                raise TypeError('аргумент должен быть словарем')
+            if not all(map(lambda x: isinstance(x, Thing), dictionaries)):
+                raise TypeError('ключами могут быть только объекты класса Thing')
+        else:
+            dictionaries = {}
+            # super().__init__(dictionaries)
+
+    def __setitem__(self, key, value):
+        if not isinstance(key, Thing):
+            raise TypeError('ключами могут быть только объекты класса Thing')
+        super().__setitem__(key, value)
 ################################################################
 
 ################################################################
