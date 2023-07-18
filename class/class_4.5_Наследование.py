@@ -3619,7 +3619,7 @@ def class_log(lst):
     def dec_class(cls):  # class Vector
         method = {k: v for k, v in cls.__dict__.items() if callable(v)}
         for k, v in method.items():  # в methods помещаются все вызываемые методы из класса cls (__init__, __setitem__)
-            setattr(cls, k, dec_method(v, lst))  # __init__, __setitem__
+            setattr(cls, k, dec_method(v, lst))  # v = dec_method(v, lst)
 
         return cls
 
@@ -3748,23 +3748,179 @@ def class_log(vector_log):
         return cls
 
     return decor
-################################################################
 
 
 ################################################################
+# Здесь мы модифицировали наш старый декоратор таким образом, чтобы он выполнял декорируемую функцию iters раз, а затем
+# выводил среднее время выполнения. Однако чтобы добиться этого, пришлось воспользоваться природой функций в Python.
+# Функция benchmark() на первый взгляд может показаться декоратором, но на самом деле таковым не является. Это обычная
+# функция, которая принимает аргумент iters, а затем возвращает декоратор. В свою очередь, он декорирует функцию
+# fetch_webpage(). Поэтому мы использовали не выражение @benchmark, а @benchmark(iters=10) — это означает, что тут
+# вызывается функция benchmark() (функция со скобками после неё обозначает вызов функции), после чего она возвращает
+# сам декоратор.Да, это может быть действительно сложно уместить в голове, поэтому держите правило:
+# Декоратор принимает функцию в качестве аргумента и возвращает функцию.В нашем примере benchmark() не удовлетворяет
+# этому условию, так как она не принимает функцию в качестве аргумента. В то время как функция actual_decorator(),
+# которая возвращается benchmark(), является декоратором.
+
+
+def benchmark(iters):
+    def actual_decorator(func):
+        import time
+
+        def wrapper(*args, **kwargs):
+            total = 0
+            for i in range(iters):
+                start = time.time()
+                return_value = func(*args, **kwargs)
+                end = time.time()
+                total = total + (end - start)
+            print('[*] Среднее время выполнения: {} секунд.'.format(total / iters))
+            return return_value
+
+        return wrapper
+
+    return actual_decorator
+
+
+@benchmark(iters=10)
+def fetch_webpage(url):
+    import requests
+    webpage = requests.get(url)
+    return webpage.text
+
+
+webpage = fetch_webpage('https://google.com')
+print(webpage)
 
 ################################################################
+# Подвиг 10 (на повторение). В программе объявлены два класса и глобальная переменная:
+# CURRENT_OS = 'windows'   # 'windows', 'linux'Вам необходимо объявить класс с именем FileDialogFactory
+# (фабрика классов), который бы при выполнении команды:dlg = FileDialogFactory(title, path, exts)
+# возвращал объект класса WindowsFileDialog, если CURRENT_OS равна строке 'windows', в противном случае - объект
+# класса LinuxFileDialog. Объект самого класса FileDialogFactory создаваться не должен.Для реализации такой логики,
+# объявите внутри класса FileDialogFactory два статических метода:def create_windows_filedialog(title, path, exts)
+# - для создания объектов класса WindowsFileDialog;def create_linux_filedialog(title, path, exts) - для создания
+# объектов класса LinuxFileDialog.Эти методы следует вызывать в магическом методе __new__() класса FileDialogFactory.
+# Подумайте, как это правильно сделать, чтобы не создавался объект самого класса, а лишь возвращался объект или класса
+# WindowsFileDialog, или класса LinuxFileDialog.
+CURRENT_OS = 'windows'  # 'windows', 'linux'
+
+
+class WindowsFileDialog:
+    def __init__(self, title, path, exts):
+        self.__title = title  # заголовок диалогового окна
+        self.__path = path  # начальный каталог с файлами
+        self.__exts = exts  # кортеж из отображаемых расширений файлов
+
+
+class LinuxFileDialog:
+    def __init__(self, title, path, exts):
+        self.__title = title  # заголовок диалогового окна
+        self.__path = path  # начальный каталог с файлами
+        self.__exts = exts  # кортеж из отображаемых расширений файлов
+
+
+class FileDialogFactory:
+    def __new__(cls, *args, **kwargs):
+        if CURRENT_OS == 'windows':
+            return cls.create_windows_filedialog(*args, **kwargs)
+        else:
+            return cls.create_linux_filedialog(*args, **kwargs)
+
+    def __init__(self, title, path, exts):
+        self.title = title
+        self.path = path
+        self.exts = exts
+
+    @staticmethod
+    def create_windows_filedialog(title, path, exts):
+        return WindowsFileDialog(title, path, exts)
+
+    @staticmethod
+    def create_linux_filedialog(title, path, exts):
+        return LinuxFileDialog(title, path, exts)
+
+
+dlg = FileDialogFactory('Изображения', 'd:/images/', ('jpg', 'gif', 'bmp', 'png'))
+
 
 ################################################################
+class FileDialogFactory:
+    def __new__(cls, *args, **kwargs):
+        dlg_cls = {'windows': WindowsFileDialog, 'linux': LinuxFileDialog}
+        return dlg_cls[CURRENT_OS](*args, **kwargs)
+
+    def create_windows_filedialog(self, title, path, exts):
+        pass
+
+    def create_linux_filedialog(self, title, path, exts):
+        pass
+
 
 ################################################################
+class FileDialogFactory:
+    def __new__(cls, *args, **kwargs):
+        if CURRENT_OS == 'windows':
+            instance = super().__new__(WindowsFileDialog)
+            # ссылка на объект который вернет метод super() с переданным в качестве параметра WindowsFileDialog
+            return instance.__init__(*args, **kwargs)
+        else:
+            instance = super().__new__(LinuxFileDialog)
+            return instance.__init__(*args, **kwargs)
+
 
 ################################################################
+class FileDialogFactory:
+    def __new__(cls, *args, **kwargs):
+        return getattr(cls, f"create_{CURRENT_OS.lower()}_filedialog")(*args)
+
+    @staticmethod
+    def create_windows_filedialog(title, path, exts):
+        return WindowsFileDialog(title, path, exts)
+
+    @staticmethod
+    def create_linux_filedialog(title, path, exts):
+        return LinuxFileDialog(title, path, exts)
+
 
 ################################################################
+class FileDialogFactory:
+    def __new__(cls, *args):
+        return {'windows': cls.create_windows_filedialog(*args), 'linux': cls.create_linux_filedialog(*args)}[
+            CURRENT_OS]
+
+    @staticmethod
+    def create_windows_filedialog(title, path, exts):
+        return WindowsFileDialog(title, path, exts)
+
+    @staticmethod
+    def create_linux_filedialog(title, path, exts):
+        return LinuxFileDialog(title, path, exts)
+    # в словаре создаются сразу все объекты, лучше было бы в словаре хранить ссылку на класс (в вашем случае - ссылки
+    # на функции)
+
 
 ################################################################
+class FileDialogFactory:
+    def __new__(cls, *args):
+        return cls.create_filedialog({'windows': WindowsFileDialog, 'linux': LinuxFileDialog}[CURRENT_OS], *args)
 
+    @staticmethod
+    def create_filedialog(cls, title, path, exts):
+        return cls(title, path, exts)
+
+
+################################################################
+class FileDialogFactory:
+    def __new__(cls, *args, **kwargs):
+        if CURRENT_OS == 'windows':
+            return cls.create_filedialog(WindowsFileDialog, *args, **kwargs)
+        else:
+            return cls.create_filedialog(LinuxFileDialog, *args, **kwargs)
+
+    @staticmethod
+    def create_filedialog(cls, title, path, exts):
+        return cls(title, path, exts)
 ################################################################
 
 ################################################################
