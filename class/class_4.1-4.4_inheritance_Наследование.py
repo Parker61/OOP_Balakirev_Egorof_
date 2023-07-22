@@ -3921,18 +3921,251 @@ class FileDialogFactory:
     @staticmethod
     def create_filedialog(cls, title, path, exts):
         return cls(title, path, exts)
+
+
 ################################################################
+# ____4.6 Множественное наследование__Egorof
+class Product:
+    def __init__(self, name, price):
+        self.name = name
+        self.price = price
+
+    def get_price(self):
+        return self.price
+
+
+class Discount:
+    def apply_discount(self, discount):
+        self.price -= self.price * discount
+
+
+class DiscountedProduct(Product, Discount):
+    pass
+
+
+product1 = DiscountedProduct('Телефон', 10000)
+product1.apply_discount(0.1)
+print(product1.get_price())  # 9000
+
+
+################################################################
+# создать класс User, который принимает имя пользователя и пароль при инициализации, и имеет метод get_info(),
+# который возвращает строку в виде Имя пользователя: {self.username}Создайте класс Authentication, состоящий из одного
+# метода authenticate(). Данный метод принимает имя пользователя и пароль, и возвращает True, если пользователь
+# аутентифицирован успешно, и False, если аутентификация не удалась.Создайте пустой класс AuthenticatedUser, который
+# наследуется от классов Authentication и User
+class User:
+    def __init__(self, username, password):
+        self.username = username
+        self.password = password
+
+    def get_info(self):
+        return f'Имя пользователя: {self.username}'
+
+
+class Authentication(User):
+    def authenticate(self, username, password):
+        return True if username == self.username and password == self.password else False
+
+
+class AuthenticatedUser(Authentication, User):
+    pass
+
+
+# class AuthenticatedUser(User, Authentication):
+#     #TypeError: Cannot create a consistent method resolution order (MRO) for bases User, Authentication
+# Ошибка, с которой вы столкнулись, TypeError: Cannot create a consistent method resolution order (MRO) for bases User,
+# Authentication, возникает из-за того, как работает множественное наследование и порядок разрешения методов (MRO) в
+# Python.В Python, когда класс наследует от нескольких базовых классов, порядок этих классов определяет MRO.
+# MRO определяет порядок, в котором Python ищет методы и атрибуты в иерархии наследования.В вашем коде, когда вы
+# определяете класс AuthenticatedUser(Authentication, User), Python использует алгоритминеаризации C3 для определения
+# MRO. Алгоритм C3 гарантирует, что MRO сохраняет порядок базовых классов, сохраняет консистентность и разрешает
+# любые конфликты.Однако в этом случае MRO не может быть определен, потому что у классов Authentication и User есть
+# общий базовый класс (object), и они находятся на одном уровне в иерархии наследования.то создает неоднозначность при
+# расчете MRO и приводит к ошибке TypeError.Чтобы исправить эту проблему, вы можете изменить порядок базовых классов в
+# определении AuthenticatedUser на class AuthenticatedUser(User, Authentication).аким образом, вы приоритезируете класс
+# User перед классом Authentication в MRO, и ошибка больше не должна возникать.
+# Алгоритм C3 (C3 linearization algorithm) - это алгоритм, используемый Python для определения порядка разрешения
+# методов (MRO) при множественном наследовании. Он был разработан для обеспечения консистентного и предсказуемого
+# порядка разрешения методов в иерархии классов. Алгоритм C3 решает проблему неоднозначности, которая может возникнуть
+# при наличии общих базовых классов и разных путей наследования. Он строит линеаризацию, то есть линейный порядок, в
+# котором должны быть рассмотрены методы и атрибуты при вызове из экземпляра класса. Вкратце, алгоритм C3 работает
+# следующим образом:# Создается линейный список, называемый "линеаризацией", который будет содержать порядок
+# разрешения методов.Берется первый класс в списке наследования и добавляется в линеаризацию. Для каждого класса в
+# списке наследования проверяется его базовые классы.Если базовый класс уже присутствует в линеаризации или встречается
+# позже в списке наследования, он игнорируется.Если базовый класс не присутствует в линеаризации и не встречается
+# позже в списке наследования, он добавляется в линеаризацию. 6.аги 3-5 повторяются для каждого класса в списке
+# наследования.Полученная линеаризация является MRO.Алгоритм C3 гарантирует, что MRO сохраняет порядок базовых классов,
+# сохраняет консистентность и разрешает любые конфликты при множественном наследовании.
+
+assert issubclass(AuthenticatedUser, User) is True
+assert issubclass(AuthenticatedUser, Authentication) is True
+
+user1 = AuthenticatedUser('user1', 'password1')
+assert user1.get_info() == 'Имя пользователя: user1'
+assert user1.authenticate('user1', 'password2') is False
+assert user1.authenticate('user1', 'password1') is True
+
+ted = AuthenticatedUser('ted_lawyer', 'alligator3')
+print(ted.get_info())  # Имя пользователя: ted_lawyer
+
+
+################################################################
+#  Создайте базовый класс Person, у которого есть:метод __init__, принимающий имя и возраст человека. Их необходимо
+#  сохранить в атрибуты экземпляра nameи age соответственнометод display_person_info , который печатает информацию в
+#  следующем виде:Person: {name}, {age}Затем создайте класс Company , у которого есть:метод __init__, принимающий
+#  название компании и город ее основания. Их необходимо сохранить в атрибуты экземпляра company_name  и location
+#  соответственнометод display_company_info , который печатает информацию в следующем виде:
+#  Company: {company_name},  {location}И в конце создайте класс Employee , который:унаследован от классов
+#  Person и Company имеет метод __init__, принимающий имя человека, его возраст, название компании и город основания.
+#  Необходимо делегировать создание атрибутов nameи age  классу Person , а атрибуты company_name  и location должен
+#  создать класс Company
+class Person:
+    def __init__(self, name, age):
+        self.name = name
+        self.age = age
+
+    def display_person_info(self):
+        print(f'Person: {self.name}, {self.age}')
+
+
+class Company:
+    def __init__(self, company_name, location):
+        self.company_name = company_name
+        self.location = location
+
+    def display_company_info(self):
+        print(f'Company: {self.company_name}, {self.location}')
+
+
+class Employee(Person, Company):
+    def __init__(self, name, age, company_name, location):
+        super(Employee, self).__init__(name, age)
+        Company.__init__(self, company_name, location)
+
+
+emp = Employee('Jessica', 28, 'Google', 'Atlanta')
+emp.display_person_info()
+emp.display_company_info()
+
+
+################################################################
+class Person:
+    def __init__(self, *args):
+        self.name, self.age = args
+
+    def display_person_info(self):
+        print(f'Person: {self.name}, {self.age}')
+
+
+class Company:
+    def __init__(self, *args):
+        self.company_name, self.location = args
+
+    def display_company_info(self):
+        print(f'Company: {self.company_name}, {self.location}')
+
+
+class Employee(Person, Company):
+    def __init__(self, *args):
+        Person.__init__(self, *args[:2])
+        Company.__init__(self, *args[2:])
+
 
 ################################################################
 
-################################################################
+class Employee(Person, Company):
+    def __init__(self, name, age, company_name, location):
+        super().__init__(name, age)
+        Company.__init__(self, company_name, location)
+
 
 ################################################################
+# 4.7 MRO - порядок разрешения методов
 
-################################################################
+class O: ...
 
-################################################################
 
+class A(O): ...
+
+
+class B(O): ...
+
+
+class C(O): ...
+
+
+class D(O): ...
+
+
+class E(O): ...
+
+
+class K1(C, A, B): ...
+
+
+class K2(A, D): ...
+
+
+class K3(B, D, E): ...
+
+
+class Z(K1, K2, K3): ...
+
+
+print(Z.mro())
+"""[<class '__main__.Z'>, <class '__main__.K1'>, <class '__main__.C'>, 
+<class '__main__.K2'>, <class '__main__.A'>, <class '__main__.K3'>, 
+<class '__main__.B'>, <class '__main__.D'>, <class '__main__.E'>, <class '__main__.O'>, <class 'object'>]"""
+
+
+def get_mro(class_name):
+    print(*[cl.__name__ for cl in class_name.mro()], sep=' -> ')
+# Z -> K1 -> C -> K2 -> A -> K3 -> B -> D -> E -> O -> object
+
+get_mro(Z)
+get_mro(K3)
+
+
+class Music(object): pass
+
+
+class Rock(Music): pass
+
+
+class Gothic(Music): pass
+
+
+class Metal(Rock): pass
+
+
+class GothicRock(Rock, Gothic): pass
+
+
+class GothicMetal(Metal, Gothic): pass
+
+
+class The69Eyes(GothicRock, GothicMetal): pass
+
+
+print(The69Eyes.mro())
+
+
+def get_mro(class_name):
+    print(*[cl.__name__ for cl in class_name.mro()], sep=' -> ')
+
+
+get_mro(The69Eyes)
+# [<class '__main__.Z'>, <class '__main__.K1'>, <class '__main__.C'>, <class '__main__.K2'>, <class '__main__.A'>,
+# <class '__main__.K3'>, <class '__main__.B'>, <class '__main__.D'>, <class '__main__.E'>, <class '__main__.O'>,
+# <class 'object'>]
+# Z -> K1 -> C -> K2 -> A -> K3 -> B -> D -> E -> O -> object
+# K3 -> B -> D -> E -> O -> object
+
+# [<class '__main__.The69Eyes'>, <class '__main__.GothicRock'>, <class '__main__.GothicMetal'>, <class '__main__.
+# Metal'>, <class '__main__.Rock'>, <class '__main__.Gothic'>, <class '__main__.Music'>, <class 'object'>]
+
+# The69Eyes -> GothicRock -> GothicMetal -> Metal -> Rock -> Gothic -> Music -> object
 ################################################################
 
 ################################################################
