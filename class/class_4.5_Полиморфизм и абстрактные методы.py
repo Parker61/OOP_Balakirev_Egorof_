@@ -316,15 +316,19 @@ class AbstractClass(ABC):
 # abstract_class_method() - это абстрактный метод уровня класса. Обратите внимание на порядок использования декораторов
 # classmethod и abstractmethod. Они должны быть записаны именно в такой последовательности.Теперь, если объявить
 # какой-либо дочерний класс, например:
-# # class Bus(Transport):
-#     def __init__(self, model, speed):
-#         self._model = model
-#         self._speed = speed
-# #     def go(self):
-#         print("bus go")
-# #     @classmethod
-#     def abstract_class_method(cls):
-#         pass
+class Bus(Transport):
+    def __init__(self, model, speed):
+        self._model = model
+        self._speed = speed
+
+    def go(self):
+        print("bus go")
+
+    @classmethod
+    def abstract_class_method(cls):
+        pass
+
+
 # То в нем обязательно нужно переопределить абстрактные методы go и abstract_class_method класса Transport. Иначе,
 # объект класса Bus не будет создан (возникнет исключение TypeError).Используя эту информацию, объявите базовый
 # класс Model (модель), в котором нужно объявить один абстрактный метод с сигнатурой:def get_pk(self): ...
@@ -335,6 +339,22 @@ class AbstractClass(ABC):
 # автоматически появляться локальный атрибут _id с уникальным целочисленным значением для каждого объекта класса
 # ModelForm.В классе ModelForm переопределите метод:def get_pk(self): ...который должен возвращать значение атрибута _id
 
+# С помощью модуля abc можно определять не только абстрактные методы, но и абстрактные объекты-свойства (property)
+from abc import ABC, abstractmethod
+
+
+class Transport(ABC):
+    @abstractmethod
+    def go(self):
+        """Метод для перемещения транспортного средства"""
+
+    @property
+    @abstractmethod
+    def speed(self):
+        """Абстрактный объект-свойство"""
+
+
+################################################################
 from abc import ABC, abstractmethod
 
 
@@ -720,34 +740,720 @@ class Stack(StackInterface):
             self.tail = self.tail.prev
             self.tail.next = None
         return last
-################################################################################################
 
-################################################################################
 
 ################################################################################################
+# Подвиг 8. С помощью модуля abc можно определять не только абстрактные методы, но и абстрактные объекты-свойства
+# (property). Делается это следующим образом:
+# from abc import ABC, abstractmethod
+#
+#
+# class Transport(ABC):
+#     @abstractmethod
+#     def go(self):
+#         """Метод для перемещения транспортного средства"""
+#
+#     @property
+#     @abstractmethod
+#     def speed(self):
+#         """Абстрактный объект-свойство"""
+# Используя эту информацию и информацию о модуле abc из подвига 6, объявите базовый класс с именем CountryInterface со
+# следующими абстрактными методами и свойствами:name - абстрактное свойство (property), название страны (строка);
+# population - абстрактное свойство (property), численность населения (целое положительное число);
+# square - абстрактное свойство (property), площадь страны (положительное число);get_info() - абстрактный метод
+# для получения сводной информации о стране.На основе класса CountryInterface объявите дочерний класс Country,
+# объекты которого создаются командой:country = Country(name, population, square)В самом классе Country должны быть
+# переопределены следующие свойства и методы базового класса:name - свойство (property) для считывания названия
+# страны (строка);population - свойство (property) для записи и считывания численности населения
+# (целое положительное число);square - свойство (property) для записи и считывания площади страны
+# (положительное число);get_info() - метод для получения сводной информации о стране в виде строки:
+# "<название>: <площадь>, <численность населения>"
+from abc import ABC, abstractmethod
+
+
+class CountryInterface(ABC):
+
+    @property
+    @abstractmethod
+    def name(self): ...
+
+    @property
+    @abstractmethod
+    def population(self): ...
+
+    @property
+    @abstractmethod
+    def square(self): ...
+
+    @abstractmethod
+    def get_info(self): ...
+
+
+class Country(CountryInterface):
+    def __init__(self, name, population, square):
+        self._name = name
+        self._population = population
+        self._square = square
+
+    @property
+    def name(self):
+        return self._name
+
+    @name.setter
+    def name(self, value):
+        self._name = value
+
+    @property
+    def population(self):
+        return self._population
+
+    @population.setter
+    def population(self, value):
+        self._population = value
+
+    @property
+    def square(self):
+        return self._square
+
+    @square.setter
+    def square(self, value):
+        self._square = value
+
+    def get_info(self):
+        return f"{self.name}: {self.square}, {self.population}"
+
+
+country = Country("Россия", 140000000, 324005489.55)
+name = country.name
+pop = country.population
+country.population = 150000000
+country.square = 354005483.0
+print(country.get_info())  # Россия: 354005483.0, 150000000
 
 ################################################################################
+from abc import ABC, abstractmethod, abstractproperty
+
+
+class CountryInterface(ABC):
+
+    @abstractmethod
+    def name(self):
+        '''Не определено объект-свойство для записи и считывания название страны'''
+
+    @abstractmethod
+    def population(self):
+        '''Не определено объект-свойство для записи и считывания численности населения'''
+
+    @abstractmethod
+    def square(self):
+        '''Не определено объект-свойство для записи и считывания площади страны'''
+
+    @abstractmethod
+    def get_info(self):
+        '''Не определен метод get_info для получения сводной информации о стране.'''
+
+
+class Country(CountryInterface):
+
+    def __init__(self, name, population, square):
+        self._name = name
+        self.population = population
+        self.square = square
+
+    # population и square - это свойства. Так как для них определен сеттер, то то при инициализации значение присваивается
+    # атрибуту, определенному в сеттере. Если сеттера нет тогда значение свойству нужно присваивать напрямую через
+    # подчеркивание (как для _name - там только геттер)
+    @property
+    def name(self):
+        return self._name
+
+    @property
+    def population(self):
+        return self._population
+
+    @population.setter
+    def population(self, population):
+        self._population = population
+
+    @property
+    def square(self):
+        return self._square
+
+    @square.setter
+    def square(self, square):
+        self._square = square
+
+    def get_info(self):
+        return f'{self.name}: {self.square}, {self.population}'
+
 
 ################################################################################################
+class Descriptor:
+    def __set_name__(self, owner, name):
+        self.name = f'_{name}'
+
+    def __get__(self, instance, owner):
+        return property() if instance is None else getattr(instance, self.name)
+
+    def __set__(self, instance, new_value):
+        setattr(instance, self.name, new_value)
+
+
+class Country(CountryInterface, ABC):
+    name, population, square = Descriptor(), Descriptor(), Descriptor()
+
+    def __init__(self, *args):
+        self.name, self.population, self.square = args
+
+    def get_info(self):
+        return f"{self.name}: {self.square}, {self.population}"
+
 
 ################################################################################
+# Подвиг 9 (на повторение). Вам поручают разработать класс для представления маршрутов в навигаторе. Для этого
+# требуется объявить класс с именем Track, объекты которого могут создаваться командами:tr = Track(start_x, start_y)
+# tr = Track(pt1, pt2, ..., ptN)где start_x, start_y - начальная координата маршрута (произвольные числа);
+# pt1, pt2, ..., ptN - набор из произвольного числа точек (координат) маршрута (объекты класса PointTrack).
+# При передаче аргументов (start_x, start_y) координата должна представляться первым объектом класса PointTrack.
+# Наборы всех точек (объектов PointTrack) должны сохраняться в локальном приватном атрибуте объекта класса Track:
+# __points - список из точек (координат) маршрута.Далее, каждая точка (координата) должна определяться классом
+# PointTrack, объекты которого создаются командой:pt = PointTrack(x, y)где x, y - числа (целые или вещественные).
+# Если передается другой тип данных, то должно генерироваться исключение командой:
+# raise TypeError('координаты должны быть числами')В классе PointTrack переопределите магический метод __str__,
+# чтобы информация об объекте класса возвращалась в виде строки:"PointTrack: <x>, <y>"Например:
+pt = PointTrack(1, 2)
+print(pt)  # PointTrack: 1, 2
+
+
+# В самом классе Track должно быть свойство (property) с именем:points - для получения кортежа из точек маршрута.
+# Также в классе Track должны быть методы:def add_back(self, pt) - добавление новой точки в конец маршрута
+# (pt - объект класса PointTrack);def add_front(self, pt) - добавление новой точки в начало маршрута
+# (pt - объект класса PointTrack);def pop_back(self) - удаление последней точки из маршрута;def pop_front(self)
+# - удаление первой точки из маршрута.Пример использования классов (эти строчки в программе писать не нужно):
+class Track:
+    def __init__(self, *args):
+        self.__points = list(args)
+
+    @property
+    def points(self):
+        return tuple(self.__points)
+
+    def add_back(self, pt):
+        self.__points.append(pt)
+
+    def add_front(self, pt):
+        self.__points.insert(0, pt)
+
+    def pop_back(self):
+        self.__points.pop()
+
+    def pop_front(self):
+        self.__points.pop(0)
+
+
+class PointTrack:
+    def __init__(self, x, y):
+        if type(x) not in (int, float) or type(y) not in (int, float):
+            raise TypeError('координаты должны быть числами')
+        self.x = x
+        self.y = y
+
+    def __str__(self):
+        return f"PointTrack: {self.x}, {self.y}"
+
+
+tr = Track(PointTrack(0, 0), PointTrack(1.2, -0.5), PointTrack(2.4, -1.5))
+tr.add_back(PointTrack(1.4, 0))
+tr.pop_front()
+for pt in tr.points:
+    print(pt)
+
 
 ################################################################################################
+class Track:
+    def __init__(self, *args):
+        self.__points = list(args)
+
+    def __setattr__(self, name, val):
+        if isinstance(val[0], PointTrack):
+            super().__setattr__(name, val)
+        else:
+            super().__setattr__(name, [PointTrack(val[0], val[1])])
+
+    # В данном коде super().__setattr__(name, [PointTrack(val[0], val[1])]) используется для вызова метода __setattr__
+    # родительского класса и установки значения атрибута name равным [PointTrack(val[0], val[1])].Это делается для
+    # обеспечения правильной инициализации атрибута __points в классе Track. Если переданный аргумент val не является
+    # экземпляром класса PointTrack, то создается новый объект PointTrack с координатами val[0] и val[1], и этот объект
+    # становится значением атрибута __points. Таким образом, при создании объекта класса Track можно передать либо
+    # начальные координаты маршрута (start_x и start_y), либо набор точек маршрута (pt1, pt2, ..., ptN).
+    # В обоих случаях аргументы будут корректно преобразованы в объекты класса PointTrack и сохранены в
+    # атрибуте __points.
+    @property
+    def points(self):
+        return tuple(self.__points)
+
+    def add_back(self, pt):
+        self.__points.append(pt)
+
+    def add_front(self, pt):
+        self.__points.insert(0, pt)
+
+    def pop_back(self):
+        self.__points.pop()
+
+    def pop_front(self):
+        self.__points.pop(0)
+
+
+class PointTrack:
+    def __init__(self, x, y):
+        self.valid(x, y)
+        self.x = x
+        self.y = y
+
+    @staticmethod
+    def valid(x, y):
+        if type(x) not in (int, float) or type(y) not in (int, float):
+            raise TypeError('координаты должны быть числами')
+
+    def __str__(self):
+        return f'PointTrack: {self.x}, {self.y}'
+
 
 ################################################################################
+class Track:
+
+    def __init__(self, *args):
+        if all(isinstance(arg, (int, float)) for arg in args):
+            self.__points = [PointTrack(*args)]
+        if all(isinstance(arg, PointTrack) for arg in args):
+            self.__points = [*args]
+
+    @property
+    def points(self):
+        return tuple(self.__points)
+
+    def add_back(self, pt):
+        self.__points.append(pt)
+
+    def add_front(self, pt):
+        self.__points.insert(0, pt)
+
+    def pop_back(self):
+        return self.__points.pop()
+
+    def pop_front(self):
+        return self.__points.pop(0)
+
+
+class PointTrack:
+
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
+    def __setattr__(self, key, value):
+        if key in ('x', 'y'):
+            if not isinstance(value, (int, float)):
+                raise TypeError('координаты должны быть числами')
+        super().__setattr__(key, value)
+
+    def __str__(self):
+        return f"PointTrack: {self.x}, {self.y}"
+
 
 ################################################################################################
+# Понимаю, что с двусвязными списками никто не хочет замарачиваться. Но настоящие герои всегда идут в обход
+# (с)Бармалей из фильма "Айболит-66" :)Не поленился и сравнил:
+# Количество итераций = 200_000 (по 100_000 добавлений в начало и конец). Двусвязный список: 0.9304535388946533
+# Количество итераций = 200_000 (по 100_000 добавлений в начало и конец). Список (list): 16.014753818511963
+class PointTrack:
+    __slots__ = ('__x', '__y', '__next', '__prev')
+
+    def __init__(self, x, y):
+        self.__x = x
+        self.__y = y
+        self.__next = self.__prev = None
+
+    @property
+    def x(self):
+        return self.__x
+
+    @x.setter
+    def x(self, value):
+        self.__x = value
+
+    @property
+    def y(self):
+        return self.__y
+
+    @y.setter
+    def y(self, value):
+        self.__y = value
+
+    @property
+    def next(self):
+        return self.__next
+
+    @next.setter
+    def next(self, value):
+        self.__next = value
+
+    @property
+    def prev(self):
+        return self.__prev
+
+    @prev.setter
+    def prev(self, value):
+        self.__prev = value
+
+    def __setattr__(self, key, value):
+        if key in ('_PointTrack__next', '_PointTrack__prev') and not (isinstance(value, PointTrack) or value is None):
+            raise TypeError(f"Ошибочный атрибут указателя {value}")
+        elif key in ('_PointTrack__x', '_PointTrack__y') and not isinstance(value, (int, float)):
+            raise TypeError('координаты должны быть числами')
+        object.__setattr__(self, key, value)
+
+    def __repr__(self):
+        return f'PointTrack: {self.__x}, {self.__y}'
+
+
+class Track:
+
+    def __init__(self, *args):
+        if type(args[0]) in (int, float) and type(args[1]) in (int, float):
+            self.top = self.tail = PointTrack(args[0], args[1])
+            slice = 2
+        else:
+            slice = 0
+            self.top = self.tail = None
+        for pt in args[slice:]:
+            self.add_back(pt)
+        self.__points = []
+
+    def add_back(self, point):
+        if not self.tail:
+            self.top = self.tail = point
+            return
+        point.prev = self.tail
+        self.tail.next = point
+        self.tail = point
+
+    def add_front(self, point):
+        if not self.top:
+            self.top = self.tail = point
+            return
+        self.top.prev = point
+        point.next = self.top
+        self.top = point
+
+    def pop_front(self):
+        if not self.top:
+            return None
+        point = self.top
+        self.top = self.top.next
+        self.top.prev = None
+        return point
+
+    def pop_back(self):
+        if not self.tail:
+            return None
+        point = self.tail
+        self.tail = self.tail.prev
+        self.tail.next = None
+        return point
+
+    @property
+    def points(self):
+        point = self.top
+        lst = [point]
+        while point.next:
+            point = point.next
+            lst.append(point)
+        return tuple(lst)
+
 
 ################################################################################
+class PointTrack:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
+    def __setattr__(self, key, value):
+        if key in ("x", "y") and type(value) not in (int, float):
+            raise TypeError('координаты должны быть числами')
+        return object.__setattr__(self, key, value)
+
+    def __str__(self):
+        return f"PointTrack: {self.x}, {self.y}"
+
+
+class Track:
+    def __init__(self, *args):
+        self.__points = []
+        if len(args) == 2:
+            self.__points.append(PointTrack(*args))
+        else:
+            for p in args:
+                self.__points.append(p)
+
+    @property
+    def points(self):
+        return tuple(self.__points)
+
+    def add_back(self, pt):
+        self.__points.append(pt)
+
+    def add_front(self, pt):
+        self.__points.insert(0, pt)
+
+    def pop_back(self):
+        self.__points.pop()
+
+    def pop_front(self):
+        self.__points.pop(0)
+
 
 ################################################################################################
+# По описанию методов класса Track на ум пришёл односвязный список.
+class Stack:
+    def __init__(self):
+        self._top = self._end = None
+
+    def push_back(self, obj):
+        if self._top is None:
+            self._top = self._end = obj
+        else:
+            self._end._next = obj
+            self._end = obj
+
+    def push_front(self, obj):
+        if self._top is None:
+            self._top = self._end = obj
+        else:
+            obj._next = self._top
+            self._top = obj
+
+    def pop_back(self):
+        if self._top is None:
+            raise IndexError('Стек пуст')
+        current = self._top
+        if self._top == self._end:
+            self._top = self._end = None
+        else:
+            while current._next != self._end:
+                current = current._next
+            current._next = None
+            current, self._end = self._end, current
+        return current
+
+    def pop_front(self):
+        if self._top is None:
+            raise IndexError('Стек пуст')
+        current = self._top
+        if self._top == self._end:
+            self._top = self._end = None
+        else:
+            self._top = current._next
+        return current
+
+    def __len__(self):
+        k = 0
+        for _ in self:
+            k += 1
+        return k
+
+    def __iter__(self):
+        x = self._top
+        while x is not None:
+            yield x
+            x = x._next
+
+    def __str__(self):
+        return str([str(x) for x in self])
+
+
+class Track:
+    def __init__(self, *args):
+        self.__points = Stack()
+        if len(args) == 2 and all(type(x) != PointTrack for x in args):
+            self.add_back(PointTrack(*args))
+        else:
+            for p in args:
+                self.add_back(p)
+
+    def add_back(self, obj):
+        if not isinstance(obj, PointTrack):
+            raise TypeError('Объект не является PointTrack')
+        self.__points.push_back(obj)
+
+    def add_front(self, obj):
+        if not isinstance(obj, PointTrack):
+            raise TypeError('Объект не является PointTrack')
+        self.__points.push_front(obj)
+
+    def pop_back(self):
+        self.__points.pop_back()
+
+    def pop_front(self):
+        self.__points.pop_front()
+
+    @property
+    def points(self):
+        return tuple(self.__points)
+
+    def __str__(self):
+        return str(self.__points)
+
+
+class PointTrack:
+    def __init__(self, x, y):
+        self.x, self.y = x, y
+        self._next = None
+
+    def __setattr__(self, key, value):
+        if key in 'xy' and not isinstance(value, (int, float)):
+            raise TypeError('координаты должны быть числами')
+        object.__setattr__(self, key, value)
+
+    def __str__(self): return f"PointTrack: {self.x}, {self.y}"
+
 
 ################################################################################
+# Подвиг 10 (на повторение, релакс). Объявите класс с именем Food (еда), объекты которого создаются командой:
+# food = Food(name, weight, calories)где name - название продукта (строка); weight - вес продукта (любое
+# положительное число); calories - калорийная ценность продукта (целое положительное число).Объявите следующие
+# дочерние классы с именами:BreadFood - хлеб;SoupFood - суп;FishFood - рыба.Объекты этих классов должны создаваться
+# командами:bf = BreadFood(name, weight, calories, white) # white - True для белого хлеба, False - для остальных
+# sf = SoupFood(name, weight, calories, dietary) # dietary - True для диетического супа, False - для других видов
+# ff = FishFood(name, weight, calories, fish) # fish - вид рыбы (семга, окунь, сардина и т.д.)В каждом объекте этих
+# дочерних классов должны формироваться соответствующие локальные атрибуты с именами:BreadFood: _name,
+# _weight, _calories, _whiteSoupFood: _name, _weight, _calories, _dietaryFishFood: _name, _weight, _calories, _fish
+class Food:
+    def __init__(self, name, weight, calories):
+        self._name = name
+        self._weight = weight
+        self._calories = calories
+
+
+class BreadFood(Food):
+    def __init__(self, name, weight, calories, white):
+        super().__init__(name, weight, calories)
+        self._white = white
+
+
+class SoupFood(Food):
+    def __init__(self, name, weight, calories, dietary):
+        super().__init__(name, weight, calories)
+        self._dietary = dietary
+
+
+class FishFood(Food):
+    def __init__(self, name, weight, calories, fish):
+        super().__init__(name, weight, calories)
+        self._fish = fish
+
+
+bf = BreadFood("Бородинский хлеб", 34.5, 512, False)
+sf = SoupFood("Черепаший суп", 520, 890.5, False)
+ff = FishFood("Консерва рыбная", 340, 1200, "семга")
+
 
 ################################################################################################
+class Food:
+    pAttrs = tuple(("_name", "_weight", "_calories"))
+    cAttrs = tuple()
+
+    def __init__(self, *args):
+        self.__dict__.update(dict(zip(self.pAttrs + self.cAttrs, args)))
+
+
+class BreadFood(Food): cAttrs = tuple(("_white",))
+
+
+class SoupFood(Food): cAttrs = tuple(("_dietary",))
+
+
+class FishFood(Food): cAttrs = tuple(("_fish",))
+
 
 ################################################################################
+from typing import Union
 
+from dataclasses import dataclass  # Модуль dataclasses в Python, создание типов данных
+
+
+# Атрибуты класса - переменные для использования в этих сгенерированных методах определяются с использованием аннотаций
+# типов. Декоратор @dataclass помимо прочего, добавит метод __init__(),
+
+@dataclass
+class Food:
+    _name: str
+
+    _weight: Union[int, float]
+
+    _calories: int
+
+
+@dataclass
+class BreadFood(Food):
+    _white: bool
+
+
+@dataclass
+class SoupFood(Food):
+    _dietary: bool
+
+
+@dataclass
+class FishFood(Food):
+    _fish: str
+
+
+################################################################################################
+class Food:
+    add_attr = None
+
+    def __init__(self, *args):
+        self._name, self._weight, self._calories = args[:3]
+        if self.add_attr:
+            setattr(self, self.add_attr, args[3])
+
+
+class BreadFood(Food):
+    add_attr = '_white'
+
+
+class SoupFood(Food):
+    add_attr = '_dietary'
+
+
+class FishFood(Food):
+    add_attr = '_fish'
+
+
+################################################################################
+class Food:
+    attr = None
+
+    def __init__(self, n, w, c, x=None):
+        self._name = n
+        self._weight = w
+        self._calories = c
+        if x is not None:
+            setattr(self, self.attr, x)
+
+
+class BreadFood(Food):
+    attr = '_white'
+
+
+class SoupFood(Food):
+    attr = '_dietary'
+
+
+class FishFood(Food):
+    attr = '_fish'
 ################################################################################################
 
 ################################################################################

@@ -3924,7 +3924,8 @@ class FileDialogFactory:
 
 
 ################################################################
-# ____4.6 Множественное наследование__Egorof
+# ____4.6 Множественное наследование__Egorof____
+
 class Product:
     def __init__(self, name, price):
         self.name = name
@@ -4121,6 +4122,8 @@ print(Z.mro())
 
 def get_mro(class_name):
     print(*[cl.__name__ for cl in class_name.mro()], sep=' -> ')
+
+
 # Z -> K1 -> C -> K2 -> A -> K3 -> B -> D -> E -> O -> object
 
 get_mro(Z)
@@ -4156,6 +4159,8 @@ def get_mro(class_name):
 
 
 get_mro(The69Eyes)
+
+
 # [<class '__main__.Z'>, <class '__main__.K1'>, <class '__main__.C'>, <class '__main__.K2'>, <class '__main__.A'>,
 # <class '__main__.K3'>, <class '__main__.B'>, <class '__main__.D'>, <class '__main__.E'>, <class '__main__.O'>,
 # <class 'object'>]
@@ -4167,152 +4172,2723 @@ get_mro(The69Eyes)
 
 # The69Eyes -> GothicRock -> GothicMetal -> Metal -> Rock -> Gothic -> Music -> object
 ################################################################
+# __Balakiref___ 4.6 Множественное наследование____
+class A:
+    def __init__(self):
+        print("A")
+        super().__init__()
 
+
+class B:
+    def __init__(self):
+        print("B")
+        super().__init__()
+
+
+class C(A, B):
+    def __init__(self):
+        print("C")
+        super().__init__()
+
+
+c = C()  # C A B
+
+
+##############################################################
+class O:
+    def method(self):
+        print('O', end=' ')
+
+
+class A(O):
+    def method(self):
+        super().method()
+        print('A', end=' ')
+
+
+class B(O):
+    def method(self):
+        super().method()
+        print('B', end=' ')
+
+
+class C(A, B):
+    def method(self):
+        super().method()
+        print('C', end=' ')
+
+
+c = C()
+c.method()  # O B A C - обратный порядок относительно C->A->B->O->object
+print()
+print('->'.join([x.__name__ for x in C.mro()]))  # C->A->B->O->object
+
+
+################################################################
+class A:
+    def __init__(self, name, old):
+        # super().__init__()
+        self.name = name
+        self.old = old
+
+
+class B:
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+
+class C(B, A):
+    def __init__(self, name, old, weight, height):
+        super().__init__(name, old)
+        self.weight = weight
+        self.height = height
+
+
+person = C("Balakirev", 33, 80, 185)
+
+
+# последовательность вызова классов
+# (<class '__main__.C'>, <class '__main__.B'>, <class '__main__.A'>, <class 'object'>)
+
+################################################################
+# Подвиг 4. С помощью множественного наследования удобно описывать принадлежность объектов к нескольким разным группам.
+# Выполним такой пример.Определите в программе классы в соответствии с их иерархией, представленной на рисунке выше:
+# Digit, Integer, Float, Positive, NegativeКаждый объект этих классов должен создаваться однотипной командой вида:
+# obj = Имя_класса(value)где value - числовое значение. В каждом классе следует делать свою проверку на корректность
+# значения value:- в классе Digit: value - любое число;- в классе Integer: value - целое число;- в классе Float:
+# value - вещественное число;- в классе Positive: value - положительное число;- в классе Negative:
+# value - отрицательное число.Если проверка не проходит, то генерируется исключение командой:
+# raise TypeError('значение не соответствует типу объекта')После этого объявите следующие дочерние классы:
+# PrimeNumber - простые числа; наследуется от классов Integer и Positive;FloatPositive - наследуется от классов Float
+# и Positive.Создайте три объекта класса PrimeNumber и пять объектов класса FloatPositive с произвольными
+# допустимыми для них значениями. Сохраните все эти объекты в виде списка digits.Затем, используя функции
+# isinstance() и filter(), сформируйте следующие списки из указанных объектов:lst_positive - все объекты,
+# относящиеся к классу Positive;lst_float - все объекты, относящиеся к классу Float.
+class Digit:
+    def __init__(self, value):
+        if type(value) not in [int, float, complex]:
+            raise TypeError('значение не соответствует типу объекта')
+        self.value = value
+
+
+class Integer(Digit):
+    def __init__(self, value):
+        if type(value) not in [int]:
+            raise TypeError('значение не соответствует типу объекта')
+        super().__init__(value)
+
+
+class Float(Digit):
+    def __init__(self, value):
+        if type(value) not in [float]:
+            raise TypeError('значение не соответствует типу объекта')
+        super().__init__(value)
+
+
+class Positive(Digit):
+    def __init__(self, value):
+        if value < 0:  # не положительное число;
+            raise TypeError('значение не соответствует типу объекта')
+        super().__init__(value)
+
+
+class Negative(Digit):
+    def __init__(self, value):
+        if value > 0:  # не отрицательное число.
+            raise TypeError('значение не соответствует типу объекта')
+        super().__init__(value)
+
+
+class PrimeNumber(Integer, Positive):
+    def __init__(self, value):
+        # Дополнительная проверка на простое число
+        if not self.is_prime(value):
+            raise TypeError('значение не соответствует типу объекта')
+        super().__init__(value)
+
+    @staticmethod
+    def is_prime(num):
+        if num < 2:
+            return False
+        for i in range(2, int(num ** 0.5) + 1):
+            if num % i == 0:
+                return False
+        return True
+
+
+class FloatPositive(Float, Positive): ...
+
+
+digits = [PrimeNumber(3), PrimeNumber(5), PrimeNumber(7), FloatPositive(1.5), FloatPositive(9.2), FloatPositive(6.5),
+          FloatPositive(3.5), FloatPositive(8.9)]
+
+lst_positive = list(filter(lambda x: isinstance(x, Positive), digits))
+
+lst_float = list(filter(lambda x: Float in x.__class__.__mro__, digits))
+print(PrimeNumber.__class__.__mro__)  # (<class 'type'>, <class 'object'>)
+print(Float in PrimeNumber.__mro__)  # False
+print(PrimeNumber.__mro__)  # (<class '__main__.PrimeNumber'>, <class '__main__.Integer'>,..
+
+print(len(lst_positive))
+print(lst_positive)
+print(len(lst_float))
+print(lst_float)
+
+
+################################################################
+class Digit:
+    def __init__(self, value):
+        self._value = value
+
+    def __setattr__(self, name, value):
+        if not self._check_value(value):
+            raise TypeError('значение не соответствует типу объекта')
+        super().__setattr__(name, value)
+
+    def _check_value(self, value):
+        return type(value) in (int, float)
+
+
+class Integer(Digit):
+    def _check_value(self, value):
+        return super()._check_value(value) and type(value) is int
+
+
+class Float(Digit):
+    def _check_value(self, value):
+        return super()._check_value(value) and type(value) is float
+
+
+class Positive(Digit):
+    def _check_value(self, value):
+        return super()._check_value(value) and value > 0
+
+
+class Negative(Digit):
+    def _check_value(self, value):
+        return super()._check_value(value) and value < 0
+
+
+class PrimeNumber(Integer, Positive):
+    pass
+
+
+class FloatPositive(Float, Positive):
+    pass
+
+
+digits = [PrimeNumber(1), PrimeNumber(2), PrimeNumber(3),
+          FloatPositive(1.2), FloatPositive(1.3), FloatPositive(1.4),
+          FloatPositive(1.5), FloatPositive(1.6)]
+
+lst_positive = list(filter(lambda x: isinstance(x, Positive), digits))
+lst_float = list(filter(lambda x: isinstance(x, Float), digits))
+
+
+################################################################
+def type_error(value, types=(int, float), fltr=lambda x: True):
+    if not (isinstance(value, types) and fltr(value)):
+        raise TypeError('значение не соответствует типу объекта')
+
+
+# Параметр fltr=lambda x: True в функции type_error определяет фильтрующую функцию, которая определяет, удовлетворяет
+# ли значение дополнительным критериям помимо его типа.В предоставленном коде параметр fltr используется в некоторых
+# подклассах класса Digit, чтобы ограничить принимаемые значения. Он позволяет настраивать фильтрацию на основе
+# конкретных условий.Например, в подклассе Positive параметр fltr определен как lambda x: x > 0, что означает, что
+# только значения, большие нуля, будут проходить через фильтр. Аналогично, в подклассе Negative параметр fltr
+# определен как lambda x: x < 0, поэтому только значения меньше нуля будут проходить через фильтр.В других подклассах,
+# таких как PrimeNumber и FloatPositive, параметр fltr не используется, и все значения соответствующих типов
+# (Integer и Float соответственно) будут приняты без дополнительной фильтрации.fltr=lambda x: True - это параметр по
+# умолчанию, который используется, когда нет необходимости в пользовательской фильтрации. Он обеспечивает возможность
+# вызова функции type_error без явного указания фильтрующей функции.
+
+class Digit:
+    def __init__(self, value):
+        type_error(value)
+
+
+class Integer(Digit):
+    def __init__(self, value):
+        super().__init__(value)
+        type_error(value, int)
+
+
+class Float(Digit):
+    def __init__(self, value):
+        super().__init__(value)
+        type_error(value, float)
+
+
+class Positive(Digit):
+    def __init__(self, value):
+        super().__init__(value)
+        type_error(value, fltr=lambda x: x > 0)
+
+
+class Negative(Digit):
+    def __init__(self, value):
+        super().__init__(value)
+        type_error(value, fltr=lambda x: x < 0)
+
+
+class PrimeNumber(Integer, Positive): ...
+
+
+class FloatPositive(Float, Positive): ...
+
+
+digits = [PrimeNumber(17), PrimeNumber(7), PrimeNumber(22987633823298),
+          FloatPositive(.258), FloatPositive(.432), FloatPositive(1.0),
+          FloatPositive(99999999.9), FloatPositive(8333333333333333.2)]
+
+lst_positive = list(filter(lambda x: isinstance(x, Positive), digits))
+lst_float = list(filter(lambda x: isinstance(x, Float), digits))
+
+
+################################################################
+class Digit:
+    check_value = lambda x, value: isinstance(value, (float, int))
+
+    def raise_err(self):
+        raise TypeError('значение не соответствует типу объекта')
+
+    def __init__(self, value):
+        self.check_value(value) or self.raise_err()
+        self.value = value
+
+
+class Integer(Digit):
+    check_value = lambda x, value: isinstance(value, int) and value > 0
+
+
+class Float(Digit):
+    check_value = lambda x, value: isinstance(value, float) and value > 0
+
+
+class Positive(Digit):
+    check_value = lambda x, value: value > 0
+
+
+class Negative(Digit):
+    check_value = lambda x, value: value < 0
+
+
+class PrimeNumber(Integer, Positive):
+    pass
+
+
+class FloatPositive(Float, Positive):
+    pass
+
+
+digits = [PrimeNumber(1), PrimeNumber(2), PrimeNumber(3),
+          FloatPositive(1.2), FloatPositive(1.3), FloatPositive(1.4),
+          FloatPositive(1.5), FloatPositive(1.6)]
+
+lst_positive = list(filter(lambda x: isinstance(x, Positive), digits))
+lst_float = list(filter(lambda x: isinstance(x, Float), digits))
+
+################################################################
+# cмотрите, вы вынесли всю логику в один класс Digit - повод для гордости =)Если нужно будет, в перспективе разработать
+# еще 3-4 класса, снова придется править исходный класс? =)В большинстве случаев вам поступит исходный класс и
+# править его никто не даст, только наследоваться от него.реализация в рамках задачи отличная, но в целом подход
+# неправильный=)
+
+################################################################
+from typing import Any
+from abc import ABC, abstractmethod
+
+
+class DigitInterface(ABC):
+    @property
+    @abstractmethod
+    def value(self):
+        pass
+
+    @abstractmethod
+    def verify_value(self, value):
+        pass
+
+
+class Digit(DigitInterface):
+    __value: Any
+
+    def __init__(self, value):
+        self.value = value
+
+    @property
+    def value(self):
+        return self.value
+
+    @value.setter
+    def value(self, value):
+        if not self.verify_value(value):
+            raise TypeError('значение не соответствует типу объекта')
+        self.__value = value
+
+    def verify_value(self, value) -> bool:
+        if type(self) is Digit:
+            return isinstance(value, (int, float))
+        return True
+
+
+class Integer(Digit):
+    def verify_value(self, value) -> bool:
+        return isinstance(value, int) and super().verify_value(value)
+
+
+class Float(Digit):
+    def verify_value(self, value) -> bool:
+        return isinstance(value, float) and super().verify_value(value)
+
+
+class Positive(Digit):
+    def verify_value(self, value) -> bool:
+        return value > 0 and super().verify_value(value)
+
+
+class Negative(Digit):
+    def verify_value(self, value) -> bool:
+        return value < 0 and super().verify_value(value)
+
+
+class PrimeNumber(Integer, Positive):
+    pass
+
+
+class FloatPositive(Float, Positive):
+    pass
+
+
+digits = [PrimeNumber(3), PrimeNumber(1),
+          PrimeNumber(4), FloatPositive(1.5),
+          FloatPositive(9.2), FloatPositive(6.5),
+          FloatPositive(3.5), FloatPositive(8.9)]
+lst_positive = [obj for obj in digits if isinstance(obj, Positive)]
+lst_float = [obj for obj in digits if isinstance(obj, Float)]
+
+
+################################################################
+class Digit:
+    value_types = lambda _, x: type(x) in (int, float)
+
+    def __init__(self, value):
+        if not self.value_types(value):
+            raise TypeError('значение не соответствует типу объекта')
+        self.value = value
+
+
+class Integer(Digit):
+    value_types = lambda _, x: type(x) == int
+
+
+class Float(Digit):
+    value_types = lambda _, x: type(x) == float
+
+
+class Positive(Digit):
+    value_types = lambda _, x: x > 0
+
+
+class Negative(Digit):
+    value_types = lambda _, x: x < 0
+
+
+class PrimeNumber(Integer, Positive):
+    value_types = lambda _, x: Integer.value_types(_, x) and Positive.value_types(_, x)
+
+
+class FloatPositive(Float, Positive):
+    value_types = lambda _, x: Float.value_types(_, x) and Positive.value_types(_, x)
+
+
+is_simple = lambda x: not any(map(lambda i: not x % i, range(2, int(x ** .5) + 1)))
+digits = [(FloatPositive(n / 10), PrimeNumber(n))[is_simple(n)] for n in range(5, 5 + 8)]
+lst_positive = [*filter(lambda x: isinstance(x, Positive), digits)]
+lst_float = [*filter(lambda x: isinstance(x, Float), digits)]
+
+
+################################################################
+# Подвиг 5. В программе объявлены два класса:Затем, создается объект класса Book (книга) и отображается в консоль:
+# book = Book("Python ООП", "Балакирев", 2022)
+# print(book)В результате, на экране увидим что то вроде:<__main__.Book object at 0x0000015FBA4B3D00>
+# Но нам требуется, чтобы здесь отображались локальные атрибуты объекта с их значениями в формате:
+# <атрибут_1>: <значение_1><атрибут_2>: <значение_2>...<атрибут_N>: <значение_N>Для этого вам дают задание
+# разработать два класса:ShopGenericView - для отображения всех локальных атрибутов объектов любых дочерних
+# классов (не только Book);ShopUserView - для отображения всех локальных атрибутов, кроме атрибута _id,
+# объектов любых дочерних классов (не только Book).То есть, в этих классах нужно переопределить два магических
+# метода: __str__() и __repr__().
+class ShopItem:
+    ID_SHOP_ITEM = 0
+
+    def __init__(self):
+        super().__init__()
+        ShopItem.ID_SHOP_ITEM += 1
+        self._id = ShopItem.ID_SHOP_ITEM
+
+    def get_pk(self):
+        return self._id
+
+
+class ShopGenericView:
+    def __repr__(self):
+        lst = []
+        for k, v in self.__dict__.items():
+            lst.append(f'{k}: {v}\n')
+        return ''.join(lst)
+
+
+class ShopUserView:
+    def __str__(self):
+        lst = []
+        for k, v in self.__dict__.items():
+            if k != '_id':
+                lst.append(f'{k}: {v}\n')
+        return ''.join(lst)
+
+
+class Book(ShopItem, ShopUserView, ShopGenericView):
+    def __init__(self, title, author, year):
+        super().__init__()
+        self._title = title
+        self._author = author
+        self._year = year
+
+
+book = Book("Python ООП", "Балакирев", 2022)
+print(book)
+
+
+# _id: 1
+# _title: Python ООП
+# _author: Балакирев
+# _year: 2022
+
+
+################################################################
+class ShopItem:
+    ID_SHOP_ITEM = 0
+
+    def __init__(self):
+        super().__init__()
+        ShopItem.ID_SHOP_ITEM += 1
+        self._id = ShopItem.ID_SHOP_ITEM
+
+    def get_pk(self):
+        return self._id
+
+
+class ShopGenericView:
+    Exclude = tuple()
+
+    def __str__(self):
+        # return '\n'.join('{0}: {1}'.format(attr, v) for attr, v in self.__dict__.items() if attr not in self.Exclude)
+        return '\n'.join(f'{attr[0]}: {attr[1]}' for attr, v in self.__dict__.items() if attr not in self.Exclude)
+
+    def __repr__(self):
+        return self.__str__()
+
+
+class ShopUserView(ShopGenericView):
+    Exclude = ('_id',)
+
+
+class Book(ShopItem):
+    def __init__(self, title, author, year):
+        super().__init__()
+        self._title = title
+        self._author = author
+        self._year = year
+
+
+book = Book("Python ООП", "Балакирев", 2022)
+print(book)  # <__main__.Book object at 0x000001898F35C150>
+
+
+################################################################
+class ShopItem:
+    ID_SHOP_ITEM = 0
+
+    def __init__(self):
+        super().__init__()
+        ShopItem.ID_SHOP_ITEM += 1
+        self._id = ShopItem.ID_SHOP_ITEM
+
+    def get_pk(self):
+        return self._id
+
+
+class ShopGenericView:
+
+    def __repr__(self):
+        return '\n'.join(map(lambda x: f'{x[0]}: {x[1]}', list(self.__dict__.items())))
+
+
+class ShopUserView:  # кроме атрибута _id
+
+    def __str__(self):
+        return '\n'.join(map(lambda x: f'{x[0]}: {x[1]}', list(self.__dict__.items())[1:]))
+
+
+class Book(ShopItem, ShopUserView):
+    def __init__(self, title, author, year):
+        super().__init__()
+        self._title = title
+        self._author = author
+        self._year = year
+
+
+book = Book("Python ООП", "Балакирев", 2022)
+print(book)
+
+
+####################################################################
+class ShopItem:
+    ID_SHOP_ITEM = 0
+
+    def __init__(self):
+        super().__init__()
+        ShopItem.ID_SHOP_ITEM += 1
+        self._id = ShopItem.ID_SHOP_ITEM
+
+    def get_pk(self):
+        return self._id
+
+
+class ShopGenericView:
+    def __iter__(self):
+        for i in self.__dict__.items():
+            yield i
+
+    def __str__(self):
+        return '\n'.join(map(lambda x: f'{x[0]}: {x[1]}', self))
+
+
+class ShopUserView(ShopGenericView):
+    def __iter__(self):
+        for data in list(self.__dict__.items())[1::]:
+            yield data
+
+
+class Book(ShopItem):
+    def __init__(self, title, author, year):
+        super().__init__()
+        self._title = title
+        self._author = author
+        self._year = year
+
+
+################################################################
+class ShopItem:
+    ID_SHOP_ITEM = 0
+
+    def __init__(self):
+        ShopItem.ID_SHOP_ITEM += 1
+        self._id = ShopItem.ID_SHOP_ITEM
+
+    def get_pk(self):
+        return self._id
+
+
+class ShopGenericView:
+    _no = []
+
+    def __repr__(self):
+        return '\n'.join(f'{k}: {v}' for k, v in self.__dict__.items() if k not in self._no)
+
+
+class ShopUserView(ShopGenericView):
+    _no = ['_id']
+
+
+class Book(ShopItem):
+    def __init__(self, *args):
+        super().__init__()
+        self._title, self._author, self._year = args[:3]
+
+
+################################################################
+# __Egorof___4.8 Миксины___________________________________
+class Mixin:
+    def mixin_method(self):
+        print("This is a mixin method.")
+
+
+class MyClass(Mixin):
+    def my_method(self):
+        self.mixin_method()
+
+
+obj = MyClass()
+obj.my_method()  # Output: This is a mixin method.
+
+
+################################################################
+class BasePizza:
+    BASE_PIZZA_PRICE = 15
+
+    def __init__(self, name, price):
+        self.name = name
+        self.price = price
+        self.toppings = ['cheese']
+
+    def __str__(self):
+        return f"{self.name} with {self.toppings}, ${self.price:.2f}"
+
+
+class PepperoniMixin:
+    def add_pepperoni(self):
+        print("Adding pepperoni!")
+        self.price += 5
+        self.toppings += ['pepperoni']
+
+
+class MushroomMixin:
+    def add_mushrooms(self):
+        print("Adding mushrooms!")
+        self.price += 3
+        self.toppings += ['mushrooms']
+
+
+class OnionMixin:
+    def add_onion(self):
+        print("Adding onion!")
+        self.price += 2
+        self.toppings += ['onion']
+
+
+class BaconMixin:
+    def add_bacon(self):
+        print("Adding bacon!")
+        self.price += 6
+        self.toppings += ['bacon']
+
+
+class OlivesMixin:
+    def add_olives(self):
+        print("Adding olives!")
+        self.price += 1
+        self.toppings += ['olives']
+
+
+class OlivesPizza(BasePizza, OlivesMixin):
+
+    def __init__(self):
+        super().__init__('Море оливок', BasePizza.BASE_PIZZA_PRICE)
+        self.add_olives()
+
+
+class PepperoniPizza(BasePizza, PepperoniMixin):
+
+    def __init__(self):
+        super().__init__('Колбасятина', BasePizza.BASE_PIZZA_PRICE)
+        self.add_pepperoni()
+
+
+class MushroomOnionBaconPizza(BasePizza, MushroomMixin, OnionMixin, BaconMixin):
+
+    def __init__(self):
+        super().__init__('Грибной пяточок с луком', BasePizza.BASE_PIZZA_PRICE)
+        self.add_mushrooms()
+        self.add_onion()
+        self.add_bacon()
+
+
+pizza = MushroomOnionBaconPizza()
+print(pizza)
+
+
+# Adding mushrooms!
+# Adding onion!
+# Adding bacon!
+# Грибной пяточок с луком with ['cheese', 'mushrooms', 'onion', 'bacon'], $26.00
+################################################################
+class ToStringMixin:
+    def __str__(self):
+        return f"{self.__class__.__name__}({str(self.__dict__)})"
+
+
+class MyClass(ToStringMixin):
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
+
+obj = MyClass(1, 2)
+print(obj)  # Output: MyClass({'x': 1, 'y': 2})
+
+
+################################################################
+# использования миксина для подсчета количества экземпляров класса:
+class CountInstancesMixin:
+    count = 0
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.__class__.count += 1
+
+
+# ?? self.__class__ в данном коде является ссылкой на класс объекта, который вызывает этот код.В этом примере self
+# представляет экземпляр класса, который был создан, а self.__class__ является атрибутом этого экземпляра, содержащим
+# ссылку на его класс.В классе CountInstancesMixin, self.__class__ используется для доступа к переменной класса count
+# и инкрементации ее значения при создании каждого нового экземпляра.self.__class__ может быть полезен, например, в
+# тех случаях, когда вы хотите создать метод, который будет работать со всеми экземплярами класса, а не только с
+# конкретным экземпляром, для которого он был вызван.Переменная count в классе CountInstancesMixin является
+# переменной класса, а не экземпляра. Это означает, что она разделяется между всеми экземплярами класса и доступна
+# через ссылку на класс, такую как self.__class__ или ClassName.count, где ClassName - имя класса.Когда вы создаете
+# новый экземпляр класса, метод __init__() класса CountInstancesMixin вызывается через механизм наследования, и
+# переменная count инкрементируется для класса, к которому относится экземпляр.Таким образом, любой экземпляр класса
+# Cat или Dog может изменить значение переменной count для своего класса. Например, если вы создадите новый экземпляр
+# класса Cat, переменная count будет увеличена на единицу для класса Cat. Если вы создадите новый экземпляр класса Dog,
+# переменная count будет увеличена на единицу для класса Dog.
+class Cat(CountInstancesMixin):
+    def __init__(self, name):
+        self.name = name
+        super().__init__()
+
+
+class Dog(CountInstancesMixin):
+    def __init__(self, name):
+        self.name = name
+        super().__init__()
+
+
+obj1 = Cat("Барсик")
+obj2 = Cat("Гипард")
+
+obj3 = Dog("Жучка")
+
+print(Cat.count)  # Output: 2
+print(Dog.count)  # Output: 1
+
+
+################################################################
+# аналог
+class Cat:
+    count = 0  # Class variable
+
+    def __init__(self):
+        Cat.count += 1
+
+
+class Dog:
+    count = 0  # Class variable
+
+    def __init__(self):
+        Dog.count += 1
+
+
+# Creating instances of Cat and Dog classes
+cat1 = Cat()
+cat2 = Cat()
+dog1 = Dog()
+
+print(Cat.count)  # Output: 2
+print(Dog.count)  # Output: 3
+
+
+################################################################
+class Mixin1(object):
+    def test(self):
+        print("Mixin1")
+
+
+class Mixin2(object):
+    def test(self):
+        print("Mixin2")
+
+
+class BaseClass(object):
+    def test(self):
+        print("BaseClass")
+
+
+class MyClass(BaseClass, Mixin1, Mixin2):
+    pass
+
+
+obj = MyClass()
+obj.test()
+
+
+# порядок разрешения методов при вызове метода .test()  - MyClass => BaseClass => Mixin1 => Mixin2
+################################################################
+# Не понял прикола раскладывать топпинги по разным классам, поэтому положил все в один класс.
+class CountryPizza(BasePizza, ToppingMixin):
+    def __init__(self):
+        super().__init__('Деревенская пицца', BasePizza.BASE_PIZZA_PRICE)
+        self.add_ham()
+        self.add_pepper()
+        self.add_olives()
+        self.add_pepperoni()
+        self.add_mushrooms()
+        self.add_chicken()
+
+
+################################################################
+# Для этого создайте класс PermissionMixin, который будет иметь следующие методы:__init__(self): метод инициализации,
+# который создает множество permissions для хранения разрешений. В него мы будем сохранять действия, которые будут
+# доступны пользователям, например Чтение, Запись, Выполнение и т.д.grant_permission(self, permission): метод для
+# назначения разрешения. Добавляет переданное разрешение в множество permissionsrevoke_permission(self, permission):
+# метод для отмены разрешения. Удаляет переданное разрешение из множества permissionshas_permission(self, permission):
+# метод для проверки наличия разрешения. Возвращает True, если переданное разрешение присутствует в множестве
+# permissions, и False в противном случае.Создайте класс User, который будет наследоваться от PermissionMixin и
+# ииметь следующие атрибуты:name: имя пользователя.email: email пользователя.
+class PermissionMixin:
+    def __init__(self):
+        self.permissions = set()
+
+    def grant_permission(self, permission):
+        self.permissions.add(permission)
+
+    def revoke_permission(self, permission):
+        self.permissions.discard(permission)
+
+    def has_permission(self, permission):
+        return permission in self.permissions
+
+
+class User(PermissionMixin):
+    def __init__(self, name, email):
+        super().__init__()
+        self.name = name
+        self.email = email
+
+
+################################################################
+# Ваша задача научить классы конвертиться к json-строке при помощи миксина под названием JsonSerializableMixin,
+# который добавляет метод to_json() в любой класс, использующий этот миксин. Метод to_json() конвертирует словарь
+# атрибутов экземпляра в строку JSON, используя стандартную библиотеку json в Python.Онлайн инструмент преобразования
+# JSON-строки в объект, не забудьте убрать апострофы по краям строки
+import json
+
+
+class JsonSerializableMixin:
+    def to_json(self):
+        attributes = self.__dict__  # получаем атрибуты экземпляра класса в виде словаря
+        return json.dumps(attributes)
+
+
+class Car(JsonSerializableMixin):
+    def __init__(self, make: str, color: str):
+        self.make = make
+        self.color = color
+
+
+class Book(JsonSerializableMixin):
+    def __init__(self, title: str, author: str):
+        self.title = title
+        self.author = author
+
+
+class Person(JsonSerializableMixin):
+    def __init__(self, name: str, age: int):
+        self.name = name
+        self.age = age
+
+
+################################################################
+# Класс DictMixin представляет собой миксин, который добавляет в класс, наследующий его, метод to_dict(). Этот метод
+# позволяет преобразовать объект в словарь. Внутри класса DictMixin вы можете создавать сколько угодно служебных методов
+# и атрибутов, которые помогут вам справиться с задачей. Главное, это реализовать метод to_dict(), он являться
+# точкой входа для взаимодействия с вашим миксином и он должен вернуть представление вашего объекта в виде словаря.
+# Обратите внимание на вложенность атрибутов.
+class DictMixin:
+    def to_dict(self):
+        dct = {}
+        for k, v in self.__dict__.items():
+            if isinstance(v, DictMixin):
+                dct[k] = v.to_dict()
+            elif isinstance(v, list):
+                lst = []
+                for i in v:
+                    lst.append(i.to_dict())
+                    dct[k] = lst
+            else:
+                dct[k] = v
+        return dct
+
+    # for раскрывает словарь, где i - ключ, а j - значения! и если в j обычные значения - нам их нужно просто добавить
+    # в наш словарь "а" (это блок else),а если в j появляется экземпляр класса - нужно его так же распотрошить, как и
+    # основной экземпляр, к которому мы изначально применяем цикл (в нем же все то же самое будет происходить).
+    # Сложность была со списком - решил добавлением переменной "р".
+    # вариант без проверок  разбить на задачи поменьше - сначала сделайте и выведите словарь без проверок:
+    # a = {}
+    # for i, j in self.__dict__.items():
+    #     a[i] = j
+    # return a
+
+
+class Phone(DictMixin):
+    def __init__(self, number):
+        self.number = number
+
+
+class Person(DictMixin):
+    def __init__(self, name, age, address):
+        self.name = name
+        self.age = age
+        self.address = address
+
+
+class Address(DictMixin):
+    def __init__(self, street, city, state, zip_code):
+        self.street = street
+        self.city = city
+        self.state = state
+        self.zip_code = zip_code
+
+
+class Company(DictMixin):
+    def __init__(self, name, address):
+        self.name = name
+        self.address = address
+
+
+################################################################
+class DictMixin:
+    def __repr__(self):
+        return str(self.__dict__)
+
+    def to_dict(self):
+        return eval(self.__repr__())
+
+
+# eval преобразует строку в код питона. В данном случае условная строка "{'key': 'val'}" преобразуется в словарь. Ну а
+# repr - это репрезентация объекта в консоли и возвращает строку. По умолчанию адрес в памяти, но тут метод переназначен
+# если кратко, то есть два метода, которые отвечают за представление объекта в строковом виде, это __str__ и __repr__.
+# Разница между ними в том, что __str__ не срабатывает, если объект находится внутри другого объекта, в таких случаях
+# вызывается __repr__. Поэтому, если там надо изменить то, как объект будет представляется внутри другого объекта, нам
+# нужно переопределять именно метод __repr__. Ну а про то, что при отсутствии метода __str__ вызывается метод __repr__
+# вы наверняка и так знаете.Используя это, я сделал так, что в строковом представлении объект отображается как словарь
+# атрибутов, а классы вложенные в этот словарь в свою очередь так же представляются как аналогичные словари(объект
+# внутри другого объекта). Ну а функция eval все это преобразовывает из строкового вида в тип объекта.
+
+################################################################
+import json
+
+
+class DictMixin:
+
+    def to_dict(self):
+        a = json.dumps(self.__dict__, indent=2, default=lambda x: x.__dict__)
+        s = json.loads(a)
+        return s
+
+
+################################################################
+class DictMixin:
+    def to_dict(self) -> dict:
+        dct = self.__dict__
+        for k, v in dct.items():
+            if isinstance(v, DictMixin):
+                dct[k] = v.to_dict()
+            if isinstance(v, list):
+                for i, k in enumerate(v):
+                    if isinstance(k, DictMixin):
+                        v[i] = k.to_dict()
+        return dct
+
+
+################################################################
+class DictMixin:
+    def to_dict(self):
+        result = dict()
+        for i in self.__dict__:
+            if hasattr(self.__dict__[i], '__dict__'):
+                result.setdefault(i, self.__dict__[i].to_dict())
+            elif isinstance(self.__dict__[i], (list, tuple)):
+                for j in self.__dict__[i]:
+                    result.setdefault(i, []).append(j.to_dict())
+            else:
+                result.setdefault(i, self.__dict__[i])
+        return result
+
+
+################################################################
+class DictMixin:
+    def to_dict(self):
+        dct = dict(self.__dict__)
+        for attr, value in dct.items():
+            if isinstance(value, DictMixin):
+                dct[attr] = value.to_dict()
+            elif isinstance(value, list):
+                dct[attr] = [obj.to_dict() for obj in value]
+        return dct
+
+
+################################################################
+class DictMixin:
+    def to_dict(self):
+        for key, value in self.__dict__.items():
+            if isinstance(value, (Phone, Company, Address)):
+                self.__dict__[key] = value.__dict__
+            if type(value) == list:
+                for i in range(len(value)):
+                    value[i] = value[i].to_dict()
+
+        return self.__dict__
+
+
+################################################################
+import json
+
+
+class DictMixin:
+    def to_dict(self):
+        return json.loads(json.dumps(self, default=vars))
+
+
+################################################################
+# Рекурсивный обход словаря и списков внутри него.
+class DictMixin:
+
+    @staticmethod
+    def make_dict(obj_dict: dict) -> dict:
+        result = {}
+        for key, value in obj_dict.items():
+            if hasattr(value, '__dict__'):
+                value = DictMixin.make_dict(value.__dict__)
+            elif isinstance(value, (set, list, tuple)):
+                value = type(value)([DictMixin.make_dict(val.__dict__)
+                                     if hasattr(val, '__dict__') else val for val in value])
+            result[key] = value
+        return result
+
+    def to_dict(self):
+        return self.make_dict(self.__dict__)
+
+
+################################################################
+class DictMixin:
+
+    def to_dict(self):
+        answer = dict()
+        for atr in self.__dict__.items():
+            if not isinstance(atr[1], (str, int, float)):
+                if isinstance(atr[1], list):
+                    value = []
+                    for x in atr[1]:
+                        value.append(DictMixin.to_dict(x))
+                else:
+                    value = DictMixin.to_dict(atr[1])
+            else:
+                value = atr[1]
+            answer[atr[0]] = value
+        return answer
+
+
+################################################################
+class DictMixin:
+    def to_dict(self):
+        return self.flatten(self.__dict__)
+
+    def flatten(self, my_dict):
+        res = {}
+
+        for k, v in my_dict.items():
+            if isinstance(v, DictMixin):  # Если прошёл -> рекурсия
+                res[k] = self.flatten(v.__dict__)
+            elif type(v) == list:  # Если лист -> всё что наберёт в рекурсии в []
+                res[k] = [self.flatten(i.__dict__) for i in v]
+            else:  # В ином случает - это просто пара ключ-значение
+                res[k] = v
+
+        return res
+
+
+################################################################
+class DictMixin:
+
+    def to_dict(self):
+        new_dict = dict()
+        for key, value in self.__dict__.items():
+            if isinstance(value, __class__):
+                value = self.get_obj(value)
+            if isinstance(value, list):
+                value = [self.get_obj(obj) for obj in value]
+            new_dict[key] = value
+        return new_dict
+
+    def get_obj(self, obj):
+        new_dict = dict()
+        for key, value in obj.__dict__.items():
+            if isinstance(value, __class__):
+                value = self.get_obj(value)
+            new_dict[key] = value
+        return new_dict
+
+
+################################################################
+# Сериализация класса - 2
+# Теперь давайте выполним сериализацию объектов, атрибутами которых могут быть другие объекты. Для этого переделайте
+# миксин JsonSerializableMixin, так чтобы он мог сериализовать такие объекты. Внутри миксина JsonSerializableMixin
+# обязательно должен быть метод to_json(), который возвращает итоговую строку сериализации объекта. Все остальное
+# вы можете создавать по своему усмотрению. # Напишите определение класса JsonSerializableMixin
+import json
+
+
+class JsonSerializableMixin:
+
+    def to_dict(self):
+        dct = {}
+        for k, v in self.__dict__.items():
+            if isinstance(v, JsonSerializableMixin):
+                dct[k] = v.to_dict()
+            elif isinstance(v, list):
+                lst = []
+                for trim in v:
+                    if isinstance(trim, (int, str, float)):
+                        lst.append(trim)
+                    else:
+                        lst.append(trim.to_dict())
+                dct[k] = lst
+            else:
+                dct[k] = v
+        return dct
+
+    def to_json(self):
+        # если здесь прописать такую же логику как и в to_dict и return json.dumps(dct) проверку не проходит???
+        return json.dumps(self.to_dict())
+
+
+class Person(JsonSerializableMixin):
+    def __init__(self, name, age, address):
+        self.name = name
+        self.age = age
+        self.address = address
+
+
+class Address(JsonSerializableMixin):
+    def __init__(self, street, city, state, zip_code):
+        self.street = street
+        self.city = city
+        self.state = state
+        self.zip_code = zip_code
+
+
+class Company(JsonSerializableMixin):
+    def __init__(self, name, address):
+        self.name = name
+        self.address = address
+
+
+################################################################
+import json
+
+
+class JsonSerializableMixin(json.JSONEncoder):
+
+    def default(self, obj):
+        return obj.__dict__
+
+    def to_json(self):
+        return json.dumps(self, cls=JsonSerializableMixin)
+
+
+# Класс JsonSerializableMixin является подклассом json.JSONEncoder, который обеспечивает сериализацию объектов в формат
+# JSON.Метод default(self, obj) определен в классе JsonSerializableMixin. Он вызывается при сериализации объекта и
+# возвращает словарь (obj.__dict__) содержащий все атрибуты объекта. Это позволяет преобразовать объект Python в
+# JSON-совместимый словарь.Метод to_json(self) также определен в JsonSerializableMixin. Он использует json.dumps()
+# для сериализации текущего объекта в строку JSON. Параметр cls=JsonSerializableMixin указывает, что при сериализации
+# должен использоваться метод default() из этого класса.Таким образом, когда вызывается метод to_json() объекта, он
+# будет преобразован в JSON-строку с помощью json.dumps(), а метод default() будет использоваться для преобразования
+# атрибутов объекта в словарь.
+#########################################################################
+class JsonSerializableMixin:
+
+    def to_json(self):
+        return json.dumps(self.__dict__, default=lambda x: x.__dict__)
+
+
+json.dumps(obj, *, skipkeys=False, ensure_ascii=True, check_circular=True, allow_nan=True, cls=None,
+           indent=None, separators=None, default=None, sort_keys=False, **kw)
+
+
+# #obj - объект Python,
+# skipkeys=False - игнорирование неизвестных типов ключей в словарях,
+# ensure_ascii=True - экранирование не-ASCII символов,
+# check_circular=True - проверка циклических ссылок,
+# allow_nan=True - представление значений nan, inf, -inf в JSON,
+# cls=None - метод, для сериализации дополнительных типов,
+# indent=None - количество отступов при сериализации,
+# separators=None - разделители используемые в JSON,
+# default=None - функция для объектов, которые не могут быть сериализованы,
+# sort_keys=False - сортировка словарей.
+
+# json.dumps - это функция, предоставляемая модулем json, которая преобразует объект Python в строку в формате JSON.
+# self.__dict__ получает словарь атрибутов текущего объекта. Он содержит все имена атрибутов в качестве ключей и их
+# соответствующие значения.Параметр default функции json.dumps определяет функцию, которая будет использоваться для
+# преобразования несериализуемых объектов, с которыми встречается процесс сериализации. В данном случае используется
+# лямбда-функция lambda x: x.__dict__. Эта лямбда-функция возвращает словарь атрибутов несериализуемого объекта.
+# Путем передачи self.__dict__ и функции по умолчанию в json.dumps, объект сериализуется в строку в формате JSON.
+##################################################################
+class JsonSerializableMixin:
+
+    def __repr__(self):
+        return str(self.__dict__)
+
+    def to_json(self):
+        return json.dumps(eval(self.__repr__()))
+
+
+################################################################\
+class JsonSerializableMixin:
+    def to_json(self):
+        return json.dumps(self, default=vars)
+
+
+# В контексте данного кода, default=vars является аргументом функции json.dumps(). Он определяет функцию, которая будет
+# вызываться для сериализации объектов, которые не могут быть сериализованы стандартным способом.В данном случае,
+# default=vars указывает на функцию vars(), которая возвращает словарь, содержащий атрибуты объекта. То есть, если
+# объект не может быть прямо сериализован, json.dumps() будет использовать vars() для получения словаря его атрибутов,
+# который затем будет сериализован в формат JSON.
+####################################################################
+# без import json
+class JsonSerializableMixin:
+    def to_json(self):
+        return __import__('json').dumps(self.__dict__, default=lambda x: x.__dict__)
+
+
+######################
+# Подвиг 8 (введение в паттерн миксинов - mixins). Часто множественное наследование используют для наполнения
+# дочернего класса определенным функционалом. То есть, с указанием каждого нового базового класса, дочерний класс
+# приобретает все больше и больше возможностей. И, наоборот, убирая часть базовых классов, дочерний класс теряет
+# соответствующую часть функционала. Например, паттерн миксинов активно используют в популярном фреймворке Django.
+# В частности, когда нужно указать дочернему классу, какие запросы от клиента он должен обрабатывать
+# (запросы типа GET, POST, PUT, DELETE и т.п.). В качестве примера реализуем эту идею в очень упрощенном виде, но
+# сохраняя суть паттерна миксинов.
+
+class RetriveMixin:
+    def get(self, request):
+        return "GET: " + request.get('url')
+
+
+class CreateMixin:
+    def post(self, request):
+        return "POST: " + request.get('url')
+
+
+class UpdateMixin:
+    def put(self, request):
+        return "PUT: " + request.get('url')
+
+
+# Здесь в каждом классе выполняется имитация обработки запросов. За GET-запрос отвечает метод get() класса RetriveMixin,
+# за POST-запрос - метод post() класса CreateMixin, за PUT-запрос - метод put() класса UpdateMixin.
+# Далее, вам нужно объявить класс с именем GeneralView, в котором следует указать атрибут (на уровне класса):
+allowed_methods = ('GET', 'POST', 'PUT', 'DELETE')  # для перечня разрешенных запросов. А также объявить метод
+
+
+# render_request со следующей сигнатурой:
+def render_request(self, request): ...
+
+
+# Здесь request - это словарь (объект запроса), в котором обязательно должны быть два ключа:
+# 'url' - адрес для обработки запроса; 'method' - метод запроса: 'GET', 'POST', 'PUT', 'DELETE' и т. д.
+# В методе render_request() нужно сначала проверить, является ли указанный запрос в словаре request разрешенным
+# (присутствует в списке allowed_methods). И если это не так, то генерировать исключение командой:
+# raise TypeError(f"Метод {request.get('method')} не разрешен.") Иначе, вызвать метод по его имени:
+# method_request = request.get('method').lower()  # имя метода, малыми буквами Подсказка: чтобы получить ссылку на
+# метод с именем method_request, воспользуйтесь магическим методом __getattribute__().Для использования полученных
+# классов, в программе объявляется следующий дочерний класс:
+class DetailView(RetriveMixin, GeneralView):
+    allowed_methods = ('GET', 'PUT',)
+
+
+# Воспользоваться им можно, например, следующим образом (эти строчки в программе не писать):
+view = DetailView()
+html = view.render_request({'url': 'https://stepik.org/course/116336/', 'method': 'GET'})
+print(html)  # GET: https://stepik.org/course/116336/
+# Если в запросе указать другой метод:
+html = view.render_request({'url': 'https://stepik.org/course/116336/', 'method': 'PUT'})
+
+
+# то естественным образом возникнет исключение (реализовывать в программе не нужно, это уже встроено в сам язык Python):
+# AttributeError: 'DetailView' object has no attribute 'put'
+# так как дочерний класс DetailView не имеет метода put. Поправить это можно, если указать соответствующий базовый класс:
+class DetailView(RetriveMixin, UpdateMixin, GeneralView):
+    allowed_methods = ('GET', 'PUT',)
+
+
+# Теперь, при выполнении команд:
+view = DetailView()
+html = view.render_request({'url': 'https://stepik.org/course/116336/', 'method': 'PUT'})
+print(html)
+
+
+# будет выведено:
+# PUT: https: // stepik.org / course / 116336 /  # Это и есть принцип работы паттерна миксинов.
+
+class RetriveMixin:
+    def get(self, request):
+        return "GET: " + request.get('url')
+
+
+class CreateMixin:
+    def post(self, request):
+        return "POST: " + request.get('url')
+
+
+class UpdateMixin:
+    def put(self, request):
+        return "PUT: " + request.get('url')
+
+
+class GeneralView:
+    allowed_methods = ('GET', 'POST', 'PUT', 'DELETE')
+
+    def render_request(self, request):
+        # url' - адрес для обработки запроса; 'method' - метод запроса: 'GET', 'POST', 'PUT', 'DELETE' и
+        if request.get('method') not in self.allowed_methods:
+            raise TypeError(f"Метод {request.get('method')} не разрешен.")
+        method_request = request.get('method').lower()
+        return self.__getattribute__(method_request)(request)
+
+
+class DetailView(RetriveMixin, UpdateMixin, GeneralView):
+    allowed_methods = ('GET', 'PUT',)
+
+
+view = DetailView()
+html = view.render_request({'url': 'https://stepik.org/course/116336/', 'method': 'PUT'})
+print(html)
+
+
+################################################################
+class GeneralView:
+    # allowed_methods = ('GET', 'POST', 'PUT', 'DELETE')
+
+    def render_request(self, request):
+        if request.get('method') not in self.allowed_methods:
+            raise TypeError(f"Метод {request.get('method')} не разрешен.")
+        method_request = request.get('method').lower()  # 'get'
+        # return self.__getattribute__(method_request)(request)
+        try:
+            method = getattr(self, method_request)  # обращение к атрибуту класса get ->def get(self, request):
+            return method(request)
+        except AttributeError:
+            raise AttributeError(f"'{self.__class__.__name__}' object has not attribute")
+
+
+################################################################
+class GeneralView:
+    allowed_methods = ('GET', 'POST', 'PUT', 'DELETE')  # на случай если нет классе DetailView
+
+    def render_request(self, request):
+        method = request.get('method').upper()
+        if method not in self.allowed_methods:
+            raise TypeError(f"Метод {request.get('method')} не разрешен.")
+        method_request = self.__getattribute__(method.lower())  # 'get'
+        # method_request = getattr(self, method.lower())
+        if method_request:
+            return method_request(request)
+
+
+################################################################
+class GeneralView:
+    allowed_methods = ('GET', 'POST', 'PUT', 'DELETE')
+
+    def render_request(self, request):
+        if request['method'] not in self.allowed_methods:
+            raise TypeError(f"Метод {request.get('method')} не разрешен.")
+        method = request.get('method').upper()
+        method_request = super().__getattribute__(method.lower())
+        if method_request:
+            return method_request(request)
+
+
+################################################################
+# Подвиг 9. Объявите класс с именем Money (деньги), объекты которого создаются командой:
+# money = Money(value)где value - любое число (целое или вещественное). Если указывается не числовое значение, то
+# генерируется исключение командой:raise TypeError('сумма должна быть числом')В каждом объекте этого класса должен
+# формироваться локальный атрибут _money с соответствующим значением. Также в классе Money должно быть объект-свойство
+# (property):money - для записи и считывания значения из атрибута _money.В связке с классом Money работает еще
+# один класс:# class MoneyOperators:
+# Он определяет работу арифметических операторов. В данном примере описан алгоритм сложения двух объектов класса Money
+# (или объектов его дочерних классов).Обратите внимание, как реализован метод __add__() в этом классе. Он универсален
+# при работе с любыми объектами класса Money или его дочерних классов. Здесь атрибут __class__ - это ссылка на
+# класс объекта self. С помощью __class__ можно создавать объекты того же класса, что и self.
+# Вам необходимо добавить в класс MoneyOperators аналогичную реализацию оператора вычитания.На основе двух классов
+# (Money и MoneyOperators) предполагается создавать классы кошельков разных валют. Например, так:
+
+class MoneyOperators:
+    def __add__(self, other):
+        if type(other) in (int, float):
+            return self.__class__(self.money + other)  # __class__ можно создавать объекты того же класса, что и self.
+
+        if type(self) != type(other):
+            raise TypeError('Разные типы объектов')
+
+        return self.__class__(self.money + other.money)
+
+    def __sub__(self, other):
+        if type(other) in (int, float):
+            return self.__class__(self.money - other)
+        if type(other) != type(other):
+            raise TypeError('Разные типы объектов')
+        return self.__class__(self.money - other.money)
+
+
+class Money:
+    def __init__(self, money):
+        self.money = money
+
+    @property
+    def money(self):
+        return self._money
+
+    @money.setter
+    def money(self, money):
+        if type(money) not in (int, float):
+            raise TypeError('сумма должна быть числом')
+        self._money = money
+
+
+class MoneyR(Money, MoneyOperators):
+    def __str__(self):
+        return f"MoneyR: {self.money}"
+
+
+class MoneyD(Money, MoneyOperators):
+    def __str__(self):
+        return f"MoneyD: {self.money}"
+
+
+m1 = MoneyR(1)
+m2 = MoneyD(2)
+m = m1 + 10
+print(m)  # MoneyR: 11
+m = m1 - 5.4
+m = m1 + m2  # TypeError
+
+################################################################
+from operator import add, sub
+from typing import Callable, Union
+
+
+class Money:
+    def __init__(self, value: Union[int, float]) -> None:
+        if type(value) not in (int, float):
+            raise TypeError('сумма должна быть числом')
+        self.money = value
+
+    money = property(lambda self: self._money)
+
+    @money.setter
+    def money(self, value: Union[int, float]) -> None:
+        self._money = value
+
+    def __str__(self) -> str:
+        return f"{self.__class__.__name__}: {self.money}"
+
+
+class MoneyOperators:
+    def __op(self, other: Union[int, float, Money], op: Callable) -> Money:
+        if type(other) in (int, float):
+            return self.__class__(op(self.money, other))
+
+        if type(self) != type(other):
+            raise TypeError('Разные типы объектов')
+
+        return self.__class__(op(self.money, other.money))
+
+    def __add__(self, other: Union[int, float, Money]) -> Money:
+        return self.__op(other, add)
+
+    def __sub__(self, other: Union[int, float, Money]) -> Money:
+        return self.__op(other, sub)
+
+
+class MoneyR(Money, MoneyOperators): ...
+
+
+class MoneyD(Money, MoneyOperators): ...
+
+
+m1 = MoneyR(1)
+m2 = MoneyD(2)
+m = m1 + 10
+print(m)  # MoneyR: 11
+m = m1 - 5.4
+m = m1 + m2  # TypeError
+
+################################################################
+from operator import add, sub
+
+
+class MoneyOperators:
+    def _operate(self, other, oper):
+        if type(other) in (int, float):
+            return self.__class__(oper(self.money, other))
+
+        if type(self) != type(other):
+            raise TypeError('Разные типы объектов')
+
+        return self.__class__(oper(self.money, other.money))
+
+    def __add__(self, other):
+        return self._operate(other, add)
+
+    def __sub__(self, other):
+        return self._operate(other, sub)
+
+
+class Money:
+    def __init__(self, value):
+        self.money = value
+
+    @property
+    def money(self):
+        return self._money
+
+    @money.setter
+    def money(self, value):
+        if not isinstance(value, (int, float)):
+            raise TypeError('сумма должна быть числом')
+        self._money = value
+
+
+class MoneyR(Money, MoneyOperators):
+    def __str__(self):
+        return f"MoneyR: {self.money}"
+
+
+class MoneyD(Money, MoneyOperators):
+    def __str__(self):
+        return f"MoneyD: {self.money}"
+
+
+################################################################
+class MoneyOperators:
+
+    def get_other(self, other):
+        if type(other) in (int, float):
+            return other
+
+        if type(self) != type(other):
+            raise TypeError('Разные типы объектов')
+        return other.money
+
+    def __add__(self, other):
+        other = self.get_other(other)
+        return self.__class__(self.money + other)
+
+    def __sub__(self, other):
+        other = self.get_other(other)
+        return self.__class__(self.money - other)
+
+    def __radd__(self, other):
+        other = self.get_other(other)
+        return self + other
+
+    def __rsub__(self, other):
+        other = self.get_other(other)
+        return self.__class__(other - self.money)
+
+
+class Money:
+    __slots__ = '_money'
+
+    def __init__(self, money):
+        self.money = money
+
+    def __setattr__(self, key, value):
+        if type(value) not in (int, float):
+            raise TypeError('Cумма должна быть числом')
+        object.__setattr__(self, key, value)
+
+    @property
+    def money(self):
+        return self._money
+
+    @money.setter
+    def money(self, value):
+        self._money = value
+
+
 ################################################################
+# __4.9 Slots__Egorof___
+# После указания __slots__ добавление новых атрибутов в экземпляр класса, кроме уже указанных, невозможно
+class PointSlots:
+    __slots__ = ('x', 'y')  # Перечисляем все возможные атрибуты экземпляров класса
+
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
+
+p2 = PointSlots(3, 4)
+p2.new_attr = 10  # AttributeError: 'PointSlots' object has no attribute 'new_attr'
+
 
-################################################################
+# Также при использовании __slots__ пропадает возможность получить словарь __dict__ с атрибутами
 
-################################################################
+class PointSlots:
+    __slots__ = ('x', 'y')  # Перечисляем все возможные атрибуты экземпляров класса
 
-################################################################
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
 
-################################################################
 
-################################################################
+p2 = PointSlots(3, 4)
+print(p2.__dict__)  # AttributeError: 'PointSlots' object has no attribute '__dict__'
+# 2. Скорость работы программы
+# Используемая коллекция для хранения имён переменных в __slots__ позволяет ускорить работу программы по сравнению с
+# используемым по умолчанию словарём (__dict__ ). Замерим время работы программы с помощью модуля timeit:
 
-################################################################
+from timeit import timeit
 
-################################################################
 
-################################################################
+class Point:
 
-################################################################
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
 
-################################################################
 
-################################################################
+class PointSlots:
+    __slots__ = ('x', 'y')
 
-################################################################
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
 
-################################################################
 
-################################################################
+def test_time_point():
+    p1 = Point(3, 4)
+    p1.x = 100
+    p1.x
+    del p1.x
 
-################################################################
 
-################################################################
+def test_time_pointslots():
+    p1 = PointSlots(3, 4)
+    p1.x = 100
+    p1.x
+    del p1.x
 
-################################################################
 
-################################################################
+print('No __slots__ stopped:', timeit(test_time_point))
+print('__slots__ stopped:', timeit(test_time_pointslots))
 
-################################################################
 
-################################################################
+# Вывод:# No __slots__ stopped: 1.048502679914236
+# __slots__ stopped: 0.9827403570525348# Использование __slots__ позволяет уменьшить время работы программы.
+# # Использование памяти
+# Уменьшение количества занимаемой памяти при использовании __slots__ связано с тем, что в __slots__ хранятся только
+# значения из пространства имён, а при использовании __dict__ в память добавляется размер коллекции __dict__ :
 
-################################################################
+class Point:
 
-################################################################
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
 
-################################################################
 
-################################################################
+class PointSlots:
+    __slots__ = ('x', 'y')
 
-################################################################
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
 
-################################################################
 
-################################################################
+s = Point(3, 4)
+print('No slots:', s.__sizeof__(), s.__dict__.__sizeof__())  # No slots: 32 88
+d = PointSlots(3, 4)
+print('Slots', d.__sizeof__())  # Slots 32
 
-################################################################
 
+# Экземпляр класса, использующий __slots__ снижает количество используемой памяти,# так как содержит только
+# пространство имён объекта.# # Таким образом использовать __slots__ важно в тех случаях, когда:
+# Есть необходимость в фиксированном количестве используемых имён переменных в объектах.
+# Необходимо ускорение работы программы.# Имеются ограничения по объему используемой памяти.
 ################################################################
+class Phone:
+    __slots__ = ['brand', 'model', '__dict__']
 
-################################################################
 
-################################################################
+phone1 = Phone()
+phone1.brand = 'Apple'
+phone1.model = 'iPhone 14'
 
-################################################################
+print(phone1.brand)  # Apple
+print(phone1.model)  # iPhone 14
+phone1.price = 1000
+print(phone1.price)  # 1000
 
-################################################################
 
 ################################################################
+class Person:
+    __slots__ = ('first_name', 'last_name', 'age')
 
-################################################################
+    def __init__(self, first_name, last_name, age):
+        self.first_name = first_name
+        self.last_name = last_name
+        self.age = age
 
-################################################################
+    def __str__(self):
+        return f"{self.first_name} {self.last_name} is {self.age} years old"
 
-################################################################
 
 ################################################################
+# Есть еще одно интересное свойство. Если мы хотим расширить все-таки наш класс, и предоставить возможность добавлять
+# аттрибуты, то в слотс можно добавить атрибут __dict__. Тогда при создании нового атрибута он будет заноситься в этот
+# словарь. Гибридная структура т.с.
 
-################################################################
+class Example:
+    __slots__ = 'x', 'y', '__dict__'
 
-################################################################
+    def __init__(self, x, y) -> None:
+        self.x = x
+        self.y = y
 
-################################################################
 
-################################################################
+p = Example(1, 2)
+p.z = 5
+print(p.z)  # выводит 5
+print(p.__dict__)  # выводит {'z': 5}
 
-################################################################
 
 ################################################################
+class Good:
+    __slots__ = ['_price']
 
-################################################################
+    def __init__(self, price):
+        self._price = price
 
-################################################################
+    @property
+    def price(self):
+        return self._price
 
-################################################################
+    @price.setter
+    def price(self, value):
+        self._price = value * 2
 
-################################################################
 
+obj = Good(5)
+print(obj.price)  # 5
+obj.price = 10
+print(obj.price)  # 20
+
+
+# obj = Good(5)  # Здесь _price задается напрямую в методе __init__, а не через сеттер. Поэтому значение не удваивается.
+# Вот здесь обратите внимание, что _price с подчеркиванием, то есть это не сеттер:
+# def __init__(self, price): self._price = price
+
 ################################################################
+# Вы работаете над проектом управления устройствами в доме. Вам нужно создать иерархию классов для различных типов
+# устройств и реализовать методы для управления ими. В качестве части проекта, вам нужно использовать механизмы slots
+# и property для определения и защиты атрибутов классов.Создайте класс Device, который будет служить базовым классом
+# для всех устройств в доме. Класс "Device" должен иметь "slots" для защищенных атрибутов "_name", "_location" и
+# "_status"(по умолчанию ON). Для атрибут "_name" создайте свойство только для чтения, а для атрибутов "_location" и
+# "_status" - свойства для чтения и записи. Добавьте метод "turn_on" для изменения статуса устройства на "ON" и метод
+# "turn_off" для изменения статуса на "OFF".Создайте класс Light, который будет наследоваться от класса "Device" и
+# представлять устройства освещения. Для этого определите слоты для атрибутов "_brightness" и "_color". Для атрибута
+# "_brightness" создайте свойство для чтения и записи, а для атрибута "_color" - только для чтения. Создайте класс
+# Thermostat, который будет наследоваться от класса "Device" и представлять устройства управления температурой. В
+# классе Thermostat определите слоты для атрибутов "_current_temperature" и "_target_temperature". Оба атрибута должны
+# управляться свойствами для чтения и записи.Создайте класс SmartTV, который будет наследоваться от класса "Device"
+# и представлять устройства для просмотра телевизионных каналов. В классе SmartTV определите слоты для атрибута
+# "_channel". Создайте свойства для управления чтением и записью атрибута _channel.
+class Data_Desc:
+    def __set_name__(self, owner, name):
+        self.name = '_' + name
+
+    def __get__(self, instance, owner):
+        return getattr(instance, self.name)
+
+    def __set__(self, instance, value):
+        setattr(instance, self.name, value)
+
+
+class None_Data_Desc:
+    def __set_name__(self, owner, name):
+        self.name = '_' + name
+
+    def __get__(self, instance, owner):
+        return getattr(instance, self.name)
+
+
+class Device:
+    __slots__ = "_name", "_location", "_status"
+    name = None_Data_Desc()
+    location = Data_Desc()
+    status = Data_Desc()
+
+    def __init__(self, name, location):
+        self._name = name
+        self.location = location
+        self.status = 'ON'
+
+    def turn_on(self):
+        self.status = 'ON'
+
+    def turn_off(self):
+        self.status = 'OFF'
+
+
+class Light(Device):
+    __slots__ = "_brightness", "_color"
+    brightness = Data_Desc()
+    color = None_Data_Desc()
+
+    def __init__(self, name, location, brightness, color):
+        super().__init__(name, location)
+        self.brightness = brightness
+        self._color = color
+
+
+class Thermostat(Device):
+    __slots__ = "_current_temperature", "_target_temperature"
+    current_temperature = Data_Desc()
+    target_temperature = Data_Desc()
+
+    def __init__(self, name, location, current_temperature, target_temperature):
+        super().__init__(name, location)
+        self.current_temperature = current_temperature
+        self.target_temperature = target_temperature
+
 
+class SmartTV(Device):
+    __slots__ = '_channel'
+    channel = Data_Desc()
+
+    def __init__(self, name, location, channel):
+        super().__init__(name, location)
+        self.channel = channel
+
+
 ################################################################
+class Value:
+    def __set_name__(self, owner, name):
+        self.name = "_" + name
+
+    def __get__(self, instance, owner):
+        return getattr(instance, self.name)
+
+    def __set__(self, instance, value):
+        setattr(instance, self.name, value)
+
+
+class Device:
+    __slots__ = "_name", "_location", "_status"
+    location, status = Value(), Value()
+
+    def __init__(self, *args):
+        self._name, self.location, self.status = (*args, 'ON')
+
+    def turn_on(self):
+        self.status = 'ON'
+
+    def turn_off(self):
+        self.status = 'OFF'
+
+    @property
+    def name(self):
+        return self._name
+
+
+class Light(Device):
+    __slots__ = "_brightness", "_color"
+    brightness = Value()
+
+    def __init__(self, *args):
+        super().__init__(*args[:2])
+        self.brightness, self._color = args[2:]
+
+    @property
+    def color(self):
+        return self._color
+
 
+class Thermostat(Device):
+    __slots__ = "_current_temperature", "_target_temperature"
+    current_temperature, target_temperature = Value(), Value()
+
+    def __init__(self, *args):
+        super().__init__(*args[:2])
+        self.current_temperature, self.target_temperature = args[2:]
+
+
+class SmartTV(Device):
+    __slots__ = "_channel"
+    channel = Value()
+
+    def __init__(self, *args):
+        super().__init__(*args[:2])
+        self.channel = args[2]
+
+
 ################################################################
+# __4.7 Коллекция __slots_____Balakirev
+
+pt1.__sizeof__() + pt1.__dict__.__sizeof__()  # 120
+# если убрать __dict__ тоже весит 32.
+
+pt2.__sizeof__()  # 32
 
+
+# __slots__ имеет такой же id, что и в самом классе, значит, это атрибут уровня класса
+# А __slots__  в pt2 весит 40 сам по себе.  Вот тут я что-то засомневался. Он не занимает память когда не вызывается или как?
 ################################################################
+# Если колекция __slots__ есть в базовом или в дочернем классе, то свойства с именем, которые не указаны в __slots__
+# попадут в колекцию __dict__, а не вызовут ошибку как в случае, если __slots__ есть и в дочернем и базовом классе
+
+class A:
+    pass
+
+
+class B(A):
+    __slots__ = ('c', 'd')
+
+    def __init__(self, c, d):
+        self.c = c
+        self.d = d
+
+
+b = B(3, 5)
+b.a = 8
+print(b.__slots__, b.__dict__)  # ('c', 'd') {'a': 8}
+print(b.a, b.c)  # 8 3
+
 
+# Аналогично, если __slots__ в базовом классе:
+
+class A:
+    __slots__ = ('c', 'd')
+
+
+class B(A):
+    def __init__(self, c, d):
+        self.c = c
+        self.d = d
+
+
+b = B(3, 5)
+b.a = 8
+print(b.__slots__, b.__dict__)  # ('c', 'd') {'a': 8}
+print(b.a, b.c)  # 8 3
+
+
+# __slots__ = ('c', 'd') in A and B
+class A:
+    __slots__ = ('c', 'd')
+
+
+class B(A):
+    __slots__ = ('c', 'd')
+
+    def __init__(self, c, d):
+        self.c = c
+        self.d = d
+
+
+b = B(3, 5)
+b.a = 8  # AttributeError: 'B' object has no attribute 'a'
+
+
 ################################################################
+class Money:
+    __slots__ = '_money',
+
+    def __init__(self, value):
+        self._money = value
+
 
+class MoneyR(Money):
+    pass
+
+
+m = MoneyR(10)
+m.s = 100
+print(m.s)  # 100
+
+
+# коллекция __slots__ накладывает ограничения на атрибуты объектов базового класса Money, но не дочернего класса MoneyR
+# программа выполнится без ошибок, т.к. коллекция __slots__ отсутствует в классе MoneyR, то в его объектах можно
+# создавать любые локальные атрибуты
 ################################################################
+class Money:
+    __slots__ = '_money',
+
+    def __init__(self, value):
+        self._money = value
+
+
+class MoneyR(Money):
+    __slots__ = '_value',
+
 
+m = MoneyR(10)
+m._money = 100
+m._value = 20
+
+
+# если в классе MoneyR прописать __slots__ = '_value', '_money', а в базовом классе убрать определение __slots__, то
+# поведение объекта m дочернего класса MoneyR не изменится
+# программа выполнится без ошибок, так как коллекция __slots__ дочернего класса расширяет коллекцию __slots__ базового
+# класса и атрибуты с именами _money и _value допустимы
 ################################################################
+# Подвиг 4. Объявите класс Person, в объектах которого разрешены только локальные атрибуты с именами (ограничение
+# задается через коллекцию __slots__):_fio - ФИО сотрудника (строка);_old - возраст сотрудника (целое положительное
+# число);_job - занимаемая должность (строка).Сами объекты должны создаваться командой:p = Person(fio, old, job)
+# Создайте несколько следующих объектов этого класса с информацией:Суворов, 52, полководец
+# Рахманинов, 50, пианист, композитор
+# Балакирев, 34, программист и преподаватель
+# Пушкин, 32, поэт и писатель
+# Сохраните все эти объекты в виде списка с именем persons.
+class Person:
+    __slots__ = '_fio', '_job', '_old'
+
+    def __init__(self, fio, old, job):
+        self._fio = fio
+        self._job = job
+        self._old = old
+
 
+text = 'Суворов, 52, полководец\n' \
+       'Рахманинов, 50, пианист, композитор\n' \
+       'Балакирев, 34, программист и преподаватель\n' \
+       'Пушкин, 32, поэт и писатель'
+
+persons = [Person(i, v, k) for i, v, *k in map(lambda x: x.split(','), text.split('\n'))]
+persons = [Person(i[0], i[1], i[1:]) for i in map(lambda x: x.split(','), text.split('\n'))]
+persons = [Person(*i) for i in map(lambda x: x.split(', ', maxsplit=2), text.splitlines())]
+# str.splitlines() делит текст по символу '\n'
+persons = [Person(*x.split(", ", maxsplit=2)) for x in text.splitlines()]
+persons = [*map(lambda row: Person(*row.split(', ', 2)), text.split('\n'))]
+print(persons)  # [<__main__.Person object at 0x000
+
+
 ################################################################
+class Person:
+    __slots__ = "_fio", "_old", "_job"
+
+    def __init__(self, *args):
+        for i, j in enumerate(self.__slots__):
+            self.__setattr__(j, args[i])
 
+
 ################################################################
+# Подвиг 5. Объявите класс Planet (планета), объекты которого создаются командой:
+# p = Planet(name, diametr, period_solar, period)где name - наименование планеты; diametr - диаметр планеты
+# (любое положительное число); period_solar - период (время) обращения планеты вокруг Солнца
+# (любое положительное число); period - период обращения планеты вокруг своей оси (любое положительное число).
+# В каждом объекте класса Planet должны формироваться локальные атрибуты с именами: _name, _diametr, _period_solar,
+# _period и соответствующими значениями.Затем, объявите класс с именем SolarSystem (солнечная система).
+# В объектах этого класса должны быть допустимы, следующие локальные атрибуты
+# (ограничение задается через коллекцию __slots__):_mercury - ссылка на планету Меркурий (объект класса Planet);
+# _venus - ссылка на планету Венера (объект класса Planet);_earth - ссылка на планету Земля (объект класса Planet);.....
+# Объект класса SolarSystem должен создаваться командой:s_system = SolarSystem()и быть только один (одновременно в
+# программе два и более объектов класса SolarSystem недопустимо). Используйте для этого паттерн Singleton.
+# В момент создания объекта SolarSystem должны автоматически создаваться перечисленные локальные атрибуты и
+# ссылаться на соответствующие объекты класса Planet со следующими данными по планетам:
+# Создайте в программе объект s_system класса SolarSystem
+class Planet:
+    def __init__(self, name, diametr, period_solar, period):
+        self._name = name
+        self._period = period
+        self._diametr = diametr
+        self._period_solar = period_solar
+
+
+class SolarSystem:
+    __slots__ = '_mercury', '_venus', '_earth', '_mars', '_jupiter', '_saturn', '_uranus', '_neptune'
+    __instance = None
+
+    def __new__(cls, *args, **kwargs):
+        if not cls.__instance:
+            cls.__instance = super().__new__(cls, *args, **kwargs)
+        return cls.__instance
 
+    def __init__(self):
+        self._mercury = Planet('Меркурий', 4878, 87.97, 1407.5)
+        self._venus = Planet('Венера', 12104, 224.7, 5832.45)
+        self._earth = Planet('Земля', 12756, 365.3, 23.93)
+        self._mars = Planet('Марс', 6794, 687, 24.62)
+        self._jupiter = Planet('Юпитер', 142800, 4330, 9.9)
+        self._saturn = Planet('Сатурн', 120660, 10753, 10.63)
+        self._uranus = Planet('Уран', 51118, 30665, 17.2)
+        self._neptune = Planet('Нептун', 49528, 60150, 16.1)
+
+
+s_system = SolarSystem()
+
 ################################################################
+task = """_mercury - ссылка на планету Меркурий (объект класса Planet);
+_venus - ссылка на планету Венера (объект класса Planet);
+_earth - ссылка на планету Земля (объект класса Planet);
+_mars - ссылка на планету Марс (объект класса Planet);
+_jupiter - ссылка на планету Юпитер (объект класса Planet);
+_saturn - ссылка на планету Сатурн (объект класса Planet);
+_uranus - ссылка на планету Уран (объект класса Planet);
+_neptune - ссылка на планету Нептун (объект класса Planet).""".splitlines()
+
 
+class SolarSystem:
+    __instance = None
+    __slots__ = tuple([a.split(' - ')[0] for a in task])
+
+
 ################################################################
+# Подвиг 6. Объявите класс с именем Star (звезда), в объектах которого разрешены только локальные атрибуты с именами
+# (ограничение задается через коллекцию __slots__):_name - название звезды (строка);
+# _massa - масса звезды (любое положительное число); часто измеряется в массах Солнца;
+# _temp - температура поверхности звезды в Кельвинах (любое положительное число).Объекты этого класса должны
+# создаваться командой:star = Star(name, massa, temp)На основе класса Star объявите следующие дочерние классы:
+# WhiteDwarf - белый карлик;YellowDwarf - желтый карлик;RedGiant - красный гигант;Pulsar - пульсар.
+# В каждом объекте этих классов должны быть разрешены (дополнительно к атрибутам базового класса Star)
+# только следующие локальные атрибуты:_type_star - название типа звезды (строка);_radius - радиус звезды
+# (любое положительное число); часто измеряется в радиусах Солнца.Соответственно, объекты этих классов должны
+# создаваться командой:star = Имя_дочернего_класса(name, massa, temp, type_star, radius)Создайте в программе
+# следующие объекты звезд:RedGiant: Альдебаран; 5; 3600; красный гигант; 45
+# WhiteDwarf: Сириус А; 2,1; 9250; белый карлик; 2
+# WhiteDwarf: Сириус B; 1; 8200; белый карлик; 0,01
+# YellowDwarf: Солнце; 1; 6000; желтый карлик; 1Все эти объекты сохраните в виде списка stars. Затем, с помощью
+# функций isinstance() и filter() сформируйте новый список с именем white_dwarfs, состоящий только из белых карликов
+# (WhiteDwarf).
+class Star:
+    __slots__ = '_name', '_massa', '_temp'
+
+    def __init__(self, name, massa, temp):
+        self._name = name
+        self._massa = massa
+        self._temp = temp
+
+
+class WhiteDwarf(Star):
+    __slots__ = '_type_star', '_radius'
+
+    def __init__(self, name, massa, temp, type_star, radius):
+        super().__init__(name, massa, temp)
+        self._type_star = type_star
+        self._radius = radius
+
+
+class YellowDwarf(Star):
+    __slots__ = '_type_star', '_radius'
 
+    def __init__(self, name, massa, temp, type_star, radius):
+        super().__init__(name, massa, temp)
+        self._type_star = type_star
+        self._radius = radius
+
+
+class RedGiant(Star):
+    __slots__ = '_type_star', '_radius'
+
+    def __init__(self, name, massa, temp, type_star, radius):
+        super().__init__(name, massa, temp)
+        self._type_star = type_star
+        self._radius = radius
+
+
+class Pulsar(Star):
+    __slots__ = '_type_star', '_radius'
+
+    def __init__(self, name, massa, temp, type_star, radius):
+        super().__init__(name, massa, temp)
+        self._type_star = type_star
+        self._radius = radius
+
+
+str_in = """RedGiant: Альдебаран; 5; 3600; красный гигант; 45
+WhiteDwarf: Сириус А; 2,1; 9250; белый карлик; 2
+WhiteDwarf: Сириус B; 1; 8200; белый карлик; 0,01
+YellowDwarf: Солнце; 1; 6000; желтый карлик; 1"""
+
+stars = [globals()[i[0]](*i[1].split('; ')) for line in str_in.splitlines() for i in [line.split(': ')]]
+print(stars)  # [<__main__.RedGiant object at 0x0000018E8CAAB240>, <_...
+white_dwarfs = [*filter(lambda x: isinstance(x, WhiteDwarf), stars)]
+print(white_dwarfs)  # [<__main__.WhiteDwarf object at 0x000001...
+################################################################
+gen = (line.split(': ') for line in str_in.splitlines())
+stars = [globals()[i[0]](*i[1].split('; ')) for i in gen]
 ################################################################
+stars = []
+for el in task2:
+    cls_name, cls_args = el.split(': ')
+    stars.append(globals()[cls_name](*cls_args.split('; ')))
 
+white_dwarfs = [wd for wd in stars if isinstance(wd, WhiteDwarf)]
 
+
 ################################################################
+class Star:
+    __slots__ = '_name', '_massa', '_temp'
+
+    def __init__(self, name, massa, temp):
+        self._name = name
+        self._massa = massa
+        self._temp = temp
+
+
+class Basicstars(Star):
+    __slots__ = '_type_star', '_radius'
+
+    def __init__(self, name, massa, temp, type_star, radius):
+        super().__init__(name, massa, temp)
+        self._type_star = type_star
+        self._radius = radius
+
 
+class WhiteDwarf(Basicstars):    __slots__ = ()
+
+
+class YellowDwarf(Basicstars):    __slots__ = ()
+
+
+class RedGiant(Basicstars):    __slots__ = ()
+
+
+class Pulsar(Basicstars):    __slots__ = ()
+
+
+str_in = """RedGiant: Альдебаран; 5; 3600; красный гигант; 45
+WhiteDwarf: Сириус А; 2,1; 9250; белый карлик; 2
+WhiteDwarf: Сириус B; 1; 8200; белый карлик; 0,01
+YellowDwarf: Солнце; 1; 6000; желтый карлик; 1"""
+
+
+def parse(line):
+    cls, data = line.split(': ')
+    return eval(f'{cls}(*{data.split("; ")})')
+    # return globals()[cls](*data.split("; "))
+
+
+stars = [*map(parse, str_in.splitlines())]
+white_dwarfs = [*filter(lambda x: isinstance(x, WhiteDwarf), stars)]
+
 ################################################################
+from itertools import starmap
+
+
+class Star:
+    __slots__ = '_name', '_massa', '_temp'
+
+    def __init__(self, *args):
+        [setattr(self, attr, value) for attr, value in zip(self.__slots__, args)]
 
+
+class WhiteDwarf(Star):
+    __slots__ = '_type_star', '_radius'
+
+    def __init__(self, *args):
+        super().__init__(args[:3])
+        [setattr(self, attr, value) for attr, value in zip(self.__slots__, args[3:])]
+
+
+class Pulsar(WhiteDwarf):
+    __slots__ = ()
+
+
+class YellowDwarf(WhiteDwarf):
+    __slots__ = ()
+
+
+class RedGiant(WhiteDwarf):
+    __slots__ = ()
+
+
+text = """RedGiant: Альдебаран; 5; 3600; красный гигант; 45
+WhiteDwarf: Сириус А; 2,1; 9250; белый карлик; 2
+WhiteDwarf: Сириус B; 1; 8200; белый карлик; 0,01
+YellowDwarf: Солнце; 1; 6000; желтый карлик; 1"""
+stars = map(lambda line: line.split(': '), text.split('\n'))
+stars = [*starmap(lambda cls, args: globals()[cls](*args.split('; ')), stars)]
+# itertools.starmap(function, iterable) - Применить функцию для каждого кортежа из списка кортежей
+white_dwarfs = [*filter(lambda obj: type(obj) == WhiteDwarf, stars)]
+
+
 ################################################################
+# Подвиг 7. Объявите класс Note (нота), объекты которого создаются командой:
+# note = Note(name, ton)где name - название ноты (допустимые значения: до, ре, ми, фа, соль, ля, си); ton - тональность
+# ноты (целое число). Тональность (ton) принимает следующие целые значения:-1 - бемоль (flat);0 - обычная нота (normal);
+# 1 - диез (sharp).Если в названии (name) или тональности (ton) передаются недопустимые значения, то генерируется
+# исключение командой:raise ValueError('недопустимое значение аргумента')В каждом объекте класса Note должны
+# формироваться локальные атрибуты с именами _name и _ton с соответствующими значениями.Объявите класс с именем Notes,
+# в объектах которого разрешены только локальные атрибуты с именами (ограничение задается через коллекцию __slots__):
+# _do - ссылка на ноту до (объект класса Note);_re - ссылка на ноту ре (объект класса Note);_mi - ссылка на ноту ми
+# (объект класса Note);_fa - ссылка на ноту фа (объект класса Note);_solt - ссылка на ноту соль (объект класса Note);
+# _la - ссылка на ноту ля (объект класса Note);_si - ссылка на ноту си (объект класса Note).Объект класса Notes должен
+# создаваться командой:notes = Notes()и быть только один (одновременно в программе два и более объектов класса
+# Notes недопустимо). Используйте для этого паттерн Singleton. В момент создания объекта Notes должны автоматически
+# создаваться перечисленные локальные атрибуты и ссылаться на соответствующие объекты класса Note (тональность (ton)
+# у всех нот изначально равна 0).Обеспечить возможность обращения к нотам по индексам: 0 - до; 1 - ре; ... ; 6 - си.
+# Например:nota = notes[2]  # ссылка на ноту ми notes[3]._ton = -1 # изменение тональности ноты фа Если указывается
+# недопустимый индекс (не целое число, или число, выходящее за интервал [0; 6]), то генерируется исключение командой:
+# raise IndexError('недопустимый индекс')
+class Note:
+    __сyrillic_notes = ('до', 'ре', 'ми', 'фа', 'соль', 'ля', 'си')
+
+    def __init__(self, name, ton):
+        self._name = name
+        self._ton = ton
+
+    def __setattr__(self, key, value):
+        if key == '_name':
+            if value not in self.__сyrillic_notes:
+                raise ValueError('недопустимое значение аргумента')
+        if key == '_ton':
+            if value not in (0, 1, -1):
+                raise ValueError('недопустимое значение аргумента')
+        super().__setattr__(key, value)
+        # object.__setattr__(self, key, value)
+
+    # @property
+    # def name(self):
+    #     return self._name
+    #
+    # @name.setter
+    # def name(self, value):
+    #     if value not in self.__сyrillic_notes:
+    #         raise ValueError('недопустимое значение аргумента')
+    #     self._name = value
+    #
+    # @property
+    # def ton(self):
+    #     return self._ton
+    #
+    # @ton.setter
+    # def ton(self, value):
+    #     if value not in [0, 1]:
+    #         raise ValueError('недопустимое значение аргумента')
+    #     self._ton = value
+
 
+class Notes:
+    __slots__ = '_do', '_re', '_mi', '_fa', '_solt', '_la', '_si'
+    __сyrillic_notes = 'до', 'ре', 'ми', 'фа', 'соль', 'ля', 'си'
+    __instance = None
+
+    def __new__(cls, *args, **kwargs):
+        if not cls.__instance:
+            cls.__instance = super().__new__(cls, *args, **kwargs)
+        return cls.__instance
+
+    def __del__(self):
+        Notes.__instance = None
+
+    def __init__(self):
+        for k, v in zip(self.__slots__, self.__сyrillic_notes):
+            setattr(self, k, Note(v, 0))
+        # self._do = Note('до', ton=0)
+        # self._re = Note('ре', ton=0)
+        # self._mi = Note('ми', ton=0)
+        # self._fa = Note('фа', ton=0)
+        # self._solt = Note('соль', ton=0)
+        # self._la = Note('ля', ton=0)
+        # self._si = Note('си', ton=0)
+
+    def __getitem__(self, key):
+        if not (0 <= key <= 6):
+            raise IndexError('недопустимый индекс')
+        return getattr(self, self.__slots__[key])
+
+    def __setitem__(self, key, value):
+        if 0 >= value >= 6 or type(value) != int:
+            raise IndexError('недопустимый индекс')
+        setattr(self, self.__slots__[key], value)
+
+
+notes = Notes()
+
+print(notes)  # <__main__.Notes object at ........
+print(notes.__dir__())  # ['__module__', '__slots__', '_Notes__сyrillic...
+print(notes.__slots__)  # ('_do', '_re', '_mi', '_fa', '_solt', '_la', '_si')
+nota = notes[2]
+print(nota._ton)
+notes[3]._ton = -1
+print(notes[3]._ton)
+
+
 ################################################################
+class Note:
+    __slots__ = '_name', '_ton'
+
+    def __init__(self, name, ton):
+        self._name = name
+        self._ton = ton
+
+    def __setattr__(self, key, value):
+        if key == '_name' and value not in ("до", "ре", "ми", "фа", "соль", "ля", "си"):
+            raise ValueError('недопустимое значение аргумента')
+        if key == '_ton' and value not in (-1, 0, 1):
+            raise ValueError('недопустимое значение аргумента')
+        object.__setattr__(self, key, value)
+
+
+class Notes:
+    __slots__ = '_do', '_re', '_mi', '_fa', '_solt', '_la', '_si'
+    _instance = None
+
+    def __new__(cls, *args, **kwargs):
+        if cls._instance is None:
+            cls._instance = object.__new__(cls)
+        return cls._instance
+
+    def __init__(self):
+        for attr, note in zip(self.__slots__, ("до", "ре", "ми", "фа", "соль", "ля", "си")):
+            object.__setattr__(self, attr, Note(note, 0))
 
+    def __getitem__(self, item):
+        if item not in range(0, 7):
+            raise IndexError('недопустимый индекс')
+        return object.__getattribute__(self, self.__slots__[item])
+
+    def __del__(self):
+        self.__class__._instance = None
+
+
 ################################################################
+class Note:
+    note_names = ('до', 'ре', 'ми', 'фа', 'соль', 'ля', 'си')
+    note_tones = (-1, 0, 1)
+
+    def __init__(self, *args):
+        self._name, self._ton = args
+
+    def __setattr__(self, name, v):
+        if name == '_name' and v in self.note_names or name == '_ton' and v in self.note_tones:
+            return super().__setattr__(name, v)
+        raise ValueError('недопустимое значение аргумента')
+
+
+class Notes:
+    __slots__ = '_do', '_re', '_mi', '_fa', '_solt', '_la', '_si'
+
+    # Если нет __init__, он не будет зваться при каждом Notes()
+    def __new__(cls, *args, **kwargs):
+        if not hasattr(cls, '__instance'):
+            cls.__instance = super().__new__(cls)
+            for var, name in zip(cls.__slots__, Note.note_names):
+                setattr(cls.__instance, var, Note(name, 0))
+        return cls.__instance
 
+    def __getitem__(self, key):
+        if 0 <= key < len(self.__slots__):
+            return getattr(self, self.__slots__[key])
+        raise IndexError('недопустимый индекс')
+
+
 ################################################################
+NOTES = {'do': 'до', 're': 'ре', 'mi': 'ми', 'fa': 'фа', 'solt': 'соль', 'la': 'ля', 'si': 'си'}
+
+
+class Note:
+    __slots__ = ('_name', '_ton')
+
+    def __init__(self, name, ton):
+        self._name, self._ton = name, ton
+
+    def __setattr__(self, key, value):
+        if value not in {'_name': set(NOTES.values()), '_ton': {-1, 0, 1}}.get(key, []):
+            raise ValueError('недопустимое значение аргумента')
+        object.__setattr__(self, key, value)
+
+
+class Notes:
+    __obj = None
+    __slots__ = tuple(f'_{k}' for k in NOTES)
 
+    def __new__(cls, *args, **kwargs):
+        if cls.__obj is None:
+            cls.__obj = super().__new__(cls)
+        return cls.__obj
+
+    def __init__(self):
+        for k, v in NOTES.items():
+            setattr(self, f'_{k}', Note(v, 0))
+
+    def __getitem__(self, item):
+        return getattr(self, self.__slots__[item])
+
+
 ################################################################
+class Note:
+    __slots__ = '_name', '_ton'
+    __names__ = 'до,ре,ми,фа,соль,ля,си'.split(',')
+
+    def __init__(self, *args):
+        [setattr(self, attr, value) for attr, value in zip(self.__slots__, args)]
+
+    def __setattr__(self, attr, value):
+        if value not in {'_name': self.__names__, '_ton': (-1, 0, 1)}.get(attr):
+            raise ValueError('недопустимое значение аргумента')
+        super().__setattr__(attr, value)
+
+
+class Notes:
+    __slots__ = '_do', '_re', '_mi', '_fa', '_solt', '_la', '_si'
 
+    def __new__(cls, *args, **kwargs):
+        if not hasattr(cls, '__instance'):
+            cls.__instance = super().__new__(cls)
+        return cls.__instance
+
+    def __init__(self):
+        [setattr(self, a, Note(n, 0)) for a, n in zip(self.__slots__, Note.__names__)]
+
+    def __getitem__(self, key):
+        if key not in range(7):
+            raise IndexError('недопустимый индекс')
+        return getattr(self, self.__slots__[key])
+
+
 ################################################################
+# Подвиг 8 (на повторение). В программе объявлен базовый класс Function (функция) следующим образом: class Function:...
+# Здесь в инициализаторе создаются два локальных атрибута:_amplitude - амплитуда функции;_bias - смещение функции
+# по оси ординат (Oy).Далее, в методе __call__() берется значение функции в точке x через метод _get_function(),
+# который должен быть определен в дочерних классах, умножается на амплитуду функции и добавляется ее смещение.
+# Следующий метод __add__() позволяет менять смещение функции, изменяя атрибут _bias на указанное значение other.
+# Обратите внимание, в методе __add__() происходит создание нового объекта командой:obj = self.__class__(self)
+# Здесь __class__ - это ссылка на класс, к которому относится объект self. Благодаря этому в базовом классе можно
+# создавать объекты соответствующих дочерних классов. В момент создания объекта ему передается параметр self как
+# аргумент. Так будет создаваться копия объекта, т.е. новый объект с тем же набором и значениями локальных атрибутов.
+# Чтобы обеспечить этот функционал, объявите дочерний класс с именем Linear (линейная функция y = k*x + b), объекты
+# которого должны создаваться командами:obj = Linear(k, b)linear = Linear(obj)  # этот вариант используется в
+# базовом классе в методе __add__()В первом случае происходит создание объекта линейной функции с параметрами k и b.
+# Во втором - создание объекта со значениями параметров k и b, взятыми из объекта obj.В каждом объекте класса Linear
+# должны создаваться локальные атрибуты с именами _k и _b с соответствующими значениями.В результате будет создан
+# универсальный базовый класс Function для работы с произвольными функциями от одного аргумента.Применять эти классы
+# можно следующим образом (эти строчки в программе писать не нужно):f = Linear(1, 0.5)
+# Пропишите в базовом классе Function еще один магический метод для изменения масштаба (амплитуды) функции, чтобы
+# был доступен оператор умножения:f = Linear(1, 0.5)
+class Function:
+    def __init__(self):
+        self._amplitude = 1.0  # амплитуда функции
+        self._bias = 0.0  # смещение функции по оси Oy
+
+    def __call__(self, x, *args, **kwargs):
+        return self._amplitude * self._get_function(x) + self._bias
+
+    def _get_function(self, x):
+        raise NotImplementedError('метод _get_function должен быть переопределен в дочернем классе')
+
+    def __add__(self, other):
+        if type(other) not in (int, float):
+            raise TypeError('смещение должно быть числом')
+        # __class__ - это ссылка на класс, к которому относится объект self. Благодаря этому в базовом классе можно
+        # создавать объекты соответствующих дочерних классов. В момент создания объекта ему передается параметр self
+        # как аргумент. Так будет создаваться копия объекта, т.е. новый объект с тем же набором и значениями локальных
+        # атрибутов.
+        obj = self.__class__(self)
+        obj._bias = self._bias + other  # 0+10=10
+        return obj
+
+    def __mul__(self, other):
+        if type(other) not in (int, float):
+            raise TypeError('смещение должно быть числом')
+        obj = self.__class__(self)
+        # obj = __import__('copy').deepcopy(self)
+        obj._amplitude = self._amplitude * other
+        return obj
 
+
+class Linear(Function):
+    def __init__(self, *args):
+        super().__init__()
+        if isinstance(args[0], self.__class__):
+            self._k = args[0]._k
+            self._b = args[0]._b
+        else:
+            self._k = args[0]
+            self._b = args[1]
+
+    def _get_function(self, x):
+        return self._k * x + self._b
+
+
+f = Linear(1, 0.5)
+f2 = f + 10  # изменение смещения (атрибут _bias)
+# print(f2)  # self._bias 0+10=10
+y1 = f(0)  # 0.5
+print(y1)  # 0.5
+y2 = f2(0)  # 10.5
+print(y2)
+f = Linear(1, 0.5)
+f2 = f * 5  # изменение амплитуды (атрибут _amplitude)
+y1 = f(0)  # 0.5
+y2 = f2(0)  # 2.5
+print(y2)
+####################################################################
+class Linear(Function):
+
+    # в этом инициализаторе надо предусмотреть, что на вход может подаваться либо два числа
+    # либо экземпляр класса, из которого надо выудить эти два числа
+    def __init__(self, *args):
+        super().__init__()
+        if isinstance(args[0], self.__class__):
+            self._k = args[0]._k
+            self._b = args[0]._b
+        else:
+            self._k = args[0]
+            self._b = args[1]
+
+
 ################################################################
+class Linear(Function):
+    def __init__(self, *args):
+        super().__init__()
+        if len(args) == 2 and type(args[0]) in (int, float) and type(args[1]) in (int, float):
+            self._k = args[0]
+            self._b = args[1]
+
+        elif type(args[0]) == Linear:
+            self._k = args[0]._k
+            self._b = args[0]._b
 
+
 ################################################################
+class Linear(Function):
+    def __init__(self, *args):
+        super().__init__()
+        try:
+            self._k = args[0]
+            self._b = args[1]
+        except AttributeError:
+            self._k = args[0]._k
+            self._b = args[0]._b
+
 
 ################################################################
+class Function:
+    def __init__(self):
+        self._amplitude = 1.0  # амплитуда функции
+        self._bias = 0.0  # смещение функции по оси Oy
+
+    def __call__(self, x, *args, **kwargs):
+        return self._amplitude * self._get_function(x) + self._bias
+
+    def _get_function(self, x):
+        raise NotImplementedError('метод _get_function должен быть переопределен в дочернем классе')
+
+    def __add__(self, other):
+        if type(other) not in (int, float):
+            raise TypeError('смещение должно быть числом')
+
+        obj = self.__class__(self)  # без self.__class__(self._k, self._b)!!
+        obj._bias = self._bias + other
+        return obj
+
+    def __mul__(self, other):
+        if type(other) not in (int, float):
+            raise TypeError('смещение должно быть числом')
+        obj = self.__class__(self)
+        obj._amplitude = self._amplitude * other
+        return obj
+
+
+class Linear(Function):
+    def __init__(self, *args):
+        super().__init__()
+        self._k, self._b = args if len(args) > 1 else (args[0]._k, args[0]._b)
 
+    def _get_function(self, x):
+        return self._k * x + self._b
 ################################################################
 
 ################################################################
