@@ -6784,7 +6784,7 @@ class Function:
             raise TypeError('смещение должно быть числом')
         obj = self.__class__(self)
         # obj = __import__('copy').deepcopy(self)
-        obj._amplitude = self._amplitude * other
+        obj._amplitude *= other
         return obj
 
 
@@ -6814,6 +6814,8 @@ f2 = f * 5  # изменение амплитуды (атрибут _amplitude)
 y1 = f(0)  # 0.5
 y2 = f2(0)  # 2.5
 print(y2)
+
+
 ####################################################################
 class Linear(Function):
 
@@ -6889,8 +6891,18 @@ class Linear(Function):
 
     def _get_function(self, x):
         return self._k * x + self._b
-################################################################
 
+
+################################################################
+class Shop:
+    ID_SHOP_ITEM = 0
+
+
+sp = Shop()
+sp.ID_SHOP_ITEM += 1
+print(Shop.ID_SHOP_ITEM)  # 0
+# в строчке sp.ID_SHOP_ITEM += 1 создается новая локальная переменная ID_SHOP_ITEM со значением 1
+# Чтобы менялся атрибут класса, можно прописать sp.__class__.ID_SHOP_ITEM += 1 или Shop.ID_SHOP_ITEM += 1
 ################################################################
 
 ################################################################
