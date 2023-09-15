@@ -602,7 +602,7 @@ class Point:
         except AttributeError:
             return f"Атрибут с именем {item} не существует"
 
-
+#
 pt = Point(1, 2)
 print(pt.z)
 
