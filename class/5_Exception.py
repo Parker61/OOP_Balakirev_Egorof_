@@ -602,6 +602,7 @@ class Point:
         except AttributeError:
             return f"Атрибут с именем {item} не существует"
 
+
 #
 pt = Point(1, 2)
 print(pt.z)
@@ -2922,6 +2923,8 @@ with BoxDefender(box) as b:
     b.add_thing(("зонт", 346.6))
     b.add_thing(("шина", 500))
     ...
+
+
 ############################################################
 class PrinterError(Exception):
     """Класс общих ошибок принтера"""
@@ -2941,7 +2944,170 @@ except (PrinterConnectionError, PrinterPageError) as e:
     print(e)
 except PrinterError as e:
     print(e)
-    #при возникновении исключений PrinterConnectionError или PrinterPageError выполнение программы перейдет в блок
+    # при возникновении исключений PrinterConnectionError или PrinterPageError выполнение программы перейдет в блок
     # except с этими двумя классами
-    #при выполнении программы на экране будет отображена строка "соединение с принтером отсутствует"
+    # при выполнении программы на экране будет отображена строка "соединение с принтером отсутствует"
 ########################################################
+# _________Менеджер контекста для открытия соединения к базе данных
+# В качестве примера разберем базу данных sqlite3. программа подключения к БД без менеджера контекста:
+import sqlite3
+
+try:
+    con = sqlite3.connect("mydb.sqlite")
+except sqlite3.Error as er:
+    print("Error connecting to database:", er)
+
+cur = con.cursor()
+sql_query = "INSERT INTO user VALUES(?, ?)"
+sql_data = ("John", "MacDonald")
+
+try:
+    cur.execute(sql_query, sql_data)
+    con.commit()
+except sqlite3.Error as er:
+    print('SQLite error: %s' % (' '.join(er.args)))
+    print("Exception class is: ", er.__class__)
+    print('SQLite traceback: ')
+finally:
+    con.close()
+# Теперь перепишем код через контекстный менеджер, для это создадим класс DatabaseManager.
+# В этом примере контекстный менеджер открывает базу данных "mydb.sqlite" и выполняет запрос на вставку записи в
+# таблицу "user". Если произойдет ошибка при подключении к базе данных, выводится соответствующее сообщение.
+# Если при работе с базой данных возникнут другие ошибки, они отлавливаются и выводится сообщение об ошибке с их
+# описанием. После окончания работы контекстного менеджера соединение с базой данных автоматически закрывается.
+import sqlite3
+
+
+class DatabaseManager:
+    def __init__(self, db_name):
+        self.db_name = db_name
+
+    def __enter__(self):
+        try:
+            self.conn = sqlite3.connect(self.db_name)
+        except sqlite3.Error as e:
+            print("Error connecting to database:", e)
+            return None
+        else:
+            return self.conn
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        try:
+            self.conn.close()
+        except AttributeError:
+            print("Database connection not established")
+        except sqlite3.Error as e:
+            print("An error occurred while closing the database connection: ", e)
+
+
+with DatabaseManager("mydb.sqlite") as conn:
+    if conn:
+        cur = conn.cursor()
+        sql_query = "INSERT INTO user VALUES(?, ?)"
+        sql_data = ("John", "MacDonald")
+        cur.execute(sql_query, sql_data)
+        conn.commit()
+###################################################################################
+# Как и любой другой класс, менеджер контекста может сохранять в атрибутах некоторое внутреннее
+# состояние. В следующем примере показано, как создать менеджер контекста для измерения времени выполнения блока кода
+# или функции:
+
+import time
+
+
+def calculate():
+    for i in range(1000000):
+        2 ** 2123
+
+
+class Timer:
+    def __enter__(self):
+        self.start = time.time()  # запись и созр значения
+        self.end = 0.0
+        return lambda: self.end - self.start
+
+    def __exit__(self, *args):
+        self.end = time.time()  # запись значения  и сохр его перед выходом из менеджера контекста
+
+
+with Timer() as my_timer:
+    time.sleep(0.6)
+print(my_timer())  # вызов lambda и выч-е со всеми сохр ранее значениями self.end - self.start
+
+with Timer() as my_timer2:
+    time.sleep(1.5)
+print(my_timer2())
+
+with Timer() as timer_calc:
+    calculate()
+print(timer_calc())
+# Как только блок with заканчивается, вызывается метод __exit__(). Метод получает время в конце блока и обновляет
+# значение атрибута .end, чтобы лямбда-функция могла вычислить время, необходимое для запуска блока кода with.
+
+# my_timer() - это вызов лямбда-функции, возвращенной методом __enter__() менеджера контекста Timer. При создании
+# менеджера контекста с помощью with Timer() as my_timer, метод __enter__() устанавливает начальное время в атрибуте
+# self.start = time.time(), а затем возвращает лямбда-функцию lambda: self.end - self.start, которая будет вызвана
+# после завершения блока кода with. Вызов my_timer() возвращает результат выполнения этой лямбда-функции, то есть
+# разницу между self.end и self.start, то есть время, прошедшее во время выполнения блока кода with.
+
+# почему перемененные my_timer сохраняются после закрытия with-
+# ты открыл файл - присвоил содержимому переменную, во избежание повреждения файла ты его закрыл (вышел из менеджера
+# контекста), а с содержимым продолжил дальше работать. Это еще и экономия памяти, не нужно держать файл в буфере,
+# а если еще и содержимое сохранил в итератор, то просто невероятный профит.
+# my_timer не перестает существовать. Метод __exit__ не уничтожает объект, а всего лишь присваивает атрибуту .end значение времени, когда вызывался метод. Вас, вероятно, вводит в заблуждение механизм работы __exit__ у дескрипторов файла и соединения баз данных из прошлых примеров, которые закрываются  по выходу из менеджера. Здесь такого нет.
+#
+# with Timer() as my_timer - создает инстанс и присваивает результат его метода __enter__ переменной my_timer
+# исполнение какого-то кода присваивает атрибуту инстанса время на момент исполнения __exit__.
+# При этом по завершению работы менеджера инстанс Timer никуда не пропадает из памяти, как не пропадают и его атрибуты
+# .start и .end, к которым остается доступ у анонимной функии. Только не скажу из-за замыкания или просто потому что
+# объект существует.
+
+# лямбда-функция вызывается после __exit__ потому что мы ее вернули в enter и она сохранилась в my_timer, а дальше
+# мы уже вызываем ее и получаем результат работы.
+#####################################################################
+#_____Создание контекстных менеджеров на основе функций
+#функция используется для создания контекстного менеджера-contextlib.contextmanager()
+# Есть альтернативный и удобный способ реализации протокола управления контекстом: использовать функцию генератора и
+# декоратор @contextmanager из встроенного модуля contextlib. Вам всего лишь нужно задекорировать соответствующим
+# образом функцию-генератор с помощью @contextmanager и вы получите контекстный менеджер. При этом @contextmanager
+# автоматически предоставит оба требуемых метода __enter__() и __exit__().
+from contextlib import contextmanager
+
+
+@contextmanager
+def my_context_manager():
+    print("Начало контекстного менеджера ...")
+    yield "Ух ты как круто!"
+    print("Конец контекстного менеджера...")
+
+
+with my_context_manager() as phrase:
+    print(phrase)
+#Начало контекстного менеджера ...
+# Ух ты как круто!
+# Конец контекстного менеджера...
+
+########################################################################
+# пример обработки подключения к БД mysql.
+# Обратите внимание на блок try-finally. В нем мы пытаемся вернуть объект conn в менеджер контекста блока with и
+# вызываем метод .close()
+import os
+import contextlib
+import mysql.connector
+
+
+@contextlib.contextmanager
+def get_mysql_conn(db):
+    """
+    Context manager to automatically close DB connection.
+    We retrieve credentials from Environment variables
+    """
+    conn = mysql.connector.connect(
+        host=os.environ.get('MYSQL_HOST'),
+        user=os.environ.get('MYSQL_USER'),
+        password=os.environ.get('MYSQL_PWD'), database=db)
+
+    try:
+        yield conn
+    finally:
+        conn.close()
